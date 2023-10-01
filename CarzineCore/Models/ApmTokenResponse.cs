@@ -1,4 +1,4 @@
-﻿namespace Carzine.Models
+﻿namespace CarzineCore.Models
 {
 	public class ApmTokenResponse
 	{

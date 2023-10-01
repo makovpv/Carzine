@@ -21,11 +21,31 @@ table tr:nth-child(even) {
 </div>
 <div>
   <table>
+	<tr>
+		<th>Source</th>
+		<th>Name</th>
+		<th>Manufacturer</th>
+		<th>Part Number</th>
+		<th>Price RUB</th>
+		<th>Weight</th>
+		<th>Volume</th>
+		<th>Delivery-min</th>
+		<th>Delivery-max</th>
+		<th>Count min</th>
+		<th>Count max</th>
+	</tr>
 	<tr *ngFor="let x of myRes">
+		<td>{{x.source}}</td>
 		<td>{{x.name}}</td>
-		<td>{{x.make}}</td>
-		<td>{{x.priceName}}</td>
-		<td>{{x.price}}</td>
+		<td>{{x.manufacturer}}</td>
+		<td>{{x.partNumber}}</td>
+		<td>{{x.priceRub}}</td>
+		<td>{{x.weight}}</td>
+		<td>{{x.volume}}</td>
+		<td>{{x.deliveryMin}}</td>
+		<td>{{x.deliveryMax}}</td>
+		<td>{{x.minOrderAmount}}</td>
+		<td>{{x.maxOrderAmount}}</td>
 	</tr>
   </table>
 </div>

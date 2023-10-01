@@ -4,22 +4,42 @@ namespace CarzineCore
 {
 	public class CarzineCalculator
 	{
-		public List<ProductModel> MakePrice(List<ApmProduct> apmProducts)
-		{
-			var result = new List<ProductModel>();
+		private readonly DataCollector _dataCollector = new DataCollector();
 
-			foreach (var apmProduct in apmProducts)
+		public CarzineCalculator()
+		{
+			
+		}
+
+		public async Task<List<StandardProductModel>> CalcPriceRubAsync(List<StandardProductModel> products)
+		{
+			var usdRate = await _dataCollector.GetCbrCursAsync("USD");
+
+			var result = products.ToList();
+
+			foreach (var product in result)
 			{
-				result.Add(new ProductModel()
-				{
-					Name = apmProduct.name,
-					Price = apmProduct.price + 100,
-					Make = apmProduct.make,
-					PriceName = apmProduct.priceName,
-				});
+				product.PriceRub = GetChargedPrice(product.Price) * usdRate;
 			}
 			
 			return result;
+		}
+
+		private decimal GetChargedPrice(decimal price)
+		{
+			if (price <= 0)
+				throw new Exception("Price cannot be equal or less than 0");
+			
+			if (price <= 10)
+				return price * 5;
+			else if (price <= 50)
+				return price * 4;
+			else if (price <= 120)
+				return price * 3;
+			else if (price <= 1000)
+				return price * 2;
+			else
+				return price * (decimal)1.7;
 		}
 	}
 }

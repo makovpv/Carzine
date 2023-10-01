@@ -7,7 +7,7 @@ import { Component, Inject } from '@angular/core';
 })
 export class HomeComponent {
   myRes: any;
-  searchCode: string = "101";
+  searchCode: string = "31126753992";
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
 

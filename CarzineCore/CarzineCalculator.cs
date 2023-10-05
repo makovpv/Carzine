@@ -4,8 +4,6 @@ namespace CarzineCore
 {
 	public class CarzineCalculator
 	{
-		private readonly DataCollector _dataCollector = new DataCollector();
-
 		public CarzineCalculator()
 		{
 			
@@ -13,7 +11,7 @@ namespace CarzineCore
 
 		public async Task<List<StandardProductModel>> CalcPriceRubAsync(List<StandardProductModel> products)
 		{
-			var usdRate = await _dataCollector.GetCbrCursAsync("USD");
+			var usdRate = await DataCollector.GetCbrCursAsync("USD");
 
 			var result = products.ToList();
 

@@ -13,7 +13,7 @@ namespace CarzineCore
 {
 	public class DataCollector
 	{
-		public async Task<decimal> GetCbrCursAsync(string currencyCode = "USD")
+		public static async Task<decimal> GetCbrCursAsync(string currencyCode = "USD")
 		{
 			var client = new CbrDailyInfo.DailyInfoSoapClient(new CbrDailyInfo.DailyInfoSoapClient.EndpointConfiguration());
 
@@ -32,16 +32,47 @@ namespace CarzineCore
 			return resultFFF;
 		}
 
-		public static async Task<IEnumerable<StandardProductModel>> GetEmexDataAsync(string detailNum, ApiCredentials apiCredentials)
+		public static void CreateClient()
+		{
+			var client = new EmexServiceReference.ServiceSoapClient(new EmexServiceReference.ServiceSoapClient.EndpointConfiguration());
+		}
+
+		public static async Task<string> GetCustomer(ApiCredentials apiCredentials)
 		{
 			var client = new EmexServiceReference.ServiceSoapClient(new EmexServiceReference.ServiceSoapClient.EndpointConfiguration());
 
-			var customer = await client.LoginAsync(new EmexServiceReference.Customer() {
+			var customer = await client.LoginAsync(new EmexServiceReference.Customer()
+			{
 				UserName = apiCredentials.username,
 				Password = apiCredentials.password
 			});
 
-			var bbb = await client.SearchPartAsync(customer, detailNum, true);
+			return customer.CustomerId;
+		}
+
+		public static async Task<IEnumerable<StandardProductModel>> GetEmexDataAsync(string detailNum, ApiCredentials apiCredentials)
+		{
+			EmexServiceReference.ServiceSoapClient client;
+			EmexServiceReference.Customer customer = null;
+			
+			client = new EmexServiceReference.ServiceSoapClient(new EmexServiceReference.ServiceSoapClient.EndpointConfiguration());
+
+			try
+			{
+				customer = await client.LoginAsync(new EmexServiceReference.Customer()
+				{
+					UserName = apiCredentials.username,
+					Password = apiCredentials.password
+				});
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("M2" + ex.Message);
+			}
+
+			EmexServiceReference.FindByNumber[] bbb;
+
+			bbb = await client.SearchPartAsync(customer, detailNum, true);
 
 			_ = client.CloseAsync();
 
@@ -81,13 +112,25 @@ namespace CarzineCore
 			return mm.RootElement.mainProducts.ToStandard();
 		}
 
+		public static async Task<List<StandardProductModel>> GetDataSingleSourceAsync(string detailCode, ApiCredentials apmCreds)
+		{
+			var res = await GetApmDataAsync(detailCode, apmCreds);
+			return res.ToList();
+		}
+
 		public static async Task<List<StandardProductModel>> GetDataMultipleSourceAsync(string detailCode, ApiCredentials apmCreds, ApiCredentials emexCreds)
 		{
 			var result = new List<StandardProductModel>();
 
-			result.AddRange(await GetApmDataAsync(detailCode, apmCreds));
+			var tasks = new Task<IEnumerable<StandardProductModel>>[2] {
+				GetApmDataAsync(detailCode, apmCreds),
+				GetEmexDataAsync(detailCode, emexCreds)
+			};
 
-			result.AddRange(await GetEmexDataAsync(detailCode, emexCreds));
+			var products = await Task.WhenAll(tasks);
+
+			result.AddRange(products[0]);
+			result.AddRange(products[1]);
 
 			return result;
 		}

@@ -12,13 +12,38 @@ table tr:nth-child(odd) {
 table tr:nth-child(even) {
   background-color: #ffffff;
 }
+
+.product-card {
+	border: solid 2px green;
+	margin: 16px 16px 16px 0;
+	padding: 8px;
+	border-radius: 8px;
+	width: 300px;
+}
 </style>
 
 <div>
   <label>Code</label>
   <input type="text" [(ngModel)]="searchCode">
-  <button (click)="search()">Search</button>
+  <button (click)="search1()">Search 1</button>
+  <button (click)="search2()">Search 2</button>
+  <span style="color: red;" *ngIf="inProgress">Wait...</span>
 </div>
+<div style="display: flex;">
+	<div class="product-card">
+		<strong>Best Price</strong>
+		<div>Manufacturer: {{searchResult.bestPrice?.manufacturer}}</div>
+		<div>Price, rub: {{searchResult.bestPrice?.priceRub | number: '1.0-0'}}</div>
+		<div>Delivery, days: {{searchResult.bestPrice?.deliveryMin}}</div>
+	</div>
+	<div class="product-card">
+		<strong>Express delivery</strong>
+		<div>Manufacturer: {{searchResult.expressDelivery?.manufacturer}}</div>
+		<div>Price, rub: {{searchResult.expressDelivery.priceRub | number: '1.0-0'}}</div>
+		<div>Delivery, days: {{searchResult.expressDelivery?.deliveryMin}}</div>
+	</div>
+</div>
+
 <div>
   <table>
 	<tr>
@@ -34,12 +59,12 @@ table tr:nth-child(even) {
 		<th>Count min</th>
 		<th>Count max</th>
 	</tr>
-	<tr *ngFor="let x of myRes">
+	<tr *ngFor="let x of searchResult.products">
 		<td>{{x.source}}</td>
 		<td>{{x.name}}</td>
 		<td>{{x.manufacturer}}</td>
 		<td>{{x.partNumber}}</td>
-		<td>{{x.priceRub}}</td>
+		<td>{{x.priceRub | number: '1.0-0'}}</td>
 		<td>{{x.weight}}</td>
 		<td>{{x.volume}}</td>
 		<td>{{x.deliveryMin}}</td>

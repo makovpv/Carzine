@@ -1,8 +1,14 @@
+using CarzineCore;
+using CarzineCore.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSingleton<IApiDataService, ApiDataService>();
+builder.Services.AddSingleton<IDbDataService, DbDataService>();
 
 var app = builder.Build();
 

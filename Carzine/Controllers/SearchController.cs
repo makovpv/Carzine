@@ -1,5 +1,6 @@
 ﻿using Carzine.Models;
 using CarzineCore;
+using CarzineCore.Interfaces;
 using CarzineCore.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,29 +10,28 @@ namespace Carzine.Controllers
 	[Route("[controller]")]
 	public class SearchController : ControllerBase
 	{
-		private readonly ApiCredentials _apiApm;
-		private readonly ApiCredentials _apiEmex;
 
 		private readonly ILogger<SearchController> _logger;
 
-		public SearchController(ILogger<SearchController> logger, IConfiguration config)
+		private readonly IApiDataService _apiDataService;
+
+		public SearchController(ILogger<SearchController> logger, IConfiguration config, IApiDataService apiDataService)
 		{
 			_logger = logger;
-			
-			_apiApm = config.GetSection("apmApi").Get<ApiCredentials>();
-			_apiEmex = config.GetSection("emexApi").Get<ApiCredentials>();
+
+			_apiDataService = apiDataService;
 		}
 
 		[HttpGet]
 		public async Task<IActionResult> Get(string code, int mode = 1)
 		{
-			List<StandardProductModel> result;
+			IEnumerable<StandardProductModel> result;
 			
 			try
 			{
 				result = mode == 1 ?
-				await DataCollector.GetDataSingleSourceAsync(code, _apiApm) :
-				await DataCollector.GetDataMultipleSourceAsync(code, _apiApm, _apiEmex);
+					await _apiDataService.GetDataSingleSourceAsync(code) :
+					await _apiDataService.GetDataMultipleSourceAsync(code);
 			}
 			catch (Exception ex)
 			{
@@ -44,7 +44,7 @@ namespace Carzine.Controllers
 
 			var myLogic = new CarzineCalculator();
 
-			var products = await myLogic.CalcPriceRubAsync(result);
+			var products = await myLogic.CalcPriceRubAsync(result.ToList());
 
 			return StatusCode(
 				StatusCodes.Status200OK, 

@@ -12,4 +12,8 @@ export class OrderService {
   preOrder(data: PreOrderModel): Promise<any> {
     return this.http.post(this.baseUrl+'order/preorder', data).toPromise();
   }
+
+  getPreOrders(): Promise<any> {
+    return this.http.get(this.baseUrl+'order/preorder').toPromise();
+  }
 }

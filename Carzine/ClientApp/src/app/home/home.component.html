@@ -1,18 +1,4 @@
 <style>
-table, th , td {
-  border: 1px solid grey;
-  border-collapse: collapse;
-  padding: 5px;
-}
-
-table tr:nth-child(odd) {
-  background-color: #f1f1f1;
-}
-
-table tr:nth-child(even) {
-  background-color: #ffffff;
-}
-
 .product-card {
 	border: solid 2px green;
 	margin: 16px 16px 16px 0;
@@ -42,9 +28,8 @@ table tr:nth-child(even) {
 <div id="search">
   <label>Code</label>
   <input type="text" [(ngModel)]="searchCode">
-  <button mat-stroked-button color="primary" (click)="search1()">Search 1</button>
-  <button mat-stroked-button color="primary" (click)="search2()">Search 2</button>
-  <span style="color: red;" *ngIf="inProgress">Wait...</span>
+  <button mat-stroked-button color="primary" (click)="search1()" [disabled]="inProgress">Search 1</button>
+  <button mat-stroked-button color="primary" (click)="search2()" [disabled]="inProgress">Search 2</button>
 </div>
 <div style="display: flex;">
 	<div class="product-card">
@@ -61,14 +46,23 @@ table tr:nth-child(even) {
 			<strong>Express delivery</strong>
 		</div>
 		<div>Manufacturer: {{searchResult.expressDelivery?.manufacturer}}</div>
-		<div>Price, rub: {{searchResult.expressDelivery.priceRub | number: '1.0-0'}}</div>
+		<div>Price, rub: {{searchResult.expressDelivery?.priceRub | number: '1.0-0'}}</div>
 		<div>Delivery, days: {{searchResult.expressDelivery?.deliveryMin}}</div>
 		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.expressDelivery)">Order</button>
+	</div>
+	<div class="product-card">
+		<div class="product-card-title">
+			<strong>Optimal</strong>
+		</div>
+		<div>Manufacturer: {{searchResult.optimal?.manufacturer}}</div>
+		<div>Price, rub: {{searchResult.optimal?.priceRub | number: '1.0-0'}}</div>
+		<div>Delivery, days: {{searchResult.optimal?.deliveryMin}}</div>
+		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.optimal)">Order</button>
 	</div>
 </div>
 
 <div>
-  <table>
+  <table *ngIf="!inProgress">
 	<tr>
 		<th>Source</th>
 		<th>Name</th>
@@ -96,19 +90,7 @@ table tr:nth-child(even) {
 		<td>{{x.maxOrderAmount}}</td>
 	</tr>
   </table>
+
+  <mat-spinner *ngIf="inProgress"></mat-spinner>
+
 </div>
-
-<!-- <form #myForm="ngForm"> -->
-
-<!-- </form> -->
-
-<!-- https://www.freakyjolly.com/angular-material-dialog-example-fullscreen-confirm-paleness/ -->
-
-<!-- <ng-template #dialogRef let-mydata>
-	<span>Phone</span>
-	<input>
-	<button mat-stroked-button mat-dialog-close="MMMMMM">Ok</button>
-	<button mat-stroked-button mat-dialog-close="MMMMMM">Cancel</button>
-</ng-template> -->
-
-

@@ -21,7 +21,7 @@ namespace CarzineCore
 				Name = product.name,
 				PartNumber = product.code,
 				Manufacturer = product.make,
-				Price = product.price,
+				Price = Math.Round(product.price),
 				MaxOrderAmount = product.available,
 				MinOrderAmount = product.minLot,
 				Weight = product.weight,
@@ -36,14 +36,32 @@ namespace CarzineCore
 			return products.Select(product => new StandardProductModel()
 			{
 				DeliveryMax = Convert.ToInt32(product.GuaranteedDay),
+				DeliveryMin = Convert.ToInt32(product.Delivery),
 				Volume = Convert.ToDecimal(product.VolumeAdd),
 				Weight = Convert.ToDecimal(product.WeightGr / 1000.0),
-				Price = Convert.ToDecimal(product.Price),
+				Price = Math.Round(Convert.ToDecimal(product.Price)),
 				MaxOrderAmount = Convert.ToInt32(product.Available),
 				Manufacturer = product.MakeName,
 				Name = product.PartNameRus,
 				PartNumber = product.DetailNum,
 				Source = "Emex"
+			});
+		}
+
+		public static IEnumerable<StandardProductModel> ToStandard(this ApecProduct[] products)
+		{
+			return products.Select(product => new StandardProductModel()
+			{
+				DeliveryMax = product.DeliveryDays,
+				DeliveryMin = product.DeliveryDays,
+				Volume = product.WeightVolume,
+				Weight = product.WeightPhysical,
+				Price = Math.Round(product.Price),
+				MaxOrderAmount = product.QtyInStock,
+				Manufacturer = product.Brand,
+				Name = product.PartDescription,
+				PartNumber = product.PartNumber,
+				Source = "Apec"
 			});
 		}
 	}

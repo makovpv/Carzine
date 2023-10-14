@@ -8,6 +8,8 @@ namespace Carzine.Models
 
         public StandardProductModel? ExpressDelivery { get; set; }
 
+        public StandardProductModel? Optimal { get; set; }
+
         public IEnumerable<StandardProductModel>? Products { get; set; }
     }
 }

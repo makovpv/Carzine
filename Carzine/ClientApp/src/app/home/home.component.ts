@@ -30,7 +30,6 @@ export class HomeComponent {
   search1() {
     console.log(this.searchCode);
 
-    this.searchResult = new ProductSearchResultModel();
     this.inProgress = true;
 
     this.searchService.search(this.searchCode, 1)
@@ -47,7 +46,6 @@ export class HomeComponent {
 
   search2() {
     this.inProgress = true;
-    this.searchResult = new ProductSearchResultModel();
 
     this.searchService.search(this.searchCode, 2)
       .then((result: ProductSearchResultModel) => {

@@ -1,0 +1,18 @@
+<div>
+  <table>
+    <tr>
+        <th>Phone</th>
+        <th>Part Number</th>
+        <th>Manufacturer</th>
+        <th>Price RUB</th>
+        <th>Delivery-min</th>
+    </tr>
+    <tr *ngFor="let x of preOrders">
+        <td>{{x.phone}}</td>
+        <td>{{x.partNumber}}</td>
+        <td>{{x.manufacturer}}</td>
+        <td>{{x.priceRub | number: '1.0-0'}}</td>
+        <td>{{x.deliveryMin}}</td>
+    </tr>
+  </table>
+</div>

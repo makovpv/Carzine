@@ -23,6 +23,21 @@ namespace CarzineCore
 			return result;
 		}
 
+		public StandardProductModel GetOptimalProduct(List<StandardProductModel> products)
+		{
+			// need for tests!!
+
+			var prices = products.Select(x => x.PriceRub).Distinct().ToArray();
+			Array.Sort(prices);
+
+			var delivery = products.Select(x => x.DeliveryMin).Distinct().ToArray();
+			Array.Sort(delivery);
+
+			var rrrr = products.MinBy(x => (Array.IndexOf(prices, x.PriceRub) + Array.IndexOf(delivery, x.DeliveryMin)) / 2.0);
+
+			return rrrr;
+		}
+
 		private decimal GetChargedPrice(decimal price)
 		{
 			if (price <= 0)

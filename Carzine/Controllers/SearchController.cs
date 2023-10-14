@@ -52,7 +52,8 @@ namespace Carzine.Controllers
 				{
 					Products = products,
 					BestPrice = products.MinBy(x => x.PriceRub),
-					ExpressDelivery = products.MinBy(x => x.DeliveryMin)
+					ExpressDelivery = products.MinBy(x => x.DeliveryMin),
+					Optimal = myLogic.GetOptimalProduct(products)
 				});
 
 		}

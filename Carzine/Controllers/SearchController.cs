@@ -46,7 +46,7 @@ namespace Carzine.Controllers
 				StatusCodes.Status200OK,
 				new SearchResultViewModel()
 				{
-					Products = products,
+					Products = products.FillEmptyNames(),
 					BestPrice = products.MinBy(x => x.PriceRub),
 					ExpressDelivery = products.MinBy(x => x.DeliveryMin),
 					Optimal = myLogic.GetOptimalProduct(products)

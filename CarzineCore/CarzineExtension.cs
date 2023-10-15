@@ -65,5 +65,20 @@ namespace CarzineCore
 				IsOriginal = originalBrandName == product.Brand
 			});
 		}
+
+		public static IEnumerable<StandardProductModel> FillEmptyNames(this List<StandardProductModel> products)
+		{
+			var defaultName = products.FirstOrDefault(x => !string.IsNullOrEmpty(x.Name))?.Name;
+
+			if (string.IsNullOrEmpty(defaultName))
+				return products;
+
+			foreach (var product in products.Where(x => string.IsNullOrEmpty(x.Name)))
+			{
+				product.Name = defaultName;
+			}
+
+			return products;
+		}
 	}
 }

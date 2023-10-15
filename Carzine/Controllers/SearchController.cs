@@ -10,12 +10,11 @@ namespace Carzine.Controllers
 	[Route("[controller]")]
 	public class SearchController : ControllerBase
 	{
-
 		private readonly ILogger<SearchController> _logger;
 
 		private readonly IApiDataService _apiDataService;
 
-		public SearchController(ILogger<SearchController> logger, IConfiguration config, IApiDataService apiDataService)
+		public SearchController(ILogger<SearchController> logger, IApiDataService apiDataService)
 		{
 			_logger = logger;
 
@@ -23,19 +22,16 @@ namespace Carzine.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Get(string code, int mode = 1)
+		public async Task<IActionResult> Get(string code, bool analog)
 		{
 			IEnumerable<StandardProductModel> result;
 			
 			try
 			{
-				result = mode == 1 ?
-					await _apiDataService.GetDataSingleSourceAsync(code) :
-					await _apiDataService.GetDataMultipleSourceAsync(code);
+				result = await _apiDataService.GetDataMultipleSourceAsync(code, analog);
 			}
 			catch (Exception ex)
 			{
-				_logger.LogInformation("******");
 				_logger.LogInformation(ex.Message);
 				_logger.LogError(ex.StackTrace);
 				
@@ -47,7 +43,7 @@ namespace Carzine.Controllers
 			var products = await myLogic.CalcPriceRubAsync(result.ToList());
 
 			return StatusCode(
-				StatusCodes.Status200OK, 
+				StatusCodes.Status200OK,
 				new SearchResultViewModel()
 				{
 					Products = products,

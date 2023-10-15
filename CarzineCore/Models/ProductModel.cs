@@ -54,5 +54,7 @@
 		public int DeliveryMax { get; set; }
 
 		public string Source { get; set; }
+
+		public bool? IsOriginal { get; set; }
 	}
 }

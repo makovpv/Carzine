@@ -1,6 +1,7 @@
 ﻿using CarzineCore.Interfaces;
 using CarzineCore.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -20,11 +21,15 @@ namespace CarzineCore
 
 		private readonly RestClient _restClient = new();
 
+		private readonly ILogger _logger;
+
 		private ApmTokenResponse _apmApiToken;
 		private ApecTokenResponse _apecApiToken;
 
-		public ApiDataService(IConfiguration config)
+		public ApiDataService(IConfiguration config, ILogger<ApiDataService> logger)
 		{
+			_logger = logger;
+			
 			_apiApmCred = GetApiCredentials(config.GetSection("apmApi"));
 			_apiEmexCred = GetApiCredentials(config.GetSection("emexApi"));
 			_apiApecCred = GetApiCredentials(config.GetSection("apecApi"));
@@ -82,79 +87,97 @@ namespace CarzineCore
 			return _apecApiToken.access_token;
 		}
 
-		public async Task<IEnumerable<StandardProductModel>> GetDataMultipleSourceAsync(string detailCode)
+		public async Task<IEnumerable<StandardProductModel>> GetDataMultipleSourceAsync(string detailCode, bool includeAnalogs)
 		{
 			var result = new List<StandardProductModel>();
 
 			var tasks = new Task<IEnumerable<StandardProductModel>>[3] {
-				GetApmDataAsync(detailCode),
-				GetApecDataAsync(detailCode),
-				GetEmexDataAsync(detailCode)
+				GetApmDataAsync(detailCode, includeAnalogs),
+				GetApecDataAsync(detailCode, includeAnalogs),
+				GetEmexDataAsync(detailCode, includeAnalogs)
 			};
 
-			var products = await Task.WhenAll(tasks);
+			try
+			{
+				var products = await Task.WhenAll(tasks);
 
-			result.AddRange(products[0]);
-			result.AddRange(products[1]);
-			result.AddRange(products[2]);
+				result.AddRange(products[0]);
+				result.AddRange(products[1]);
+				result.AddRange(products[2]);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error while getting API data. PN={0}", detailCode);
+			}
 
 			return result;
 		}
 
-		private async Task<IEnumerable<StandardProductModel>> GetEmexDataAsync(string detailNum)
+		private async Task<IEnumerable<StandardProductModel>> GetEmexDataAsync(string detailNum, bool includeAnalogs)
 		{
-			EmexServiceReference.ServiceSoapClient client;
-			EmexServiceReference.Customer customer = null;
-
-			client = new EmexServiceReference.ServiceSoapClient(new EmexServiceReference.ServiceSoapClient.EndpointConfiguration());
-
 			try
 			{
+				EmexServiceReference.ServiceSoapClient client;
+				EmexServiceReference.Customer customer = null;
+
+				client = new EmexServiceReference.ServiceSoapClient(new EmexServiceReference.ServiceSoapClient.EndpointConfiguration());
+
 				customer = await client.LoginAsync(new EmexServiceReference.Customer()
 				{
 					UserName = _apiEmexCred.username,
 					Password = _apiEmexCred.password
 				});
+
+				EmexServiceReference.FindByNumber[] result;
+
+				result = await client.SearchPartAsync(customer, detailNum, true);
+
+				_ = client.CloseAsync();
+
+				return result.ToStandard();
 			}
 			catch (Exception ex)
 			{
-				throw new Exception("M2" + ex.Message);
+				_logger.LogError(ex, "Error while getting Emex API data. PN={0}", detailNum);
+
+				return new List<StandardProductModel>();
 			}
-
-			EmexServiceReference.FindByNumber[] bbb;
-
-			bbb = await client.SearchPartAsync(customer, detailNum, true);
-
-			_ = client.CloseAsync();
-
-			return bbb.ToStandard();
 		}
 
-		private async Task<IEnumerable<StandardProductModel>> GetApmDataAsync(string detailCode)
+		private async Task<IEnumerable<StandardProductModel>> GetApmDataAsync(string detailCode, bool includeAnalogs)
 		{
-			var token = await GetApmApiTokenAsync();
-
-			var dataSearch = new
+			try
 			{
-				token.name,
-				token.token,
-				code = detailCode,
-				//analogs = false
-			};
+				var token = await GetApmApiTokenAsync();
 
-			var result = await new HttpClient().PostAsJsonAsync($"{_apiApmCred.url}product/search", dataSearch);
+				var dataSearch = new
+				{
+					token.name,
+					token.token,
+					code = detailCode,
+					analogs = includeAnalogs
+				};
 
-			if (!result.IsSuccessStatusCode)
+				var result = await new HttpClient().PostAsJsonAsync($"{_apiApmCred.url}product/search", dataSearch);
+
+				if (!result.IsSuccessStatusCode)
+					return new List<StandardProductModel>();
+
+				var content = await result.Content.ReadAsStringAsync();
+
+				content = content.Replace($"{detailCode}_code", "root");
+
+				return JsonConvert.DeserializeObject<ApmRootSearchResult>(content)
+					.RootElement
+					.mainProducts
+					.ToStandard();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error while getting Apm API data. PN={0}", detailCode);
+				
 				return new List<StandardProductModel>();
-
-			var content = await result.Content.ReadAsStringAsync();
-
-			content = content.Replace($"{detailCode}_code", "root");
-
-			return JsonConvert.DeserializeObject<ApmRootSearchResult>(content)
-				.RootElement
-				.mainProducts
-				.ToStandard();
+			}
 		}
 
 		private static RestRequest GetRestRequest(string? resource, string token, Method method = Method.Get)
@@ -166,47 +189,55 @@ namespace CarzineCore
 			return request;
 		}
 
-		private async Task<IEnumerable<StandardProductModel>> GetApecDataAsync(string detailCode)
-		{
-			var token = await GetApecApiTokenAsync();
-
-			var request = GetRestRequest($"{_apiApecCred.url}api/getdeliverypoints", token, Method.Get);
-			var response = await _restClient.ExecuteAsync(request);
-			var firstDeliveryPointId = JsonConvert.DeserializeObject<ApecDeliveryPoint[]>(response.Content).First().DeliveryPointID;
-
-			request = GetRestRequest($"{_apiApecCred.url}api/search/{detailCode}/brands?deliveryPointID={firstDeliveryPointId}&analogues=false", token, Method.Get);
-			response = await _restClient.ExecuteAsync(request);
-
-			if (response.Content == "\"Ничего не найдено\"")
-			{
-				return new List<StandardProductModel>();
-			}
-
-			var firstBrand = JsonConvert.DeserializeObject<ApecBrand[]>(response.Content).First();
-
-			request = GetRestRequest($"{_apiApecCred.url}api/search/{detailCode}/brand/{firstBrand.Brand}?deliveryPointID={firstDeliveryPointId}&analogues=false", token, Method.Get);
-			response = await _restClient.ExecuteAsync(request);
-
-			var result = JsonConvert.DeserializeObject<ApecProduct[]>(response.Content).ToStandard();
-
-			return result;
-		}
-
-		public async Task<IEnumerable<StandardProductModel>> GetDataSingleSourceAsync(string detailCode)
+		private async Task<IEnumerable<StandardProductModel>> GetApecDataAsync(string detailCode, bool includeAnalogs)
 		{
 			var result = new List<StandardProductModel>();
 
-			var tasks = new Task<IEnumerable<StandardProductModel>>[2] {
-				GetApmDataAsync(detailCode),
-				GetApecDataAsync(detailCode)
-			};
+			try
+			{
+				var token = await GetApecApiTokenAsync();
 
-			var products = await Task.WhenAll(tasks);
+				var request = GetRestRequest($"{_apiApecCred.url}api/getdeliverypoints", token, Method.Get);
+				var response = await _restClient.ExecuteAsync(request);
+				var firstDeliveryPointId = JsonConvert.DeserializeObject<ApecDeliveryPoint[]>(response.Content)?.First().DeliveryPointID;
 
-			result.AddRange(products[0]);
-			result.AddRange(products[1]);
+				request = GetRestRequest(
+					$"{_apiApecCred.url}api/search/{detailCode}/brands?deliveryPointID={firstDeliveryPointId}&analogues={includeAnalogs}",
+					token,
+					Method.Get
+				);
+				response = await _restClient.ExecuteAsync(request);
 
-			return result;
+				if (string.IsNullOrEmpty(response.Content) || response.Content == "\"Ничего не найдено\"")
+				{
+					return result;
+				}
+
+				var brands = JsonConvert.DeserializeObject<ApecBrand[]>(response.Content);
+
+				foreach (var brand in brands)
+				{
+					//need to be replaced with multi-theard
+
+					request = GetRestRequest(
+						$"{_apiApecCred.url}api/search/{detailCode}/brand/{brand.Brand}?deliveryPointID={firstDeliveryPointId}&analogues={includeAnalogs}",
+						token,
+						Method.Get
+					);
+
+					response = await _restClient.ExecuteAsync(request);
+
+					result.AddRange(JsonConvert.DeserializeObject<ApecProduct[]>(response.Content)?.ToStandard(brand.Brand));
+				}
+
+				return result;
+			}
+			catch(Exception ex)
+			{
+				_logger.LogError(ex, "Error while getting Apec API data. PN={0}", detailCode);
+
+				return result;
+			}
 		}
 
 		public List<StandardProductModel> GetProducts()

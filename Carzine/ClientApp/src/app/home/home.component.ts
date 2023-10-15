@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, Inject, TemplateRef, ViewChild } from '@angular/core';
 import { ProductModel } from '../models/ProductModel';
 import { ProductSearchResultModel } from '../models/ProductSearchResultModel';
@@ -18,6 +17,7 @@ export class HomeComponent {
   searchResult = new ProductSearchResultModel();
   inProgress = false;
   searchCode: string = "31126753992";
+  includeAnalog = true;
 
   @ViewChild('dialogRef')
   dialogRef!: TemplateRef<any>;
@@ -27,12 +27,12 @@ export class HomeComponent {
     private orderService: OrderService,
     public dialog: MatDialog) { }
 
-  search1() {
+  search() {
     console.log(this.searchCode);
 
     this.inProgress = true;
 
-    this.searchService.search(this.searchCode, 1)
+    this.searchService.search(this.searchCode, this.includeAnalog)
       .then((result: ProductSearchResultModel) => {
         this.inProgress = false;
         this.searchResult = result;
@@ -41,21 +41,6 @@ export class HomeComponent {
       .catch((err) => {
         this.inProgress = false;
         alert(err.error)
-      });
-  }
-
-  search2() {
-    this.inProgress = true;
-
-    this.searchService.search(this.searchCode, 2)
-      .then((result: ProductSearchResultModel) => {
-        this.inProgress = false;
-        this.searchResult = result;
-        console.log(result.products);
-      })
-      .catch((err) => {
-        this.inProgress = false;
-        alert(err.error);
       });
   }
 

@@ -26,68 +26,69 @@
 </style>
 
 <div id="search">
-  <label>Code</label>
-  <input type="text" [(ngModel)]="searchCode">
-  <button mat-stroked-button color="primary" (click)="search1()" [disabled]="inProgress">Search 1</button>
-  <button mat-stroked-button color="primary" (click)="search2()" [disabled]="inProgress">Search 2</button>
+	<div style="width: 740px;">
+		<label>Part Number</label>
+		<input type="text" [(ngModel)]="searchCode">
+
+		<button mat-stroked-button color="primary" (click)="search()" [disabled]="inProgress">Поиск</button>
+	</div>
+	<mat-checkbox color="primary" [(ngModel)]="includeAnalog">искать аналоги</mat-checkbox>
 </div>
+
 <div style="display: flex;">
 	<div class="product-card">
 		<div class="product-card-title">
-			<strong>Best Price</strong>
+			<strong>Лучшая цена</strong>
 		</div>
-		<div>Manufacturer: {{searchResult.bestPrice?.manufacturer}}</div>
-		<div>Price, rub: {{searchResult.bestPrice?.priceRub | number: '1.0-0'}}</div>
-		<div>Delivery, days: {{searchResult.bestPrice?.deliveryMin}}</div>
-		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.bestPrice)">Order</button>
+		<div>Бренд: {{searchResult.bestPrice?.manufacturer}}</div>
+		<div>Цена: {{searchResult.bestPrice?.priceRub | number: '1.0-0'}} руб</div>
+		<div>Срок доставки: {{searchResult.bestPrice?.deliveryMin}} - {{searchResult.bestPrice?.deliveryMin}} дней</div>
+		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.bestPrice)">Заказать</button>
 	</div>
 	<div class="product-card">
 		<div class="product-card-title">
-			<strong>Express delivery</strong>
+			<strong>Экспресс доставка</strong>
 		</div>
-		<div>Manufacturer: {{searchResult.expressDelivery?.manufacturer}}</div>
-		<div>Price, rub: {{searchResult.expressDelivery?.priceRub | number: '1.0-0'}}</div>
-		<div>Delivery, days: {{searchResult.expressDelivery?.deliveryMin}}</div>
-		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.expressDelivery)">Order</button>
+		<div>Бренд: {{searchResult.expressDelivery?.manufacturer}}</div>
+		<div>Цена: {{searchResult.expressDelivery?.priceRub | number: '1.0-0'}} руб</div>
+		<div>Срок доставки: {{searchResult.expressDelivery?.deliveryMin}} - {{searchResult.bestPrice?.deliveryMin}} дней</div>
+		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.expressDelivery)">Заказать</button>
 	</div>
 	<div class="product-card">
 		<div class="product-card-title">
-			<strong>Optimal</strong>
+			<strong>Оптимальный вариант</strong>
 		</div>
-		<div>Manufacturer: {{searchResult.optimal?.manufacturer}}</div>
-		<div>Price, rub: {{searchResult.optimal?.priceRub | number: '1.0-0'}}</div>
-		<div>Delivery, days: {{searchResult.optimal?.deliveryMin}}</div>
-		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.optimal)">Order</button>
+		<div>Бренд: {{searchResult.optimal?.manufacturer}}</div>
+		<div>Цена: {{searchResult.optimal?.priceRub | number: '1.0-0'}} руб</div>
+		<div>Срок доставки: {{searchResult.optimal?.deliveryMin}} - {{searchResult.bestPrice?.deliveryMin}} дней</div>
+		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.optimal)">Заказать</button>
 	</div>
 </div>
 
 <div>
+	<div>
+		Найдено {{searchResult.products.length}} вариантов от {{searchResult.bestPrice?.priceRub | number: '1.0-0'}} рублей
+	</div>
   <table *ngIf="!inProgress">
 	<tr>
-		<th>Source</th>
-		<th>Name</th>
-		<th>Manufacturer</th>
-		<th>Part Number</th>
-		<th>Price RUB</th>
-		<th>Weight</th>
-		<th>Volume</th>
-		<th>Delivery-min</th>
-		<th>Delivery-max</th>
-		<th>Count min</th>
-		<th>Count max</th>
+		<th>Наименование детали</th>
+		<th>Бренд</th>
+		<th>Номер детали</th>
+		<th>Стоимость, руб</th>
+		<th>Срок доставки, дн</th>
+		<th>Оригинал</th>
+		<th></th>
 	</tr>
 	<tr *ngFor="let x of searchResult.products">
-		<td>{{x.source}}</td>
 		<td>{{x.name}}</td>
 		<td>{{x.manufacturer}}</td>
 		<td>{{x.partNumber}}</td>
 		<td>{{x.priceRub | number: '1.0-0'}}</td>
-		<td>{{x.weight}}</td>
-		<td>{{x.volume}}</td>
-		<td>{{x.deliveryMin}}</td>
-		<td>{{x.deliveryMax}}</td>
-		<td>{{x.minOrderAmount}}</td>
-		<td>{{x.maxOrderAmount}}</td>
+		<td>{{x.deliveryMin}} - {{x.deliveryMax}}</td>
+		<td>{{x.isOriginal}}</td>
+		<td>
+			<button mat-stroked-button mat-button color="primary" (click)="openDialog(x)">Заказать</button>
+		</td>
 	</tr>
   </table>
 

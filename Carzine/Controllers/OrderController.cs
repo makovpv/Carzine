@@ -9,10 +9,13 @@ namespace Carzine.Controllers
 	public class OrderController : ControllerBase
 	{
 		private readonly IDbDataService _dataService;
-		
-		public OrderController(IDbDataService dbService)
+		private readonly ILogger<OrderController> _logger;
+
+
+		public OrderController(IDbDataService dbService, ILogger<OrderController> logger)
 		{
 			_dataService = dbService;
+			_logger = logger;
 		}
 
 		[HttpPost("preorder")]

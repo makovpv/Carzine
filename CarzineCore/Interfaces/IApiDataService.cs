@@ -11,9 +11,7 @@ namespace CarzineCore.Interfaces
 	{
 		public List<StandardProductModel> GetProducts();
 
-		public Task<IEnumerable<StandardProductModel>> GetDataSingleSourceAsync(string detailCode);
-
-		public Task<IEnumerable<StandardProductModel>> GetDataMultipleSourceAsync(string detailCode);
+		public Task<IEnumerable<StandardProductModel>> GetDataMultipleSourceAsync(string detailCode, bool includeAnalogs);
 
 	}
 }

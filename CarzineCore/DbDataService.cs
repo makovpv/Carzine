@@ -2,6 +2,7 @@
 using CarzineCore.Models;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,14 +18,18 @@ namespace CarzineCore
 	{
 		private readonly string _connectionString;
 
+		private readonly ILogger<DbDataService> _logger;
+
 		const string _sqlInsertPreOrder =
 			"INSERT INTO pre_order(phone, [date], pn, manufacturer, price_rub, delivery_min) VALUES (@phone, getUtcDate(), @pn, @manufacturer, @priceRub, @deliveryMin)";
 		const string _sqlGetPreorders =
 			"SELECT * FROM pre_order";
 
 
-		public DbDataService(IConfiguration config)
+		public DbDataService(IConfiguration config, ILogger<DbDataService> logger)
 		{
+			_logger = logger;
+			
 			_connectionString = config.GetConnectionString("carzine");
 		}
 

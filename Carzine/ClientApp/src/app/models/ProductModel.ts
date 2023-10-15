@@ -10,4 +10,5 @@ export class ProductModel {
 	deliveryMax: number | undefined;
 	minOrderAmount: number | undefined;
 	maxOrderAmount: number | undefined;
+	isOriginal: boolean | undefined;
 }

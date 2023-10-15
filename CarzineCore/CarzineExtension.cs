@@ -48,7 +48,7 @@ namespace CarzineCore
 			});
 		}
 
-		public static IEnumerable<StandardProductModel> ToStandard(this ApecProduct[] products)
+		public static IEnumerable<StandardProductModel> ToStandard(this ApecProduct[] products, string originalBrandName)
 		{
 			return products.Select(product => new StandardProductModel()
 			{
@@ -61,7 +61,8 @@ namespace CarzineCore
 				Manufacturer = product.Brand,
 				Name = product.PartDescription,
 				PartNumber = product.PartNumber,
-				Source = "Apec"
+				Source = "Apec",
+				IsOriginal = originalBrandName == product.Brand
 			});
 		}
 	}

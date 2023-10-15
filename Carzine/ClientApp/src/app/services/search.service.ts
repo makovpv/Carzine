@@ -9,9 +9,9 @@ export class SearchService {
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
 
-  search(searchCode: string, mode: number): Promise<any> {
+  search(searchCode: string, analog: boolean): Promise<any> {
       return this.http.get<ProductSearchResultModel>(
-        this.baseUrl + 'search?code=' +searchCode + '&mode=' + mode)
+        `${this.baseUrl}search?code=${searchCode}&analog=${analog}`)
         .toPromise();
   }
 }

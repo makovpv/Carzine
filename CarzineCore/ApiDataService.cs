@@ -18,6 +18,7 @@ namespace CarzineCore
 		private readonly ApiCredentials _apiApmCred;
 		private readonly ApiCredentials _apiEmexCred;
 		private readonly ApiCredentials _apiApecCred;
+		private readonly ApiCredentials _apiAcatCred;
 
 		private readonly RestClient _restClient = new();
 
@@ -25,6 +26,7 @@ namespace CarzineCore
 
 		private ApmTokenResponse _apmApiToken;
 		private ApecTokenResponse _apecApiToken;
+		private string _acatToken;
 
 		public ApiDataService(IConfiguration config, ILogger<ApiDataService> logger)
 		{
@@ -33,6 +35,9 @@ namespace CarzineCore
 			_apiApmCred = GetApiCredentials(config.GetSection("apmApi"));
 			_apiEmexCred = GetApiCredentials(config.GetSection("emexApi"));
 			_apiApecCred = GetApiCredentials(config.GetSection("apecApi"));
+			_apiAcatCred = GetApiCredentials(config.GetSection("acatApi"));
+
+			_acatToken = config.GetSection("acatApi")["token"];
 		}
 
 		private static ApiCredentials GetApiCredentials(IConfigurationSection section)
@@ -41,7 +46,8 @@ namespace CarzineCore
 			{
 				url = section["url"],
 				username = section["username"],
-				password = section["password"]
+				password = section["password"],
+				contractNumber = section["contractNumber"]
 			};
 		}
 
@@ -180,11 +186,19 @@ namespace CarzineCore
 			}
 		}
 
-		private static RestRequest GetRestRequest(string? resource, string token, Method method = Method.Get)
+		private static RestRequest GetRestRequestBearerToken(string? resource, string token, Method method = Method.Get)
 		{
 			var request = new RestRequest(resource, method);
 
 			request.AddHeader("Authorization", $"Bearer {token}");
+
+			return request;
+		}
+		private static RestRequest GetRestRequest(string? resource, string token, Method method = Method.Get)
+		{
+			var request = new RestRequest(resource, method);
+
+			request.AddHeader("Authorization", token);
 
 			return request;
 		}
@@ -197,11 +211,11 @@ namespace CarzineCore
 			{
 				var token = await GetApecApiTokenAsync();
 
-				var request = GetRestRequest($"{_apiApecCred.url}api/getdeliverypoints", token, Method.Get);
+				var request = GetRestRequestBearerToken($"{_apiApecCred.url}api/getdeliverypoints", token, Method.Get);
 				var response = await _restClient.ExecuteAsync(request);
 				var firstDeliveryPointId = JsonConvert.DeserializeObject<ApecDeliveryPoint[]>(response.Content)?.First().DeliveryPointID;
 
-				request = GetRestRequest(
+				request = GetRestRequestBearerToken(
 					$"{_apiApecCred.url}api/search/{detailCode}/brands?deliveryPointID={firstDeliveryPointId}&analogues={includeAnalogs}",
 					token,
 					Method.Get
@@ -219,7 +233,7 @@ namespace CarzineCore
 				{
 					//need to be replaced with multi-theard
 
-					request = GetRestRequest(
+					request = GetRestRequestBearerToken(
 						$"{_apiApecCred.url}api/search/{detailCode}/brand/{brand.Brand}?deliveryPointID={firstDeliveryPointId}&analogues={includeAnalogs}",
 						token,
 						Method.Get
@@ -244,5 +258,159 @@ namespace CarzineCore
 		{
 			throw new NotImplementedException();
 		}
+
+		public async Task<string> CreateApmOrderAsync(PreOrderModel preOrder)
+		{
+			try
+			{
+				var token = await GetApmApiTokenAsync();
+
+				var orderPosition = new
+				{
+					id = 0,
+					code = preOrder.PartNumber,
+					price = 0,
+					make = preOrder.Manufacturer,
+					priceName = "",
+					supplier_id = 0,
+					quantity = 0,
+					api_reference = "my custom info"
+				};
+
+				var delivery = new
+				{
+					delivery_type = ApmDeliveryType.RussianPost
+				};
+
+				var requestBody = new
+				{
+					token.name,
+					token.token,
+					test = "ok", // !!!!!
+					order = new[] { orderPosition },
+					delivery
+				};
+
+				var response = await new HttpClient().PostAsJsonAsync($"{_apiApmCred.url}order/create", requestBody);
+
+				var content = await response.Content.ReadFromJsonAsync<ApmCreateOrderResult> ();
+
+				if (!response.IsSuccessStatusCode)
+					return content.info;
+
+				//content = content.Replace($"{detailCode}_code", "root");
+
+				//return JsonConvert.DeserializeObject<ApmRootSearchResult>(content)
+				//	.RootElement
+				//	.mainProducts
+				//	.ToStandard();
+				return content.info;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error while getting Apm API data. PN={0}", 777);
+
+				return "ssss";
+			}
+		}
+
+		public async Task<string> CreateApecOrderAsync()
+		{
+			var result =  "okkkkk2";
+
+			try
+			{
+				var token = await GetApecApiTokenAsync();
+
+				var request = GetRestRequestBearerToken($"{_apiApecCred.url}api/order", token, Method.Post);
+
+				var orderHeadLines = new dynamic[] { 
+					new {
+						Count = 1,
+						Price = 1.23,
+						Refrence = "ABC TEST",
+						ReactionByCount = 0,
+						ReactionByPrice = 0,
+						StrictlyThisNumber = true,
+						Brand = "DENSO",
+						PartNumber = "IK16",
+						SupplierID = 9553
+					} 
+				};
+				
+				var body = new {
+					IsTest = true, // !!!
+					ValidationType = 0,
+					OrderHeadLines = orderHeadLines,
+					ContractID = _apiApecCred.contractNumber,
+					CustOrderNum = "!!!ТЕСТОВЫЙ API!!!",
+					OrderNotes = "!!!ТЕСТОВЫЙ API!!!"
+				};
+
+				request = request
+					.AddHeader("Content-Type", "application/json")
+					.AddBody(body, ContentType.Json);
+
+				var response = await _restClient.ExecuteAsync(request);
+
+				if (!response.IsSuccessful)
+					_logger.LogError(response.Content);
+
+//				var firstDeliveryPointId = JsonConvert.DeserializeObject<ApecDeliveryPoint[]>(response.Content)?.First().DeliveryPointID;
+
+				//var brands = JsonConvert.DeserializeObject<ApecBrand[]>(response.Content);
+
+				return result;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error while creating Apec order");
+
+				return result;
+			}
+		}
+
+		public async Task<AcatSearchResult> SearchByVinAsync(string vin)
+		{
+			var request = GetRestRequest($"{_apiAcatCred.url}catalogs/search?text={vin}&lang=ru", _acatToken, Method.Get);
+
+			var response = await _restClient.ExecuteAsync(request);
+
+			var result = JsonConvert.DeserializeObject<AcatSearchResult>(response.Content);
+
+			return result;
+		}
+
+		public async Task<AcatGroupResult?> GetAcatGroupsAsync(AcatGroupInfo groupInfo)
+		{
+			var request = GetRestRequest(
+				$"{_apiAcatCred.url}catalogs/groups?type={groupInfo.GroupType}&mark={groupInfo.Mark}&modification={groupInfo.Modification}&model={groupInfo.Model}&group={groupInfo.Group}",
+				_acatToken,
+				Method.Get);
+
+			var response = await _restClient.ExecuteAsync(request);
+
+			var qqq = JsonConvert.DeserializeObject<AcatGroupResult>(response.Content);
+
+
+			return qqq;
+		}
+
+		public async Task<AcatPartsSearchResult> GetAcatPartsAsync(AcatGroupInfo groupInfo)
+		{
+			var request = GetRestRequest(
+				$"{_apiAcatCred.url}catalogs/parts?type={groupInfo.GroupType}&mark={groupInfo.Mark}&modification={groupInfo.Modification}&model={groupInfo.Model}&group={groupInfo.Group}&parentGroup={groupInfo.ParentGroup}",
+				_acatToken,
+				Method.Get);
+
+			var response = await _restClient.ExecuteAsync(request);
+
+			var qqq = JsonConvert.DeserializeObject<AcatPartsSearchResult>(response.Content);
+
+			return qqq;
+
+		}
 	}
+
+	
 }

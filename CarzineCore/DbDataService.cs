@@ -21,9 +21,14 @@ namespace CarzineCore
 		private readonly ILogger<DbDataService> _logger;
 
 		const string _sqlInsertPreOrder =
-			"INSERT INTO pre_order(phone, [date], pn, manufacturer, price_rub, delivery_min) VALUES (@phone, getUtcDate(), @pn, @manufacturer, @priceRub, @deliveryMin)";
+			"INSERT INTO pre_order(phone, [date], pn, manufacturer, price_rub, delivery_min, source_id) " +
+			"VALUES (@phone, getUtcDate(), @pn, @manufacturer, @priceRub, @deliveryMin, @sourceId)";
+		
 		const string _sqlGetPreorders =
 			"SELECT * FROM pre_order";
+
+		const string _sqlGetPreorderById =
+			"SELECT * FROM pre_order WHERE id = @id";
 
 
 		public DbDataService(IConfiguration config, ILogger<DbDataService> logger)
@@ -43,6 +48,20 @@ namespace CarzineCore
 			return connection;
 		}
 
+		public async Task<PreOrderModel> GetPreOrderAsync(int preOrderId)
+		{
+			using var connection = GetConnection();
+
+			var preOrder = await connection.QuerySingleAsync<PreOrderDto>(_sqlGetPreorderById, new { id = preOrderId });
+
+			return new PreOrderModel()
+			{
+				Id = preOrder.Id,
+				PartNumber = preOrder.PN,
+				SourceId = (ApiSource)preOrder.source_Id
+			};
+		}
+
 		public async Task<int> AddPreOrderAsync(PreOrderModel preorder)
 		{
 			int preOrderId;
@@ -57,7 +76,8 @@ namespace CarzineCore
 					pn = preorder.PartNumber,
 					manufacturer = preorder.Manufacturer,
 					priceRub = preorder.PriceRub,
-					deliveryMin = preorder.DeliveryMin
+					deliveryMin = preorder.DeliveryMin,
+					sourceId = (int)preorder.SourceId
 				});
 			}
 			catch (Exception ex)
@@ -123,7 +143,8 @@ namespace CarzineCore
 						PartNumber = reader.GetString("pn"),
 						Manufacturer = reader.GetString("manufacturer"),
 						PriceRub = reader.GetDecimal("price_rub"),
-						DeliveryMin = reader.GetInt32("delivery_min")
+						DeliveryMin = reader.GetInt32("delivery_min"),
+						Id = reader.GetInt32("id")
 					});
 				}
 			}

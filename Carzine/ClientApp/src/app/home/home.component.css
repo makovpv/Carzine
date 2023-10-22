@@ -1,0 +1,27 @@
+.product-card {
+	border: solid 2px green;
+	margin: 16px 16px 16px 0;
+	padding: 8px;
+	border-radius: 8px;
+	width: 300px;
+}
+
+#search {
+	display: flex; align-items: center;
+}
+
+#search button {
+	margin: 0 8px;
+}
+
+#search input {
+	margin: 0 8px;
+}
+
+.search-form-field {
+    width: 300px;
+}
+
+.product-card-title {
+	border-bottom: solid 2px green;
+}

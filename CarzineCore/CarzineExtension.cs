@@ -27,7 +27,7 @@ namespace CarzineCore
 				Weight = product.weight,
 				DeliveryMin = product.delivery.FirstInt(),
 				DeliveryMax = product.delivery.SecondInt(),
-				Source = "Apm"
+				SourceId = ApiSource.Apm
 			});
 		}
 
@@ -44,7 +44,7 @@ namespace CarzineCore
 				Manufacturer = product.MakeName,
 				Name = product.PartNameRus,
 				PartNumber = product.DetailNum,
-				Source = "Emex"
+				SourceId = ApiSource.Emex
 			});
 		}
 
@@ -61,7 +61,7 @@ namespace CarzineCore
 				Manufacturer = product.Brand,
 				Name = product.PartDescription,
 				PartNumber = product.PartNumber,
-				Source = "Apec",
+				SourceId = ApiSource.Apec,
 				IsOriginal = originalBrandName == product.Brand
 			});
 		}

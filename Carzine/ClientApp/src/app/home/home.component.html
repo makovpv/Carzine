@@ -1,38 +1,48 @@
-<style>
-.product-card {
-	border: solid 2px green;
-	margin: 16px 16px 16px 0;
-	padding: 8px;
-	border-radius: 8px;
-	width: 300px;
-}
-
-#search {
-	display: flex; align-items: center;
-}
-
-#search button {
-	margin: 0 8px;
-}
-
-#search input {
-	margin: 0 8px;
-}
-
-.product-card-title {
-	border-bottom: solid 2px green;
-	
-}
-</style>
-
 <div id="search">
 	<div style="width: 740px;">
-		<label>Part Number</label>
-		<input type="text" [(ngModel)]="searchCode">
+		
+		<mat-form-field class="search-form-field">
+			<input matInput type="search" placeholder="Номер детали" [(ngModel)]="searchCode">
+		</mat-form-field>
 
-		<button mat-stroked-button color="primary" (click)="search()" [disabled]="inProgress">Поиск</button>
+		<button mat-flat-button color="primary" (click)="search()" [disabled]="inProgress">Поиск</button>
 	</div>
 	<mat-checkbox color="primary" [(ngModel)]="includeAnalog">искать аналоги</mat-checkbox>
+</div>
+
+<div>
+	<mat-form-field class="search-form-field">
+		<input matInput type="search" placeholder="VIN" [(ngModel)]="searchVinCode">
+	</mat-form-field>
+	<button mat-flat-button color="primary" (click)="searchVIN()" [disabled]="inProgress">Поиск по VIN</button>
+</div>
+
+<div style="border: solid 2px blue; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
+	<div>{{modification.brand}}</div>
+	<div>{{modification.description}}</div>
+	<div>{{modification.modelName}}</div>
+	<div>{{modification.name}}</div>
+</div>
+<div style="border: solid 2px blue; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
+	<ul>
+		<li *ngFor="let x of partGroups">
+			{{x.name}}
+			<button (click)="getGroupItems(x)">+++</button>
+		</li>
+	</ul>
+</div>
+
+<div style="border: solid 2px orangered; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
+	<ul>
+		<li *ngFor="let x of partNumbers">
+			{{x.number}} - {{ x.name }}
+		</li>
+	</ul>
+</div>
+
+
+<div>
+	Найдено {{searchResult.products.length}} вариантов от {{searchResult.bestPrice?.priceRub | number: '1.0-0'}} рублей
 </div>
 
 <div style="display: flex;">
@@ -51,7 +61,7 @@
 		</div>
 		<div>Бренд: {{searchResult.expressDelivery?.manufacturer}}</div>
 		<div>Цена: {{searchResult.expressDelivery?.priceRub | number: '1.0-0'}} руб</div>
-		<div>Срок доставки: {{searchResult.expressDelivery?.deliveryMin}} - {{searchResult.bestPrice?.deliveryMin}} дней</div>
+		<div>Срок доставки: {{searchResult.expressDelivery?.deliveryMin}} - {{searchResult.expressDelivery?.deliveryMin}} дней</div>
 		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.expressDelivery)">Заказать</button>
 	</div>
 	<div class="product-card">
@@ -60,38 +70,36 @@
 		</div>
 		<div>Бренд: {{searchResult.optimal?.manufacturer}}</div>
 		<div>Цена: {{searchResult.optimal?.priceRub | number: '1.0-0'}} руб</div>
-		<div>Срок доставки: {{searchResult.optimal?.deliveryMin}} - {{searchResult.bestPrice?.deliveryMin}} дней</div>
+		<div>Срок доставки: {{searchResult.optimal?.deliveryMin}} - {{searchResult.optimal?.deliveryMin}} дней</div>
 		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.optimal)">Заказать</button>
 	</div>
 </div>
 
 <div>
-	<div>
-		Найдено {{searchResult.products.length}} вариантов от {{searchResult.bestPrice?.priceRub | number: '1.0-0'}} рублей
-	</div>
-  <table *ngIf="!inProgress">
-	<tr>
-		<th>Наименование детали</th>
-		<th>Бренд</th>
-		<th>Номер детали</th>
-		<th>Стоимость, руб</th>
-		<th>Срок доставки, дн</th>
-		<th>Оригинал</th>
-		<th></th>
-	</tr>
-	<tr *ngFor="let x of searchResult.products">
-		<td>{{x.name}}</td>
-		<td>{{x.manufacturer}}</td>
-		<td>{{x.partNumber}}</td>
-		<td>{{x.priceRub | number: '1.0-0'}}</td>
-		<td>{{x.deliveryMin}} - {{x.deliveryMax}}</td>
-		<td>{{x.isOriginal}}</td>
-		<td>
-			<button mat-stroked-button mat-button color="primary" (click)="openDialog(x)">Заказать</button>
-		</td>
-	</tr>
-  </table>
+	<div>Другие предложения</div>
+	<table *ngIf="!inProgress">
+		<tr>
+			<th>Наименование детали</th>
+			<th>Бренд</th>
+			<th>Номер детали</th>
+			<th>Стоимость, руб</th>
+			<th>Срок доставки, дн</th>
+			<th>Оригинал</th>
+			<th></th>
+		</tr>
+		<tr *ngFor="let x of searchResult.products">
+			<td>{{x.name}}</td>
+			<td>{{x.manufacturer}}</td>
+			<td>{{x.partNumber}}</td>
+			<td>{{x.priceRub | number: '1.0-0'}}</td>
+			<td>{{x.deliveryMin}} - {{x.deliveryMax}}</td>
+			<td>{{x.isOriginal}}</td>
+			<td>
+				<button mat-stroked-button mat-button color="primary" (click)="openDialog(x)">Заказать</button>
+			</td>
+		</tr>
+	</table>
 
-  <mat-spinner *ngIf="inProgress"></mat-spinner>
+	<mat-spinner *ngIf="inProgress"></mat-spinner>
 
 </div>

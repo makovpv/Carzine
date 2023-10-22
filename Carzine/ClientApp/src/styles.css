@@ -31,3 +31,8 @@ table tr:nth-child(odd) {
 table tr:nth-child(even) {
   background-color: #ffffff;
 }
+
+.cz-snack-panel {
+	background-color: lightblue;
+  color: black;
+}

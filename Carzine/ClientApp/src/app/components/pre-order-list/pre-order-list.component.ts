@@ -20,4 +20,18 @@ export class PreOrderListComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  openDialog(preOrderId: number | undefined) {
+    if (!preOrderId)
+      return;
+    
+    this.orderService.createOrder(preOrderId)
+      .then((x) => {
+        alert(x.res.info);
+      }
+        )
+      .catch((err) => {
+        alert(err.error.text ?? err.error)
+      });
+  }
+
 }

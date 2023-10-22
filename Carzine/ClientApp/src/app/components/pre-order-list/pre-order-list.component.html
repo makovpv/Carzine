@@ -6,6 +6,7 @@
         <th>Manufacturer</th>
         <th>Price RUB</th>
         <th>Delivery-min</th>
+        <th></th>
     </tr>
     <tr *ngFor="let x of preOrders">
         <td>{{x.phone}}</td>
@@ -13,6 +14,9 @@
         <td>{{x.manufacturer}}</td>
         <td>{{x.priceRub | number: '1.0-0'}}</td>
         <td>{{x.deliveryMin}}</td>
+        <td>
+          <button mat-stroked-button mat-button color="primary" (click)="openDialog(x.id)">Создать реальный ордер</button>
+        </td>
     </tr>
   </table>
 </div>

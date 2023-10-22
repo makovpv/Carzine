@@ -1,6 +1,6 @@
 export class ProductModel {
-	public name: string = "";
-	public source: string = "";
+	name: string = "";
+	sourceId: number | undefined;
 	manufacturer: string | undefined;
 	partNumber: string | undefined;
 	priceRub: number = 0;

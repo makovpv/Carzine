@@ -38,9 +38,9 @@ namespace Carzine.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 
-			var myLogic = new CarzineCalculator();
+			var usdRate = await DataCollector.GetCbrCursAsync("USD");
 
-			var products = await myLogic.CalcPriceRubAsync(result.ToList());
+			var products = CarzineCalculator.CalcPriceRub(result.ToList(), usdRate);
 
 			return StatusCode(
 				StatusCodes.Status200OK,
@@ -49,9 +49,106 @@ namespace Carzine.Controllers
 					Products = products.FillEmptyNames(),
 					BestPrice = products.MinBy(x => x.PriceRub),
 					ExpressDelivery = products.MinBy(x => x.DeliveryMin),
-					Optimal = myLogic.GetOptimalProduct(products)
+					Optimal = CarzineCalculator.GetOptimalProduct(products)
 				});
 
+		}
+
+		[HttpGet("searchVin")]
+		public async Task<IActionResult> SearchByVIN(string vin)
+		{
+			var result = await _apiDataService.SearchByVinAsync(vin);
+
+			var v = result.vins.FirstOrDefault();
+
+			var groupInfo = new AcatGroupInfo
+			{
+				GroupType = v.type,
+				Mark = v.mark,
+				Modification = v.modification,
+				Model = v.model,
+				Group = string.Empty
+			};
+
+			var acatGroups = await _apiDataService.GetAcatGroupsAsync(groupInfo);
+
+			////////////////////////////////////////////////////////////////////////////
+
+			//var groupInfo = new AcatGroupInfo
+			//{
+			//	GroupType = "CARS_FOREIGN",
+			//	Mark = "ford",
+			//	Modification = "0417effa2c41f9665976e0ad9467387e",
+			//	Model = "5c2447bd0d8d57b0bcbf7d8cc8407f3f",
+			//	Group = string.Empty
+			//};
+
+			//var acatGroups = await _apiDataService.GetAcatGroupsAsync(groupInfo);
+
+			////////////////////////////////////////////////////////////////////////////
+
+			//var result = new AcatPartsSearchResult();
+
+			//foreach (var group in acatGroups.Groups)
+			//{
+			//	groupInfo.ParentGroup = group.id;
+
+			//	if (group.hasSubgroups)
+			//	{
+			//		var qqq = await _apiDataService.GetAcatGroupsAsync(groupInfo);
+			//	}
+
+			//	if (group.hasParts)
+			//	{
+			//		result = await _apiDataService.GetAcatPartsAsync(groupInfo);
+			//	}
+			//}
+
+			return StatusCode(StatusCodes.Status200OK, acatGroups);
+		}
+
+		[HttpGet("groups")]
+		public async Task<IActionResult> GetGroups(string GroupType, 
+			string Mark, 
+			string Modification, 
+			string Model,
+			string Group, string? ParentGroup)
+		{
+			var groupInfo = new AcatGroupInfo()
+			{
+				Group = Group,
+				Mark = Mark,
+				GroupType = GroupType,
+				Modification = Modification,
+				Model = Model,
+				ParentGroup = ParentGroup
+			};
+
+			var result = await _apiDataService.GetAcatGroupsAsync(groupInfo);
+
+			return StatusCode(StatusCodes.Status200OK, result);
+		}
+
+		[HttpGet("parts")]
+		public async Task<IActionResult> GetParts(string GroupType,
+			string Mark,
+			string Modification,
+			string Model,
+			string Group, string? ParentGroup)
+		{
+			var groupInfo = new AcatGroupInfo()
+			{
+				Group = Group,
+				Mark = Mark,
+				GroupType = GroupType,
+				Modification = Modification,
+				Model = Model,
+				ParentGroup = ParentGroup
+			};
+
+			var result = await _apiDataService.GetAcatPartsAsync(groupInfo);
+
+			return StatusCode(StatusCodes.Status200OK, result);
 		}
 	}
 }

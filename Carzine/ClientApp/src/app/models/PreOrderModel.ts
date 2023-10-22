@@ -4,4 +4,6 @@ export class PreOrderModel {
     manufacturer: string | undefined;;
     priceRub: number | undefined;
     deliveryMin: number | undefined;
+    id: number | undefined;
+    sourceId: number | undefined;
 }

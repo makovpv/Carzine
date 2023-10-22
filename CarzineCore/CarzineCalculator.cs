@@ -9,10 +9,8 @@ namespace CarzineCore
 			
 		}
 
-		public async Task<List<StandardProductModel>> CalcPriceRubAsync(List<StandardProductModel> products)
+		public static List<StandardProductModel> CalcPriceRub(List<StandardProductModel> products, decimal usdRate)
 		{
-			var usdRate = await DataCollector.GetCbrCursAsync("USD");
-
 			var result = products.ToList();
 
 			foreach (var product in result)
@@ -33,7 +31,7 @@ namespace CarzineCore
 			return result;
 		}
 
-		public StandardProductModel GetOptimalProduct(List<StandardProductModel> products)
+		public static StandardProductModel GetOptimalProduct(List<StandardProductModel> products)
 		{
 			// need for tests!!
 
@@ -46,7 +44,7 @@ namespace CarzineCore
 			return products.MinBy(x => (Array.IndexOf(prices, x.PriceRub) + Array.IndexOf(delivery, x.DeliveryMin)) / 2.0);
 		}
 
-		private decimal GetExtraCharge(decimal price)
+		private static decimal GetExtraCharge(decimal price)
 		{
 			if (price <= 0)
 				throw new Exception("Price cannot be equal or less than 0");

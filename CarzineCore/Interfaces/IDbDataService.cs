@@ -12,5 +12,7 @@ namespace CarzineCore.Interfaces
 		public Task<int> AddPreOrderAsync(PreOrderModel preorder);
 
 		public Task<IEnumerable<PreOrderModel>> GetPreOrdersAsync();
+
+		public Task<PreOrderModel> GetPreOrderAsync(int preOrderId);
 	}
 }

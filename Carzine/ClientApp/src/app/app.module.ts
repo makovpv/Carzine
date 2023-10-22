@@ -12,6 +12,9 @@ import { PreOrderComponent } from './components/dialogs/pre-order/pre-order.comp
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatInputModule } from '@angular/material/input';
 import { PreOrderListComponent } from './components/pre-order-list/pre-order-list.component';
 
 @NgModule({
@@ -33,7 +36,10 @@ import { PreOrderListComponent } from './components/pre-order-list/pre-order-lis
     BrowserAnimationsModule,
     MatDialogModule,
     MatButtonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatCheckboxModule,
+    MatSnackBarModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]

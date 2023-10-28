@@ -22,24 +22,38 @@
 	<div>{{modification.description}}</div>
 	<div>{{modification.modelName}}</div>
 	<div>{{modification.name}}</div>
+	<img [src]="model.image">
 </div>
-<div style="border: solid 2px blue; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
-	<ul>
-		<li *ngFor="let x of partGroups">
-			{{x.name}}
-			<button (click)="getGroupItems(x)">+++</button>
-		</li>
-	</ul>
-</div>
+
+<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+	<!-- This is the tree node template for leaf nodes -->
+	<mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+	  <!-- use a disabled button to provide padding for tree leaf -->
+	  <button mat-icon-button disabled></button>
+	  <span *ngIf="node.hasParts" (click)="getNodeParts(node)" style="cursor: pointer;"><strong>{{node.itemName}}</strong></span>
+	  <span *ngIf="!node.hasParts">{{node.itemName}}</span>
+	</mat-tree-node>
+	<!-- This is the tree node template for expandable nodes -->
+	<mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+	  <button mat-icon-button matTreeNodeToggle
+			  [attr.aria-label]="'Toggle ' + node.name">
+		<mat-icon class="mat-icon-rtl-mirror">
+		  {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+		</mat-icon>
+	  </button>
+	  {{node.itemName}}
+	</mat-tree-node>
+  </mat-tree>
 
 <div style="border: solid 2px orangered; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
 	<ul>
-		<li *ngFor="let x of partNumbers">
-			{{x.number}} - {{ x.name }}
+		<li *ngFor="let x of groupParts.numbers">
+			{{x.id}} - {{ x.name }} (PN {{x.number}})
+			<button (click)="searchByPN(x.number)">Поиск по номеру</button>
 		</li>
 	</ul>
+	<img [src]="groupParts.group?.image">
 </div>
-
 
 <div>
 	Найдено {{searchResult.products.length}} вариантов от {{searchResult.bestPrice?.priceRub | number: '1.0-0'}} рублей

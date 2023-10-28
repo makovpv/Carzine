@@ -55,37 +55,34 @@ namespace Carzine.Controllers
 		}
 
 		[HttpGet("searchVin")]
-		public async Task<IActionResult> SearchByVIN(string vin)
+		public async Task<IActionResult> SearchByVIN(string vin, bool requestEcoMode = false)
 		{
-			var result = await _apiDataService.SearchByVinAsync(vin);
-
-			var v = result.vins.FirstOrDefault();
-
 			var groupInfo = new AcatGroupInfo
 			{
-				GroupType = v.type,
-				Mark = v.mark,
-				Modification = v.modification,
-				Model = v.model,
+				GroupType = "CARS_FOREIGN",
+				Mark = "ford",
+				Modification = "0417effa2c41f9665976e0ad9467387e",
+				Model = "5c2447bd0d8d57b0bcbf7d8cc8407f3f",
 				Group = string.Empty
 			};
 
+			if (!requestEcoMode)
+			{
+				var searchResult = await _apiDataService.SearchByVinAsync(vin);
+
+				var acatVin = searchResult.vins.FirstOrDefault();
+
+				groupInfo = new AcatGroupInfo
+				{
+					GroupType = acatVin?.type,
+					Mark = acatVin?.mark,
+					Modification = acatVin?.modification,
+					Model = acatVin?.model,
+					Group = string.Empty
+				};
+			}
+
 			var acatGroups = await _apiDataService.GetAcatGroupsAsync(groupInfo);
-
-			////////////////////////////////////////////////////////////////////////////
-
-			//var groupInfo = new AcatGroupInfo
-			//{
-			//	GroupType = "CARS_FOREIGN",
-			//	Mark = "ford",
-			//	Modification = "0417effa2c41f9665976e0ad9467387e",
-			//	Model = "5c2447bd0d8d57b0bcbf7d8cc8407f3f",
-			//	Group = string.Empty
-			//};
-
-			//var acatGroups = await _apiDataService.GetAcatGroupsAsync(groupInfo);
-
-			////////////////////////////////////////////////////////////////////////////
 
 			//var result = new AcatPartsSearchResult();
 

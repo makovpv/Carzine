@@ -8,3 +8,8 @@ export class CarPartsGroupModel {
 	needLoadSubgroups: boolean | undefined;
 	parentId: string | undefined;
 }
+
+export class GroupInfoModel {
+	typeId: string | undefined;
+	groups: CarPartsGroupModel[] = [];
+}

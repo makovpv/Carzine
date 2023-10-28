@@ -17,7 +17,7 @@ export class SearchService {
 
   searchVIN(searchVIN: string): Promise<any> {
       return this.http.get<any>(
-        `${this.baseUrl}search/searchVIN?vin=${searchVIN}`)
+        `${this.baseUrl}search/searchVIN?vin=${searchVIN}&requestEcoMode=true`)
         .toPromise();
   }
 

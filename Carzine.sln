@@ -5,9 +5,11 @@ VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Carzine", "Carzine\Carzine.csproj", "{C69194E6-988E-4E92-98FA-F6438AFDC600}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{7AAAACE9-7464-4CA1-9B1C-6187D575AAC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{7AAAACE9-7464-4CA1-9B1C-6187D575AAC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarzineCore", "CarzineCore\CarzineCore.csproj", "{2874A7C5-1548-4026-A72E-451DE0C6A933}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarzineCore", "CarzineCore\CarzineCore.csproj", "{2874A7C5-1548-4026-A72E-451DE0C6A933}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarzineTest", "CarzineTest\CarzineTest.csproj", "{B67EC572-A6A3-4CA0-AEF9-1CE6178F2D41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{2874A7C5-1548-4026-A72E-451DE0C6A933}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2874A7C5-1548-4026-A72E-451DE0C6A933}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2874A7C5-1548-4026-A72E-451DE0C6A933}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B67EC572-A6A3-4CA0-AEF9-1CE6178F2D41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B67EC572-A6A3-4CA0-AEF9-1CE6178F2D41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B67EC572-A6A3-4CA0-AEF9-1CE6178F2D41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B67EC572-A6A3-4CA0-AEF9-1CE6178F2D41}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

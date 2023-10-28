@@ -1,4 +1,4 @@
-import { Component, Inject, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Inject, Injectable, TemplateRef, ViewChild } from '@angular/core';
 import { ProductModel } from '../models/ProductModel';
 import { ProductSearchResultModel } from '../models/ProductSearchResultModel';
 import { MatDialog } from '@angular/material/dialog';
@@ -10,8 +10,164 @@ import { CarModificationModel } from '../models/CarModificationModel';
 import { CarPartsGroupModel } from '../models/CarPartsGroupModel';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MarkModel, CarModel } from '../models/CarModel';
-import { PartNumberModel } from '../models/PartNumberModel';
+import { GroupPartListModel } from '../models/PartNumberModel';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { FlatTreeControl } from '@angular/cdk/tree';
+import { Observable } from 'rxjs/internal/Observable';
+import { CollectionViewer, DataSource, SelectionChange } from '@angular/cdk/collections';
+import { merge } from 'rxjs';
+import { map } from 'rxjs/operators';
 
+/** Flat node with expandable and level information */
+export class DynamicFlatNode {
+  constructor(
+    public itemName: string,
+    public level = 1,
+    public expandable = false,
+    public isLoading = false,
+    public id: string,
+    public parentId: string | undefined,
+    public groupTypeId = '',
+    public mark = '',
+    public modification = '',
+    public model = '',
+    public hasParts = false
+  ) {}
+}
+
+@Injectable({providedIn: 'root'})
+export class DynamicDatabase {
+  partGroups: CarPartsGroupModel[] = [];
+  groupTypeId = '';
+  mark = '';
+  modification = '';
+  model = '';
+
+  constructor(private searchService: SearchService) { }
+
+  initialData(typeId: string, mark: string, modification: string,
+    model: string, groups: CarPartsGroupModel[]): DynamicFlatNode[] {
+    this.groupTypeId = typeId;
+    this.mark = mark;
+    this.modification = modification;
+    this.model = model;
+    this.partGroups = groups;
+
+    return this.partGroups.map(x =>
+      new DynamicFlatNode(x.name!, 0, x.hasSubgroups, true, x.id, x.parentId, typeId, mark, modification, model)
+    );
+  }
+
+  getChildren(nodeKey: string, groupInfo: any): Promise<CarPartsGroupModel[]> | undefined {
+    let ww = this.partGroups.filter(x => x.parentId === nodeKey);
+    if (ww.length === 0) {
+      return this.searchService.getGroupItems(this.groupTypeId, groupInfo.id, 
+        groupInfo.mark, groupInfo.modification, groupInfo.model, groupInfo.parentId ?? '').then((data: any) => {
+          this.partGroups.push(...data.groups);
+          return data.groups;
+        });
+    }
+
+    return new Promise<CarPartsGroupModel[]>((resolve, reject) => {
+      resolve(ww);
+    });
+  }
+
+  isExpandable(item: CarPartsGroupModel): boolean {
+    return item.hasSubgroups!;
+  }
+}
+
+export class DynamicDataSource implements DataSource<DynamicFlatNode> {
+  dataChange = new BehaviorSubject<DynamicFlatNode[]>([]);
+
+  get data(): DynamicFlatNode[] {
+    return this.dataChange.value;
+  }
+  set data(value: DynamicFlatNode[]) {
+    this._treeControl.dataNodes = value;
+    this.dataChange.next(value);
+  }
+
+  constructor(
+    private _treeControl: FlatTreeControl<DynamicFlatNode>,
+    private _database: DynamicDatabase,
+  ) {}
+
+  connect(collectionViewer: CollectionViewer): Observable<DynamicFlatNode[]> {
+    this._treeControl.expansionModel.changed.subscribe(change => {
+      if (
+        (change as SelectionChange<DynamicFlatNode>).added ||
+        (change as SelectionChange<DynamicFlatNode>).removed
+      ) {
+        this.handleTreeControl(change as SelectionChange<DynamicFlatNode>);
+      }
+    });
+
+    return merge(collectionViewer.viewChange, this.dataChange).pipe(map(() => this.data));
+  }
+
+  disconnect(collectionViewer: CollectionViewer): void {}
+
+   /** Handle expand/collapse behaviors */
+   handleTreeControl(change: SelectionChange<DynamicFlatNode>) {
+    if (change.added) {
+      change.added.forEach(node => this.toggleNode(node, true));
+    }
+    if (change.removed) {
+      change.removed
+        .slice()
+        .reverse()
+        .forEach(node => this.toggleNode(node, false));
+    }
+  }
+
+  /**
+   * Toggle the node, remove from display list
+   */
+  toggleNode(node: DynamicFlatNode, expand: boolean) {
+    //const children = this._database.getChildren(node.item);////////!!!!!!!
+    this._database.getChildren(node.id, node)?.then((data: any) => {
+      const children = data;
+
+      const index = this.data.indexOf(node);
+      if (!children || index < 0) {
+        // If no children, or cannot find the node, no op
+        return;
+      }
+
+      node.isLoading = true;
+
+      if (expand) {
+        const nodes = children.map(
+          (item: any) => new DynamicFlatNode(
+            item.name!, node.level + 1, 
+            this._database.isExpandable(item), 
+            false,
+            item.id, item.parentId,
+            node.groupTypeId,
+            node.mark,
+            node.modification,
+            node.model,
+            item.hasParts),
+        );
+        this.data.splice(index + 1, 0, ...nodes);
+      } else {
+        let count = 0;
+        for (
+          let i = index + 1;
+          i < this.data.length && this.data[i].level > node.level;
+          i++, count++
+        ) {}
+        this.data.splice(index + 1, count);
+      }
+
+        // notify the change
+        this.dataChange.next(this.data);
+        node.isLoading = false;
+    }) ;
+  }
+}
 
 @Component({
   selector: 'app-home',
@@ -23,15 +179,20 @@ export class HomeComponent {
   searchResult = new ProductSearchResultModel();
   inProgress = false;
   searchCode = ""; //"31126753992";
-  searchVinCode = "";
+  searchVinCode = "123";
   includeAnalog = true;
   modification = new CarModificationModel();
   model = new CarModel();
   mark = new MarkModel();
   carType = "";
-  partGroups: CarPartsGroupModel[] = [];
-  currentGroupId = "";
-  partNumbers: PartNumberModel[] = [];
+  currentGroup = new CarPartsGroupModel();
+  groupParts = new GroupPartListModel();
+  treeControl: FlatTreeControl<DynamicFlatNode>;
+  dataSource: any;
+  
+  getLevel = (node: DynamicFlatNode) => node.level;
+  isExpandable = (node: DynamicFlatNode) => node.expandable;
+  hasChild = (_: number, node: any) => node.expandable;
 
   @ViewChild('dialogRef')
   dialogRef!: TemplateRef<any>;
@@ -40,7 +201,20 @@ export class HomeComponent {
     private searchService: SearchService,
     private orderService: OrderService,
     public dialog: MatDialog,
-    private _snackBar: MatSnackBar) { }
+    private _snackBar: MatSnackBar,
+    private database: DynamicDatabase) { 
+      this.treeControl = new FlatTreeControl<DynamicFlatNode>(this.getLevel, this.isExpandable);
+    }
+
+  getNodeParts(node: any) {
+    this.searchService.getGroupParts(node.groupTypeId, node.id, node.mark, node.modification, 
+      node.model, node.parentId ?? '')
+        .then((result: any) => {
+          this.inProgress = false;
+
+          this.groupParts = result;
+        });
+  }
 
   search() {
     if (!this.searchCode) {
@@ -65,6 +239,11 @@ export class HomeComponent {
       });
   }
 
+  searchByPN(pn: string) {
+    this.searchCode = pn;
+    this.search();
+  }
+
   searchVIN() {
     if (!this.searchVIN) {
       this.showSnack('Укажите VIN для поиска', 3000);
@@ -80,37 +259,17 @@ export class HomeComponent {
 	      this.modification = result.modification;
         this.model = result.model;
         this.mark = result.mark;
-	      this.partGroups = result.groups;
         this.carType = result.type.id;
+
+        this.dataSource = new DynamicDataSource(this.treeControl, this.database);
+        this.dataSource!.data = this.database.initialData(result.type.id, this.mark.id, 
+          this.modification.id,
+          this.model.id, result.groups);
       })
       .catch((err) => {
         this.inProgress = false;
         alert(err.error)
       });
-  }
-
-  getGroupItems(group: CarPartsGroupModel) {
-    this.inProgress = true;
-
-    if (group.hasSubgroups) {
-      this.searchService.getGroupItems(this.carType, group.id, this.mark.id, this.modification.id, this.model.id, this.currentGroupId ?? '')
-        .then((result: any) => {
-          this.inProgress = false;
-
-          this.currentGroupId = group.id;
-          this.partGroups = result.groups;
-        });
-    };
-
-    if (group.hasParts) {
-      this.searchService.getGroupParts(this.carType, group.id, this.mark.id, this.modification.id, this.model.id, this.currentGroupId ?? '')
-        .then((result: any) => {
-          this.inProgress = false;
-
-          this.partNumbers = result.numbers;
-        });
-    };
-
   }
 
   showSnack(message: string, duration: number) {

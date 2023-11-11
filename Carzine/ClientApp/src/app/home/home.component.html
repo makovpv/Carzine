@@ -12,47 +12,72 @@
 
 <div>
 	<mat-form-field class="search-form-field">
-		<input matInput type="search" placeholder="VIN" [(ngModel)]="searchVinCode">
+		<input matInput type="search" placeholder="VIN" [matAutocomplete]="auto" [(ngModel)]="searchVinCode">
+		<mat-autocomplete #auto="matAutocomplete">
+			<mat-option *ngFor="let option of options" [value]="option">
+			  {{option}}
+			</mat-option>
+		</mat-autocomplete>
 	</mat-form-field>
-	<button mat-flat-button color="primary" (click)="searchVIN()" [disabled]="inProgress">Поиск по VIN</button>
+	<button mat-flat-button type="submit" color="primary" (click)="searchVIN()" [disabled]="inProgress">Поиск по VIN</button>
 </div>
 
 <div style="border: solid 2px blue; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
-	<div>{{modification.brand}}</div>
-	<div>{{modification.description}}</div>
-	<div>{{modification.modelName}}</div>
-	<div>{{modification.name}}</div>
-	<img [src]="model.image">
+	<div>{{modification?.brand}}</div>
+	<div>{{modification?.description}}</div>
+	<div>{{modification?.modelName}}</div>
+	<div>{{modification?.name}}</div>
+	<img [src]="model?.image">
 </div>
 
-<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-	<!-- This is the tree node template for leaf nodes -->
-	<mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-	  <!-- use a disabled button to provide padding for tree leaf -->
-	  <button mat-icon-button disabled></button>
-	  <span *ngIf="node.hasParts" (click)="getNodeParts(node)" style="cursor: pointer;"><strong>{{node.itemName}}</strong></span>
-	  <span *ngIf="!node.hasParts">{{node.itemName}}</span>
-	</mat-tree-node>
-	<!-- This is the tree node template for expandable nodes -->
-	<mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
-	  <button mat-icon-button matTreeNodeToggle
-			  [attr.aria-label]="'Toggle ' + node.name">
-		<mat-icon class="mat-icon-rtl-mirror">
-		  {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-		</mat-icon>
-	  </button>
-	  {{node.itemName}}
-	</mat-tree-node>
-  </mat-tree>
+<div id="group-parts">
+	<div class="group-parts-area">
+		<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+			<!-- This is the tree node template for leaf nodes -->
+			<mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+			<!-- use a disabled button to provide padding for tree leaf -->
+			<button mat-icon-button disabled></button>
+			<span *ngIf="node.hasParts" (click)="getNodeParts(node)" style="cursor: pointer;"><strong>{{node.itemName}}</strong></span>
+			<span *ngIf="!node.hasParts">{{node.itemName}}</span>
+			</mat-tree-node>
+			<!-- This is the tree node template for expandable nodes -->
+			<mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+			<button mat-icon-button matTreeNodeToggle
+					[attr.aria-label]="'Toggle ' + node.name">
+				<mat-icon class="mat-icon-rtl-mirror">
+				{{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+				</mat-icon>
+			</button>
+			{{node.itemName}}
+			</mat-tree-node>
+		</mat-tree>
+	</div>
 
-<div style="border: solid 2px orangered; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
-	<ul>
-		<li *ngFor="let x of groupParts.numbers">
-			{{x.id}} - {{ x.name }} (PN {{x.number}})
-			<button (click)="searchByPN(x.number)">Поиск по номеру</button>
-		</li>
-	</ul>
-	<img [src]="groupParts.group?.image">
+	<div class="group-parts-area">
+		<div>
+			<!-- <svg *ngIf="mrk"  class="mark-img" width="600" height="800">
+				<rect [attr.x]="xx" [attr.y]="yy" [attr.width]="ww" [attr.height]="hh" 
+				style="fill:rgba(0,0,0,0);stroke-width:1;stroke:red;" />
+			</svg> -->
+
+			 <img [src]="schemeImage" usemap="#workmap"> 
+			<map name="workmap">
+				<area *ngFor="let lbl of groupParts?.labels"
+					(click)="searchById(lbl.id)"
+					coords="{{lbl!.coordinate!.top!.x}},{{lbl!.coordinate!.top!.y}},{{lbl!.coordinate!.bottom!.x}},{{lbl!.coordinate!.bottom!.y}}"
+					alt="lbl.name"
+					(mouseover)="onAreaMouseOver(lbl.coordinate)"
+					(mouseout)="onAreaMouseOut()"
+					shape="rect">
+			</map>
+		</div>
+		<ul>
+			<li *ngFor="let x of groupParts.numbers">
+				{{x.id}} - {{ x.name }} (PN {{x.number}})
+				<button (click)="searchByPN(x.number)">Поиск по номеру</button>
+			</li>
+		</ul>
+	</div>
 </div>
 
 <div>

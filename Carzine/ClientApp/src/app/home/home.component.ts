@@ -189,10 +189,13 @@ export class HomeComponent {
   groupParts = new GroupPartListModel();
   treeControl: FlatTreeControl<DynamicFlatNode>;
   dataSource: any;
+  schemeImage: any;
   
   getLevel = (node: DynamicFlatNode) => node.level;
   isExpandable = (node: DynamicFlatNode) => node.expandable;
   hasChild = (_: number, node: any) => node.expandable;
+
+  options: string[] | undefined = [];
 
   @ViewChild('dialogRef')
   dialogRef!: TemplateRef<any>;
@@ -206,6 +209,19 @@ export class HomeComponent {
       this.treeControl = new FlatTreeControl<DynamicFlatNode>(this.getLevel, this.isExpandable);
     }
 
+  ngOnInit() {
+    const vins = localStorage.getItem('vins');
+    this.options = vins?.split(';') ?? [];
+  }
+
+  onAreaMouseOver(lbl: any) {}
+  onAreaMouseOut() { }
+
+  searchById(labelId: any) {
+    const PN = this.groupParts.numbers.find(x => x.labelId === labelId)?.number;
+    this.searchByPN(PN!);
+  }
+
   getNodeParts(node: any) {
     this.searchService.getGroupParts(node.groupTypeId, node.id, node.mark, node.modification, 
       node.model, node.parentId ?? '')
@@ -214,6 +230,9 @@ export class HomeComponent {
 
           this.groupParts = result;
         });
+
+    this.schemeImage = this.searchService.getSchemeUrl(node.groupTypeId, node.id, node.mark, node.modification,
+     node.model, node.parentId ?? '');
   }
 
   search() {
@@ -250,11 +269,21 @@ export class HomeComponent {
       return;
     }
 
+    if ((this.options?.indexOf(this.searchVinCode) ?? -1) === -1) {
+      this.options?.push(this.searchVinCode);
+      localStorage.setItem('vins', this.options?.join(';') ?? '');
+    }
+
     this.inProgress = true;
 
     this.searchService.searchVIN(this.searchVinCode)
       .then((result: any) => {
         this.inProgress = false;
+
+        if (!result.type || !result.model) {
+          this.showSnack("Ничего не найдено по данному VIN", 10000);
+          return;
+        }
 
 	      this.modification = result.modification;
         this.model = result.model;
@@ -262,9 +291,12 @@ export class HomeComponent {
         this.carType = result.type.id;
 
         this.dataSource = new DynamicDataSource(this.treeControl, this.database);
-        this.dataSource!.data = this.database.initialData(result.type.id, this.mark.id, 
+        this.dataSource!.data = this.database.initialData(
+          result.type.id,
+          this.mark.id, 
           this.modification.id,
-          this.model.id, result.groups);
+          this.model.id, 
+          result.groups);
       })
       .catch((err) => {
         this.inProgress = false;

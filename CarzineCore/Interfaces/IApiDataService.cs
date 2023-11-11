@@ -1,9 +1,4 @@
 ﻿using CarzineCore.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarzineCore.Interfaces
 {
@@ -23,5 +18,6 @@ namespace CarzineCore.Interfaces
 
 		public Task<AcatPartsSearchResult> GetAcatPartsAsync(AcatGroupInfo groupInfo);
 
+		public Task<Stream> GetAcatImageSourceAsync(AcatGroupInfo groupInfo);
 	}
 }

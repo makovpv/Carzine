@@ -17,7 +17,7 @@ export class SearchService {
 
   searchVIN(searchVIN: string): Promise<any> {
       return this.http.get<any>(
-        `${this.baseUrl}search/searchVIN?vin=${searchVIN}&requestEcoMode=true`)
+        `${this.baseUrl}search/searchVIN?vin=${searchVIN}&requestEcoMode=${searchVIN === '123'}`)
         .toPromise();
   }
 
@@ -43,5 +43,14 @@ export class SearchService {
       return this.http.get<any>(
         `${this.baseUrl}search/parts?groupType=${groupType}&group=${groupId}&Mark=${mark}&Modification=${modification}&Model=${model}&ParentGroup=${parentGroup}`)
         .toPromise();
+  }
+
+  getSchemeUrl(groupType: string,
+    groupId: string,
+    mark: string,
+    modification: string,
+    model: string,
+    parentGroup: string): string {
+    return `${this.baseUrl}search/scheme?groupType=${groupType}&group=${groupId}&Mark=${mark}&Modification=${modification}&Model=${model}&ParentGroup=${parentGroup}`;
   }
 }

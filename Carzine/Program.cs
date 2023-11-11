@@ -6,6 +6,8 @@ using NLog.Web;
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 logger.Debug("init main");
 
+var allowSpecificOrigins = "_allowSpecificOrigins";
+
 try
 {
 	var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,11 @@ try
 
 	builder.Services.AddSingleton<IApiDataService, ApiDataService>();
 	builder.Services.AddSingleton<IDbDataService, DbDataService>();
+
+	builder.Services.AddCors(options =>
+	{
+		options.AddPolicy(allowSpecificOrigins, policy => policy.AllowAnyOrigin());
+	});
 
 	//builder.Logging.AddConsole();
 	builder.Logging.ClearProviders();
@@ -34,6 +41,7 @@ try
 	app.UseStaticFiles();
 	app.UseRouting();
 
+	app.UseCors(allowSpecificOrigins);
 
 	app.MapControllerRoute(
 		name: "default",

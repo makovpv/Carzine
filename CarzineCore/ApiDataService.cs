@@ -405,12 +405,17 @@ namespace CarzineCore
 
 			var response = await _restClient.ExecuteAsync(request);
 
-			var qqq = JsonConvert.DeserializeObject<AcatPartsSearchResult>(response.Content);
+			return JsonConvert.DeserializeObject<AcatPartsSearchResult>(response.Content);
+		}
 
-			return qqq;
+		public async Task<Stream> GetAcatImageSourceAsync(AcatGroupInfo groupInfo)
+		{
+			var request = GetRestRequest(
+				$"{_apiAcatCred.url}catalogs/scheme?type={groupInfo.GroupType}&mark={groupInfo.Mark}&modification={groupInfo.Modification}&model={groupInfo.Model}&group={groupInfo.Group}&parentGroup={groupInfo.ParentGroup}",
+				_acatToken,
+				Method.Get);
 
+			return await _restClient.DownloadStreamAsync(request);
 		}
 	}
-
-	
 }

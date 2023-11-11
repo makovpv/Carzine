@@ -17,6 +17,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { PreOrderListComponent } from './components/pre-order-list/pre-order-list.component';
 
 @NgModule({
@@ -43,7 +44,8 @@ import { PreOrderListComponent } from './components/pre-order-list/pre-order-lis
     MatSnackBarModule,
     MatInputModule,
     MatTreeModule,
-    MatIconModule
+    MatIconModule,
+    MatAutocompleteModule
   ],
   providers: [],
   bootstrap: [AppComponent]

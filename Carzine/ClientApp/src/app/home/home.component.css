@@ -25,3 +25,20 @@
 .product-card-title {
 	border-bottom: solid 2px green;
 }
+
+#group-parts {
+	display: flex;
+}
+
+.group-parts-area {
+	width: 50%;
+	border: solid 2px orangered; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;
+}
+
+area {
+	cursor: pointer;
+}
+
+.mark-img {
+	position: absolute;
+}

@@ -147,5 +147,28 @@ namespace Carzine.Controllers
 
 			return StatusCode(StatusCodes.Status200OK, result);
 		}
+
+		[HttpGet("scheme")]
+		[Produces("image/png")]
+		public async Task<IActionResult> GetScheme(string GroupType,
+			string Mark,
+			string Modification,
+			string Model,
+			string Group, string? ParentGroup)
+		{
+			var groupInfo = new AcatGroupInfo()
+			{
+				Group = Group,
+				Mark = Mark,
+				GroupType = GroupType,
+				Modification = Modification,
+				Model = Model,
+				ParentGroup = ParentGroup
+			};
+
+			var imgSource = await _apiDataService.GetAcatImageSourceAsync(groupInfo);
+
+			return File(imgSource, "image/png");
+		}
 	}
 }

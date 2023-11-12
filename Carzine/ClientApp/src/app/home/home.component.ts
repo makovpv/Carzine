@@ -179,7 +179,6 @@ export class HomeComponent {
   searchResult = new ProductSearchResultModel();
   inProgress = false;
   searchCode = ""; //"31126753992";
-  searchVinCode = "123";
   includeAnalog = true;
   modification = new CarModificationModel();
   model = new CarModel();
@@ -190,6 +189,7 @@ export class HomeComponent {
   treeControl: FlatTreeControl<DynamicFlatNode>;
   dataSource: any;
   schemeImage: any;
+  showAllProducts = false;
   
   getLevel = (node: DynamicFlatNode) => node.level;
   isExpandable = (node: DynamicFlatNode) => node.expandable;
@@ -210,8 +210,8 @@ export class HomeComponent {
     }
 
   ngOnInit() {
-    const vins = localStorage.getItem('vins');
-    this.options = vins?.split(';') ?? [];
+    const searchHistory = localStorage.getItem('searchHistory');
+    this.options = searchHistory?.split(';') ?? [];
   }
 
   onAreaMouseOver(lbl: any) {}
@@ -219,7 +219,7 @@ export class HomeComponent {
 
   searchById(labelId: any) {
     const PN = this.groupParts.numbers.find(x => x.labelId === labelId)?.number;
-    this.searchByPN(PN!);
+    this.searchByPn(PN!);
   }
 
   getNodeParts(node: any) {
@@ -235,17 +235,40 @@ export class HomeComponent {
      node.model, node.parentId ?? '');
   }
 
+  isVinCode(code: string): boolean {
+    if (code === '123') // !!!
+      return true;
+
+    return code.length === 17 && 
+      !(code.toUpperCase().includes('I') || code.toUpperCase().includes('O') || code.toUpperCase().includes('Q'));
+  }
+
   search() {
     if (!this.searchCode) {
-      this.showSnack('Укажите код детали для поиска', 3000);
+      this.showSnack('Укажите код для поиска', 3000);
       return;
+    }
+
+    if ((this.options?.indexOf(this.searchCode) ?? -1) === -1) {
+      this.options?.push(this.searchCode);
+      localStorage.setItem('searchHistory', this.options?.join(';') ?? '');
     }
 
     this.inProgress = true;
 
-    this.searchService.search(this.searchCode, this.includeAnalog)
+    if (this.isVinCode(this.searchCode)) {
+      this.searchByVin(this.searchCode)
+    }
+    else {
+      this.searchByPn(this.searchCode);
+    }
+  }
+
+  searchByPn(pn: string) {
+    this.searchService.search(pn, this.includeAnalog)
       .then((result: ProductSearchResultModel) => {
         this.inProgress = false;
+        this.showAllProducts = false;
         this.searchResult = result;
         
         if (result.products.length === 0) {
@@ -258,25 +281,8 @@ export class HomeComponent {
       });
   }
 
-  searchByPN(pn: string) {
-    this.searchCode = pn;
-    this.search();
-  }
-
-  searchVIN() {
-    if (!this.searchVIN) {
-      this.showSnack('Укажите VIN для поиска', 3000);
-      return;
-    }
-
-    if ((this.options?.indexOf(this.searchVinCode) ?? -1) === -1) {
-      this.options?.push(this.searchVinCode);
-      localStorage.setItem('vins', this.options?.join(';') ?? '');
-    }
-
-    this.inProgress = true;
-
-    this.searchService.searchVIN(this.searchVinCode)
+  searchByVin(vin: string) {
+    this.searchService.searchVIN(vin)
       .then((result: any) => {
         this.inProgress = false;
 
@@ -336,4 +342,10 @@ export class HomeComponent {
     })
   }
 
+  getDeliveryString(deliveryMin?: number, deliveryMax?: number): any {
+    if (deliveryMin === deliveryMax)
+      return deliveryMax;
+    
+    return `${deliveryMin} - ${deliveryMax}`;
+  }
 }

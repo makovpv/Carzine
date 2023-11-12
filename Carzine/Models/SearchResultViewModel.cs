@@ -11,5 +11,7 @@ namespace Carzine.Models
         public StandardProductModel? Optimal { get; set; }
 
         public IEnumerable<StandardProductModel>? Products { get; set; }
+
+        public decimal UsdRate { get; set; }
     }
 }

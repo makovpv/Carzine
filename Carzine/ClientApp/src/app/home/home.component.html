@@ -1,25 +1,20 @@
 <div id="search">
 	<div style="width: 740px;">
-		
 		<mat-form-field class="search-form-field">
-			<input matInput type="search" placeholder="Номер детали" [(ngModel)]="searchCode">
+			<input matInput type="search"
+				placeholder="VIN / Part Number" 
+				[matAutocomplete]="auto"
+				[(ngModel)]="searchCode">
+			<mat-autocomplete #auto="matAutocomplete">
+				<mat-option *ngFor="let option of options" [value]="option">
+				  {{option}}
+				</mat-option>
+			</mat-autocomplete>
 		</mat-form-field>
-
+		
 		<button mat-flat-button color="primary" (click)="search()" [disabled]="inProgress">Поиск</button>
 	</div>
 	<mat-checkbox color="primary" [(ngModel)]="includeAnalog">искать аналоги</mat-checkbox>
-</div>
-
-<div>
-	<mat-form-field class="search-form-field">
-		<input matInput type="search" placeholder="VIN" [matAutocomplete]="auto" [(ngModel)]="searchVinCode">
-		<mat-autocomplete #auto="matAutocomplete">
-			<mat-option *ngFor="let option of options" [value]="option">
-			  {{option}}
-			</mat-option>
-		</mat-autocomplete>
-	</mat-form-field>
-	<button mat-flat-button type="submit" color="primary" (click)="searchVIN()" [disabled]="inProgress">Поиск по VIN</button>
 </div>
 
 <div style="border: solid 2px blue; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
@@ -74,7 +69,7 @@
 		<ul>
 			<li *ngFor="let x of groupParts.numbers">
 				{{x.id}} - {{ x.name }} (PN {{x.number}})
-				<button (click)="searchByPN(x.number)">Поиск по номеру</button>
+				<button (click)="searchByPn(x.number)">Поиск по номеру</button>
 			</li>
 		</ul>
 	</div>
@@ -126,18 +121,20 @@
 			<th>Оригинал</th>
 			<th></th>
 		</tr>
-		<tr *ngFor="let x of searchResult.products">
+		<tr *ngFor="let x of (showAllProducts ? searchResult.products : searchResult.products.slice(0,5))">
 			<td>{{x.name}}</td>
 			<td>{{x.manufacturer}}</td>
 			<td>{{x.partNumber}}</td>
 			<td>{{x.priceRub | number: '1.0-0'}}</td>
-			<td>{{x.deliveryMin}} - {{x.deliveryMax}}</td>
+			<td>{{getDeliveryString(x.deliveryMin, x.deliveryMax)}}</td>
 			<td>{{x.isOriginal}}</td>
 			<td>
 				<button mat-stroked-button mat-button color="primary" (click)="openDialog(x)">Заказать</button>
 			</td>
 		</tr>
 	</table>
+
+	<button id="btn-show-all" *ngIf="!showAllProducts" mat-stroked-button mat-button (click)="showAllProducts = true;">Показать все</button>
 
 	<mat-spinner *ngIf="inProgress"></mat-spinner>
 

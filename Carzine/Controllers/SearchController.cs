@@ -42,6 +42,13 @@ namespace Carzine.Controllers
 
 			var products = CarzineCalculator.CalcPriceRub(result.ToList(), usdRate);
 
+			products.Sort(delegate (StandardProductModel x, StandardProductModel y) {
+				if (x.Price == y.Price)
+					return 0;
+				
+				return x.Price > y.Price ? 1 : -1;
+			});
+
 			return StatusCode(
 				StatusCodes.Status200OK,
 				new SearchResultViewModel()
@@ -49,7 +56,8 @@ namespace Carzine.Controllers
 					Products = products.FillEmptyNames(),
 					BestPrice = products.MinBy(x => x.PriceRub),
 					ExpressDelivery = products.MinBy(x => x.DeliveryMin),
-					Optimal = CarzineCalculator.GetOptimalProduct(products)
+					Optimal = CarzineCalculator.GetOptimalProduct(products),
+					UsdRate = usdRate
 				});
 
 		}

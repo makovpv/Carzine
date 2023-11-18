@@ -1,9 +1,4 @@
 ﻿using CarzineCore.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarzineCore.Interfaces
 {
@@ -11,8 +6,8 @@ namespace CarzineCore.Interfaces
 	{
 		public Task<int> AddPreOrderAsync(PreOrderModel preorder);
 
-		public Task<IEnumerable<PreOrderModel>> GetPreOrdersAsync();
+		public Task<IEnumerable<PreOrderDto>> GetPreOrdersAsync();
 
-		public Task<PreOrderModel> GetPreOrderAsync(int preOrderId);
+		public Task<PreOrderDto> GetPreOrderAsync(int preOrderId);
 	}
 }

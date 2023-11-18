@@ -21,8 +21,10 @@ namespace CarzineCore
 		private readonly ILogger<DbDataService> _logger;
 
 		const string _sqlInsertPreOrder =
-			"INSERT INTO pre_order(phone, [date], pn, manufacturer, price_rub, delivery_min, source_id) " +
-			"VALUES (@phone, getUtcDate(), @pn, @manufacturer, @priceRub, @deliveryMin, @sourceId)";
+			"INSERT INTO pre_order(phone, [date], pn, manufacturer, price_rub, delivery_min, source_id," +
+				"[number], weight, volume, supplyer_price, delivery_cost, extra_charge, supplyer_status, client_status) " +
+			"VALUES (@phone, getUtcDate(), @pn, @manufacturer, @priceRub, @deliveryMin, @sourceId," +
+				"'???', @weight, @volume, @supplyerPrice, @deliveryCost, @extraCharge, @supplyerStatus, @clientStatus)";
 		
 		const string _sqlGetPreorders =
 			"SELECT * FROM pre_order";
@@ -77,7 +79,14 @@ namespace CarzineCore
 					manufacturer = preorder.Manufacturer,
 					priceRub = preorder.PriceRub,
 					deliveryMin = preorder.DeliveryMin,
-					sourceId = (int)preorder.SourceId
+					sourceId = (int)preorder.SourceId,
+					weight = preorder.Weight,
+					volume = preorder.Volume,
+					supplyerPrice = 123,
+					deliveryCost = 123,
+					extraCharge = 123,
+					supplyerStatus = 123,
+					clientStatus = 123
 				});
 			}
 			catch (Exception ex)

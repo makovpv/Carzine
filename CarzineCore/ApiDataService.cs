@@ -268,9 +268,9 @@ namespace CarzineCore
 				var orderPosition = new
 				{
 					id = 0,
-					code = preOrder.PartNumber,
+					code = preOrder.Product.PartNumber,
 					price = 0,
-					make = preOrder.Manufacturer,
+					make = preOrder.Product.Manufacturer,
 					priceName = "",
 					supplier_id = 0,
 					quantity = 0,

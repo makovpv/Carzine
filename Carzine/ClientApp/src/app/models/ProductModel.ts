@@ -4,6 +4,7 @@ export class ProductModel {
 	manufacturer: string | undefined;
 	partNumber: string | undefined;
 	priceRub: number = 0;
+	price: number = 0;
 	weight: number | undefined;
 	volume: number | undefined;
 	deliveryMin: number | undefined;
@@ -11,4 +12,6 @@ export class ProductModel {
 	minOrderAmount: number | undefined;
 	maxOrderAmount: number | undefined;
 	isOriginal: boolean | undefined;
+    extraCharge: number | undefined;
+	deliveryCost: number | undefined;
 }

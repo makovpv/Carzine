@@ -10,12 +10,19 @@ import { OrderService } from 'src/app/services/order.service';
 })
 export class PreOrderListComponent implements OnInit {
   preOrders: PreOrderModel[] = [];
+  suppliers: any[] = [];
+  inProgress = false;
 
   constructor(
     private orderService: OrderService) {
-      this.orderService.getPreOrders()
-        .then((data: any) => this.preOrders = data);
-    }
+
+    this.inProgress = true;
+
+    this.orderService.getPreOrders().then((data: any) => {
+      this.preOrders = data;
+      this.inProgress = false;
+	  });
+  }
 
   ngOnInit(): void {
   }
@@ -34,4 +41,7 @@ export class PreOrderListComponent implements OnInit {
       });
   }
 
+  getSupplierName(id?: number): string | undefined {
+    return this.orderService.suppliers.find(x=> x?.id === id)?.name;
+  }
 }

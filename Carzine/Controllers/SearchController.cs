@@ -24,11 +24,11 @@ namespace Carzine.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Get(string code, bool analog)
 		{
-			IEnumerable<StandardProductModel> result;
+			IEnumerable<StandardProductModel> productData;
 			
 			try
 			{
-				result = await _apiDataService.GetDataMultipleSourceAsync(code, analog);
+				productData = await _apiDataService.GetDataMultipleSourceAsync(code, analog);
 			}
 			catch (Exception ex)
 			{
@@ -40,7 +40,7 @@ namespace Carzine.Controllers
 
 			var usdRate = await DataCollector.GetCbrCursAsync("USD");
 
-			var products = CarzineCalculator.CalcPriceRub(result.ToList(), usdRate);
+			var products = CarzineCalculator.CalcPriceComponents(productData, usdRate);
 
 			products.Sort(delegate (StandardProductModel x, StandardProductModel y) {
 				if (x.Price == y.Price)

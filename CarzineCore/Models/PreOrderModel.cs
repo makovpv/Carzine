@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarzineCore.Models
 {
@@ -13,15 +8,12 @@ namespace CarzineCore.Models
 
 		public string Phone { get; set; }
 
-		[JsonProperty("PartNumber")]
-		public string PartNumber { get; set; }
+		public StandardProductModel Product { get; set; }
 
-		public string Manufacturer { get; set; }
+		public DateTime Date { get; set; }
 
-		public decimal PriceRub { get; set; }
+		public ClientStatus ClientStatus { get; set; }
 
-		public int? DeliveryMin { get; set; }
-
-		public ApiSource SourceId { get; set; }
+		public SupplyerStatus SupplyerStatus { get; set; }
 	}
 }

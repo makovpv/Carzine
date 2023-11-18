@@ -22,4 +22,14 @@ namespace CarzineCore
 		UkrainianPost = 4,
 		RussianPost = 5
 	}
+
+	public enum ClientStatus
+	{
+		New = 1
+	}
+
+	public enum SupplyerStatus
+	{
+		New = 1
+	}
 }

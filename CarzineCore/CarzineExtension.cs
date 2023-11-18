@@ -66,6 +66,30 @@ namespace CarzineCore
 			});
 		}
 
+		public static PreOrderModel ToPreOrderModel(this PreOrderDto preOrder)
+		{
+			return new PreOrderModel
+			{
+				Id = preOrder.Id,
+				Date = preOrder.Date,
+				Phone = preOrder.Phone,
+				ClientStatus = preOrder.Client_status,
+				SupplyerStatus = preOrder.Supplyer_status,
+				Product = new StandardProductModel
+				{
+					SourceId = (ApiSource)preOrder.Source_Id,
+					PartNumber = preOrder.PN,
+					DeliveryCost = preOrder.Delivery_cost,
+					ExtraCharge = preOrder.Extra_charge,
+					Manufacturer = preOrder.Manufacturer,
+					PriceRub = preOrder.Price_Rub,
+					Price = preOrder.Supplyer_price,
+					Volume = preOrder.Volume,
+					Weight = preOrder.Weight,
+				}
+			};
+		}
+
 		public static IEnumerable<StandardProductModel> FillEmptyNames(this List<StandardProductModel> products)
 		{
 			var defaultName = products.FirstOrDefault(x => !string.IsNullOrEmpty(x.Name))?.Name;

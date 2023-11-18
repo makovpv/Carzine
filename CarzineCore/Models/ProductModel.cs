@@ -1,32 +1,5 @@
 ﻿namespace CarzineCore.Models
 {
-	public class ProductModel
-	{
-		public decimal Price { get; set; }
-		/// <summary>
-		/// Product name
-		/// </summary>
-		public string Name { get; set; }
-		/// <summary>
-		/// Manufacturer name
-		/// </summary>
-		public string Make { get; set; }
-		/// <summary>
-		/// Store Name
-		/// </summary>
-		public string PriceName { get; set; }
-
-		/// <summary>
-		/// Min items count to order
-		/// </summary>
-		public int MinOrderAmount { get; set; }
-
-		/// <summary>
-		/// Max items count to order
-		/// </summary>
-		public int MaxOrderAmount { get; set; }
-	}
-
 	public class StandardProductModel
 	{
 		public string Name { get; set; }
@@ -56,5 +29,9 @@
 		public ApiSource SourceId { get; set; }
 
 		public bool? IsOriginal { get; set; }
+
+		public decimal DeliveryCost { get; set; }
+
+		public decimal ExtraCharge { get; set; }
 	}
 }

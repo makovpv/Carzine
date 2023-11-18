@@ -17,7 +17,8 @@ try
 	builder.Services.AddControllersWithViews();
 
 	builder.Services.AddSingleton<IApiDataService, ApiDataService>();
-	builder.Services.AddSingleton<IDbDataService, DbDataService>();
+	//builder.Services.AddSingleton<IDbDataService, DbDataService>();
+	builder.Services.AddSingleton<IDbDataService, MySqlDataService>();
 
 	builder.Services.AddCors(options =>
 	{

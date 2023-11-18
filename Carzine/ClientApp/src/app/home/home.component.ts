@@ -324,12 +324,9 @@ export class HomeComponent {
       if (res && res.event === 'ok' && res.data) {
         const preOrderData: PreOrderModel = {
           phone: res.data,
-          partNumber: product.partNumber,
-          manufacturer: product.manufacturer,
-          priceRub: product.priceRub,
-          deliveryMin: product.deliveryMin,
+          product: product,
           id: undefined,
-          sourceId: product.sourceId
+          date: undefined,
         }
 
         this.orderService.preOrder(preOrderData).then(() => {

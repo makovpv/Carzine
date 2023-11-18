@@ -9,20 +9,22 @@ namespace CarzineCore
 			
 		}
 
-		public static List<StandardProductModel> CalcPriceRub(List<StandardProductModel> products, decimal usdRate)
+		public static List<StandardProductModel> CalcPriceComponents(IEnumerable<StandardProductModel> products, decimal usdRate)
 		{
-			var result = products.ToList();
+			List<StandardProductModel>? result = products.ToList();
 
 			foreach (var product in result)
 			{
-				var deliveryCost = 
+				product.DeliveryCost =
 					  Math.Max(product.Weight, product.Volume) * 12
 					+ product.Price * (decimal)0.04;
-				
+
+				product.ExtraCharge = GetExtraCharge(product.Price);
+
 				var totalPriceUSD = 
 					  product.Price
-					+ deliveryCost
-					+ GetExtraCharge(product.Price)
+					+ product.DeliveryCost
+					+ product.ExtraCharge
 					+ product.Price * (decimal)0.03;
 
 				product.PriceRub = totalPriceUSD * usdRate;

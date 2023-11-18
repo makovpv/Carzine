@@ -25,7 +25,7 @@ namespace CarzineTest
 				}
 			};
 
-			var productsRub = CarzineCalculator.CalcPriceRub(productsUsd, (decimal)12.34);
+			var productsRub = CarzineCalculator.CalcPriceComponents(productsUsd, (decimal)12.34);
 
 			Assert.That(productsRub.Count, Is.EqualTo(1));
 		}

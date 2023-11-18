@@ -32,9 +32,9 @@ namespace Carzine.Controllers
 		[HttpPost("order/{preOrderId}")]
 		public async Task<IActionResult> CreateOrderAsync(int preOrderId)
 		{
-			var preOrder = await _dataService.GetPreOrderAsync(preOrderId);
+			var preOrder = (await _dataService.GetPreOrderAsync(preOrderId)).ToPreOrderModel();
 			
-			switch (preOrder.SourceId)
+			switch (preOrder.Product.SourceId)
 			{
 				case ApiSource.Apec:
 					var result1 = await _apiService.CreateApecOrderAsync();
@@ -55,9 +55,24 @@ namespace Carzine.Controllers
 		[HttpGet("preorder")]
 		public async Task<IActionResult> GetPreOrdersAsync()
 		{
-			var result = await _dataService.GetPreOrdersAsync();
+			var preOrders = await _dataService.GetPreOrdersAsync();
+
+			var result = preOrders.Select(x => x.ToPreOrderModel());
 
 			return StatusCode(StatusCodes.Status201Created, result);
+		}
+
+		[HttpGet("suppliers")]
+		public IActionResult GetSuppliers()
+		{
+			Dictionary<int, string> data = new()
+			{
+				{ (int)ApiSource.Apm, "APM" },
+				{ (int)ApiSource.Apec, "Apec" },
+				{ (int)ApiSource.Emex, "Emex" }
+			};
+
+			return StatusCode(StatusCodes.Status200OK, data);
 		}
 	}
 }

@@ -345,4 +345,10 @@ export class HomeComponent {
     
     return `${deliveryMin} - ${deliveryMax}`;
   }
+
+  onSearchKeyDown(e: any) {
+    if (e.code === 'Enter') {
+      this.search();
+    }
+  }
 }

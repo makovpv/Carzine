@@ -19,6 +19,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { PreOrderListComponent } from './components/pre-order-list/pre-order-list.component';
+import { IntCurrencyPipe } from './pipes/int-currency.pipe';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { PreOrderListComponent } from './components/pre-order-list/pre-order-lis
     NavMenuComponent,
     HomeComponent,
     PreOrderComponent,
-    PreOrderListComponent
+    PreOrderListComponent,
+    IntCurrencyPipe
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

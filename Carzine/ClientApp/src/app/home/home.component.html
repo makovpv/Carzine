@@ -4,7 +4,8 @@
 			<input matInput type="search"
 				placeholder="VIN / Part Number" 
 				[matAutocomplete]="auto"
-				[(ngModel)]="searchCode">
+				[(ngModel)]="searchCode"
+				(keydown)="onSearchKeyDown($event)">
 			<mat-autocomplete #auto="matAutocomplete">
 				<mat-option *ngFor="let option of options" [value]="option">
 				  {{option}}
@@ -85,7 +86,7 @@
 			<strong>Лучшая цена</strong>
 		</div>
 		<div>Бренд: {{searchResult.bestPrice?.manufacturer}}</div>
-		<div>Цена: {{searchResult.bestPrice?.priceRub | number: '1.0-0'}} руб</div>
+		<div>Цена: {{searchResult.bestPrice?.priceRub | intCurrency}} руб</div>
 		<div>Срок доставки: {{searchResult.bestPrice?.deliveryMin}} - {{searchResult.bestPrice?.deliveryMin}} дней</div>
 		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.bestPrice)">Заказать</button>
 	</div>
@@ -94,7 +95,7 @@
 			<strong>Экспресс доставка</strong>
 		</div>
 		<div>Бренд: {{searchResult.expressDelivery?.manufacturer}}</div>
-		<div>Цена: {{searchResult.expressDelivery?.priceRub | number: '1.0-0'}} руб</div>
+		<div>Цена: {{searchResult.expressDelivery?.priceRub | intCurrency}} руб</div>
 		<div>Срок доставки: {{searchResult.expressDelivery?.deliveryMin}} - {{searchResult.expressDelivery?.deliveryMin}} дней</div>
 		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.expressDelivery)">Заказать</button>
 	</div>
@@ -103,7 +104,7 @@
 			<strong>Оптимальный вариант</strong>
 		</div>
 		<div>Бренд: {{searchResult.optimal?.manufacturer}}</div>
-		<div>Цена: {{searchResult.optimal?.priceRub | number: '1.0-0'}} руб</div>
+		<div>Цена: {{searchResult.optimal?.priceRub | intCurrency}} руб</div>
 		<div>Срок доставки: {{searchResult.optimal?.deliveryMin}} - {{searchResult.optimal?.deliveryMin}} дней</div>
 		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.optimal)">Заказать</button>
 	</div>
@@ -125,7 +126,7 @@
 			<td>{{x.name}}</td>
 			<td>{{x.manufacturer}}</td>
 			<td>{{x.partNumber}}</td>
-			<td>{{x.priceRub | number: '1.0-0'}}</td>
+			<td>{{x.priceRub | intCurrency}}</td>
 			<td>{{getDeliveryString(x.deliveryMin, x.deliveryMax)}}</td>
 			<td>{{x.isOriginal}}</td>
 			<td>

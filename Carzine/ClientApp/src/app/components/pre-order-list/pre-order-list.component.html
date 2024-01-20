@@ -24,15 +24,15 @@
       <td>{{x.product.weight}}</td>
       <td>{{x.date | date: 'dd.MM.yyyy HH:mm'}}</td>
       <td>{{getSupplierName(x.product.sourceId)}}</td>
-      <td>{{x.product.price | number: '1.0-0'}}</td>
-      <td>{{x.product.deliveryCost | number: '1.0-0'}}</td>
-      <td>{{x.product.extraCharge | number: '1.0-0'}}</td>
+      <td>{{x.product.price | intCurrency}}</td>
+      <td>{{x.product.deliveryCost | intCurrency}}</td>
+      <td>{{x.product.extraCharge | intCurrency}}</td>
       <td></td>
       <td></td>
       <td>{{x.phone}}</td>
       <td>{{x.product.partNumber}}</td>
       <td>{{x.product.manufacturer}}</td>
-      <td>{{x.product.priceRub | number: '1.0-0'}}</td>
+      <td>{{x.product.priceRub | intCurrency}}</td>
       <td>{{x.product.deliveryMin}}</td>
       <td>
         <button mat-stroked-button mat-button color="primary" (click)="openDialog(x.id)">Создать реальный ордер</button>

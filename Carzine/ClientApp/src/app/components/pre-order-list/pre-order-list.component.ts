@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { PreOrderModel } from 'src/app/models/PreOrderModel';
-import { OrderService } from 'src/app/services/order.service';
+import { PreOrderModel } from '../../models/PreOrderModel';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-pre-order-list',
@@ -32,16 +32,16 @@ export class PreOrderListComponent implements OnInit {
       return;
     
     this.orderService.createOrder(preOrderId)
-      .then((x) => {
+      .then((x: any) => {
         alert(x.res.info);
       }
         )
-      .catch((err) => {
+      .catch((err: any) => {
         alert(err.error.text ?? err.error)
       });
   }
 
   getSupplierName(id?: number): string | undefined {
-    return this.orderService.suppliers.find(x=> x?.id === id)?.name;
+    return this.orderService.suppliers.find((x: any)=> x?.id === id)?.name;
   }
 }

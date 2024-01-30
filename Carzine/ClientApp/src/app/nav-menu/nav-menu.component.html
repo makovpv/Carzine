@@ -4,6 +4,9 @@
   >
     <div class="container">
       <a class="navbar-brand" [routerLink]="['/']">Carzine</a>
+      
+      <span style="color: darkblue;">{{userName}}</span>
+
       <button
         class="navbar-toggler"
         type="button"
@@ -33,6 +36,14 @@
             [routerLinkActiveOptions]="{ exact: true }"
           >
             <a class="nav-link text-dark" [routerLink]="['/pre-orders']">Предзаказы</a>
+          </li>
+          <li
+            class="nav-item"
+            [routerLinkActive]="['link-active']"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <a *ngIf="!userName" class="nav-link text-dark" [routerLink]="['/login']">Login</a>
+            <span *ngIf="userName" style="cursor: pointer;" class="nav-link text-dark" (click)="logout()">Logout</span>
           </li>
         </ul>
       </div>

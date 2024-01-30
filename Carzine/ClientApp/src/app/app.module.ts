@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
@@ -20,6 +20,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { PreOrderListComponent } from './components/pre-order-list/pre-order-list.component';
 import { IntCurrencyPipe } from './pipes/int-currency.pipe';
+import { AppFooterComponent } from './components/app-footer/app-footer.component';
+import { LoginComponent } from './components/login/login.component';
+import { AuthInterceptor } from './auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -28,7 +31,9 @@ import { IntCurrencyPipe } from './pipes/int-currency.pipe';
     HomeComponent,
     PreOrderComponent,
     PreOrderListComponent,
-    IntCurrencyPipe
+    IntCurrencyPipe,
+    AppFooterComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -37,6 +42,7 @@ import { IntCurrencyPipe } from './pipes/int-currency.pipe';
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'pre-orders', component: PreOrderListComponent },
+      { path: 'login', component: LoginComponent },
     ]),
     BrowserAnimationsModule,
     MatDialogModule,
@@ -49,7 +55,11 @@ import { IntCurrencyPipe } from './pipes/int-currency.pipe';
     MatIconModule,
     MatAutocompleteModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

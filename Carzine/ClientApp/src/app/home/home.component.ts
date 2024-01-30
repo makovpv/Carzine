@@ -17,6 +17,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { CollectionViewer, DataSource, SelectionChange } from '@angular/cdk/collections';
 import { merge } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 /** Flat node with expandable and level information */
 export class DynamicFlatNode {
@@ -203,6 +204,7 @@ export class HomeComponent {
   constructor(
     private searchService: SearchService,
     private orderService: OrderService,
+    private router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private database: DynamicDatabase) { 
@@ -333,7 +335,12 @@ export class HomeComponent {
           this.showSnack('Создан предзаказ', 10000);
         })
         .catch(err => {
-          alert(err.error);
+          if (err.status === 401) {
+            this.router.navigateByUrl('/login');
+          }
+          else {
+            alert(err.error);
+          }
         })
       }
     })

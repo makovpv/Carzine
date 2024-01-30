@@ -1,5 +1,8 @@
+using Carzine.Auth;
 using CarzineCore;
 using CarzineCore.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using NLog;
 using NLog.Web;
 
@@ -16,9 +19,33 @@ try
 
 	builder.Services.AddControllersWithViews();
 
+	builder.Services.AddAuthorization();
+	builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+		.AddJwtBearer(options =>
+		{
+			options.TokenValidationParameters = new TokenValidationParameters
+			{
+				// указывает, будет ли валидироваться издатель при валидации токена
+				ValidateIssuer = true,
+				// строка, представляющая издателя
+				ValidIssuer = AuthOptions.ISSUER,
+				// будет ли валидироваться потребитель токена
+				ValidateAudience = true,
+				// установка потребителя токена
+				ValidAudience = AuthOptions.AUDIENCE,
+				// будет ли валидироваться время существования
+				ValidateLifetime = true,
+				// установка ключа безопасности
+				IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+				// валидация ключа безопасности
+				ValidateIssuerSigningKey = true,
+			};
+		});
+
 	builder.Services.AddSingleton<IApiDataService, ApiDataService>();
 	//builder.Services.AddSingleton<IDbDataService, DbDataService>();
 	builder.Services.AddSingleton<IDbDataService, MySqlDataService>();
+	builder.Services.AddSingleton<IDbUserService, MySqlDataService>();
 
 	builder.Services.AddCors(options =>
 	{
@@ -42,11 +69,14 @@ try
 	app.UseStaticFiles();
 	app.UseRouting();
 
+	app.UseAuthentication();
+	app.UseAuthorization();
+
 	app.UseCors(allowSpecificOrigins);
 
 	app.MapControllerRoute(
-		name: "default",
-		pattern: "{controller}/{action=Index}/{id?}");
+	name: "default",
+	pattern: "{controller}/{action=Index}/{id?}");
 
 	app.MapFallbackToFile("index.html"); ;
 

@@ -1,6 +1,7 @@
 ﻿using CarzineCore;
 using CarzineCore.Interfaces;
 using CarzineCore.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Carzine.Controllers
@@ -21,14 +22,16 @@ namespace Carzine.Controllers
 			_apiService = apiService;
 		}
 
+		[Authorize]
 		[HttpPost("preorder")]
 		public async Task<IActionResult> AddPreOrderAsync([FromBody] PreOrderModel preorder)
 		{
-			var result = await _dataService.AddPreOrderAsync(preorder);
+			var result = await _dataService.AddPreOrderAsync(preorder, User.Identity.Name);
 			
 			return StatusCode(StatusCodes.Status201Created, result);
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpPost("order/{preOrderId}")]
 		public async Task<IActionResult> CreateOrderAsync(int preOrderId)
 		{
@@ -41,9 +44,6 @@ namespace Carzine.Controllers
 					return StatusCode(StatusCodes.Status201Created, result1);
 				case ApiSource.Apm:
 					var result2 = await _apiService.CreateApmOrderAsync(preOrder);
-
-					//Newtonsoft.Json.JsonConvert.
-
 					return StatusCode(StatusCodes.Status200OK, result2);
 				case ApiSource.Emex:
 					return StatusCode(StatusCodes.Status501NotImplemented, "Emex");
@@ -52,6 +52,7 @@ namespace Carzine.Controllers
 			}
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpGet("preorder")]
 		public async Task<IActionResult> GetPreOrdersAsync()
 		{

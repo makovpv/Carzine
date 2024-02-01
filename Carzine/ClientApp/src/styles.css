@@ -36,3 +36,7 @@ table tr:nth-child(even) {
 	background-color: lightblue;
   color: black;
 }
+
+#main-container {
+	min-height: calc(100% - 164px);
+}

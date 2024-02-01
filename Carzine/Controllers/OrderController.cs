@@ -60,7 +60,18 @@ namespace Carzine.Controllers
 
 			var result = preOrders.Select(x => x.ToPreOrderModel());
 
-			return StatusCode(StatusCodes.Status201Created, result);
+			return StatusCode(StatusCodes.Status200OK, result);
+		}
+
+		[Authorize]
+		[HttpGet("user-preorders")]
+		public async Task<IActionResult> GetUserPreOrdersAsync()
+		{
+			var preOrders = await _dataService.GetPreOrdersByUserAsync(User.Identity.Name);
+
+			var result = preOrders.Select(x => x.ToUserPreOrderModel());
+
+			return StatusCode(StatusCodes.Status200OK, result);
 		}
 
 		[HttpGet("suppliers")]

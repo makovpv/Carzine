@@ -23,6 +23,7 @@ import { IntCurrencyPipe } from './pipes/int-currency.pipe';
 import { AppFooterComponent } from './components/app-footer/app-footer.component';
 import { LoginComponent } from './components/login/login.component';
 import { AuthInterceptor } from './auth.interceptor';
+import { AccountComponent } from './components/account/account.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { AuthInterceptor } from './auth.interceptor';
     PreOrderListComponent,
     IntCurrencyPipe,
     AppFooterComponent,
-    LoginComponent
+    LoginComponent,
+    AccountComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -43,6 +45,7 @@ import { AuthInterceptor } from './auth.interceptor';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'pre-orders', component: PreOrderListComponent },
       { path: 'login', component: LoginComponent },
+      { path: 'account', component: AccountComponent },
     ]),
     BrowserAnimationsModule,
     MatDialogModule,

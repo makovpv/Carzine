@@ -1,0 +1,32 @@
+<div>
+    <table>
+      <tr>
+        <th>№ заказа</th>
+        <th>Объемный вес</th>
+        <th>Физический вес</th>
+        <th>Дата заказа</th>
+        
+        <th>Статус заказа для клиента</th>
+        
+        <th>Part Number</th>
+        <th>Производитель</th>
+        <th>Цена, руб</th>
+        <th>Срок поставки</th>
+      </tr>
+      <tr *ngFor="let x of userPreorders">
+        <td>{{x.id | number: '3.0-0'}}</td>
+        <td>{{x.product.volume}}</td>
+        <td>{{x.product.weight}}</td>
+        <td>{{x.date | date: 'dd.MM.yyyy HH:mm'}}</td>
+        
+        <td></td>
+        
+        <td>{{x.product.partNumber}}</td>
+        <td>{{x.product.manufacturer}}</td>
+        <td>{{x.product.priceRub | intCurrency}}</td>
+        <td>{{x.product.deliveryMin}}</td>
+      </tr>
+    </table>
+  
+      <mat-spinner *ngIf="inProgress"></mat-spinner>
+  </div>

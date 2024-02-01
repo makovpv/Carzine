@@ -9,6 +9,8 @@ namespace CarzineCore.Interfaces
 		public Task<IEnumerable<PreOrderDto>> GetPreOrdersAsync();
 
 		public Task<PreOrderDto> GetPreOrderAsync(int preOrderId);
+
+		public Task<IEnumerable<PreOrderDto>> GetPreOrdersByUserAsync(string userEmail);
 	}
 
 	public interface IDbUserService

@@ -6,6 +6,8 @@
 
 		public string Phone { get; set; }
 
+		public string User_email { get; set; }
+
 		public string PN { get; set; }
 
 		public string Manufacturer { get; set; }

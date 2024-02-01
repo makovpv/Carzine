@@ -23,6 +23,9 @@ namespace CarzineCore
 		const string _sqlGetPreorderById =
 			"SELECT * FROM pre_order WHERE id = @id";
 
+		const string _sqlGetPreordersByUser =
+			"SELECT * FROM pre_order WHERE user_email = @userEmail";
+
 		const string _sqlInsertUser =
 			"INSERT INTO user(login_name, pwd) " +
 			"VALUES (@loginName, @pwd)";
@@ -94,6 +97,20 @@ namespace CarzineCore
 				using var connection = GetConnection();
 
 				return await connection.QueryAsync<PreOrderDto>(_sqlGetPreorders);
+			}
+			catch (Exception ex)
+			{
+				throw;
+			}
+		}
+
+		public async Task<IEnumerable<PreOrderDto>> GetPreOrdersByUserAsync(string userEmail)
+		{
+			try
+			{
+				using var connection = GetConnection();
+
+				return await connection.QueryAsync<PreOrderDto>(_sqlGetPreordersByUser, new { userEmail });
 			}
 			catch (Exception ex)
 			{

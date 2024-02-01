@@ -8,6 +8,8 @@ namespace CarzineCore.Models
 
 		public string Phone { get; set; }
 
+		public string UserEmail { get; set; }
+
 		public StandardProductModel Product { get; set; }
 
 		public DateTime Date { get; set; }

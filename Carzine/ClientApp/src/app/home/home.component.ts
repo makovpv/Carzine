@@ -329,6 +329,7 @@ export class HomeComponent {
           product: product,
           id: undefined,
           date: undefined,
+          userEmail: undefined
         }
 
         this.orderService.preOrder(preOrderData).then(() => {

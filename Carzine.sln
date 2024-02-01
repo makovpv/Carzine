@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarzineCore", "CarzineCore\CarzineCore.csproj", "{2874A7C5-1548-4026-A72E-451DE0C6A933}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarzineTest", "CarzineTest\CarzineTest.csproj", "{B67EC572-A6A3-4CA0-AEF9-1CE6178F2D41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarzineTest", "CarzineTest\CarzineTest.csproj", "{B67EC572-A6A3-4CA0-AEF9-1CE6178F2D41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

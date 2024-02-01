@@ -73,6 +73,7 @@ namespace CarzineCore
 				Id = preOrder.Id,
 				Date = preOrder.Date,
 				Phone = preOrder.Phone,
+				UserEmail = preOrder.User_email,
 				ClientStatus = preOrder.Client_status,
 				SupplyerStatus = preOrder.Supplyer_status,
 				Product = new StandardProductModel
@@ -84,6 +85,24 @@ namespace CarzineCore
 					Manufacturer = preOrder.Manufacturer,
 					PriceRub = preOrder.Price_Rub,
 					Price = preOrder.Supplyer_price,
+					Volume = preOrder.Volume,
+					Weight = preOrder.Weight,
+				}
+			};
+		}
+
+		public static PreOrderModel ToUserPreOrderModel(this PreOrderDto preOrder)
+		{
+			return new PreOrderModel
+			{
+				Id = preOrder.Id,
+				Date = preOrder.Date,
+				ClientStatus = preOrder.Client_status,
+				Product = new StandardProductModel
+				{
+					PartNumber = preOrder.PN,
+					Manufacturer = preOrder.Manufacturer,
+					PriceRub = preOrder.Price_Rub,
 					Volume = preOrder.Volume,
 					Weight = preOrder.Weight,
 				}

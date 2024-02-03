@@ -38,5 +38,14 @@ table tr:nth-child(even) {
 }
 
 #main-container {
-	min-height: calc(100% - 164px);
+  flex: 1 0 auto;
+}
+
+app-root body {
+  display: flex;
+  flex-direction: column;
+}
+
+app-footer {
+  flex-shrink: 0;
 }

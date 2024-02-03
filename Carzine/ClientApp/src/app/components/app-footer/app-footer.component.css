@@ -1,13 +1,11 @@
 #footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
     background: #f1f1f1;
     font-size: small;
     text-align: center;
     padding: 8px;
+    margin-top: 16px;
 }
 
-#footer span {
-    padding: 0 16px;
+#footer div span {
+    padding-right: 16px;
 }

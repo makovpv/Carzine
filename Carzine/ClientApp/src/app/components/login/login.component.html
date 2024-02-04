@@ -1,17 +1,18 @@
-<h5>Login</h5>
+<div class="cr-form-container">
+    <h3>Вход</h3>
 
-<p>
-    <mat-form-field>
-        <mat-label>Email</mat-label>
-        <input type="text" name="login" matInput [(ngModel)]="login">
-    </mat-form-field>
-</p>
-<p>
-    <mat-form-field>
-        <mat-label>Password</mat-label>
-        <input type="text" matInput [(ngModel)]="password">
-    </mat-form-field>
-</p>
-
-<button mat-stroked-button (click)="loginClick()" [disabled]="!login || !password">Login</button>
-<button mat-stroked-button (click)="signUpClick()" [disabled]="!login || !password">SignUp</button>
+    <div class="form-container">
+        <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input type="text" name="login" matInput [(ngModel)]="login">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Password</mat-label>
+            <input type="password" matInput [(ngModel)]="password">
+        </mat-form-field>
+        <div>
+            <button mat-flat-button color="primary" (click)="loginClick()" [disabled]="!login || !password">Войти</button>
+            <a id="reg-link" [routerLink]="['/signup']">Зарегистрироваться</a>
+        </div>
+    </div>
+</div>

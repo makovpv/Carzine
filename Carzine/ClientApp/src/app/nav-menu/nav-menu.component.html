@@ -52,6 +52,13 @@
             <a *ngIf="!userName" class="nav-link text-dark" [routerLink]="['/login']">Login</a>
             <span *ngIf="userName" style="cursor: pointer;" class="nav-link text-dark" (click)="logout()">Logout</span>
           </li>
+          <li
+            class="nav-item"
+            [routerLinkActive]="['link-active']"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <a style="cursor: pointer;" class="nav-link text-dark" [routerLink]="['/signup']">Регистрация</a>
+          </li>
         </ul>
       </div>
     </div>

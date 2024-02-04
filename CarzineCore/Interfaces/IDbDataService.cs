@@ -4,7 +4,7 @@ namespace CarzineCore.Interfaces
 {
 	public interface IDbDataService
 	{
-		public Task<int> AddPreOrderAsync(PreOrderModel preorder, string userName);
+		public Task<int> AddPreOrderAsync(StandardProductModel product, string userName);
 
 		public Task<IEnumerable<PreOrderDto>> GetPreOrdersAsync();
 
@@ -15,7 +15,7 @@ namespace CarzineCore.Interfaces
 
 	public interface IDbUserService
 	{
-		public Task AddUserAsync(string userName, string pwd);
+		public Task AddUserAsync(string userName, string pwd, string phone);
 
 		public Task<UserDto?> GetUserByName(string userName);
 	}

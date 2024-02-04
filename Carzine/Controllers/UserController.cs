@@ -1,4 +1,5 @@
 ﻿using Carzine.Auth;
+using CarzineCore;
 using CarzineCore.Interfaces;
 using CarzineCore.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,7 @@ namespace Carzine.Controllers
 				new Claim(ClaimTypes.Name, loginData.Email)
 			};
 
-			if (loginData.Email.ToLower() == "admin")
+			if (userData.Is_Admin)
 			{
 				claims.Add(new Claim(ClaimTypes.Role, "Admin"));
 			}
@@ -65,11 +66,15 @@ namespace Carzine.Controllers
 		{
 			try
 			{
-				await _dataService.AddUserAsync(user.Name, user.Pwd);
+				await _dataService.AddUserAsync(user.Name, user.Pwd, user.Phone);
+			}
+			catch (CarzineException ex)
+			{
+				return BadRequest(ex.Message);
 			}
 			catch (Exception ex)
 			{
-				return BadRequest(ex.Message);
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 
 			return StatusCode(StatusCodes.Status200OK);

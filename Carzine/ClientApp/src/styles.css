@@ -49,3 +49,14 @@ app-root body {
 app-footer {
   flex-shrink: 0;
 }
+
+.form-container,
+form {
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cr-form-container {
+  text-align: center;
+}

@@ -1,0 +1,34 @@
+<div class="cr-form-container">
+    <h3>Регистрация</h3>
+
+    <form [formGroup]="signUpForm">
+        <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="userEmail">
+        </mat-form-field>
+        <div *ngIf="signUpForm.controls['userEmail'].invalid && signUpForm.controls['userEmail'].touched" class="cr-alert">
+            Некорректный email
+        </div>
+        <mat-form-field>
+            <mat-label>Телефон</mat-label>
+            <input matInput type="tel" formControlName="userPhone">
+        </mat-form-field>
+        <div *ngIf="signUpForm.controls['userPhone'].invalid && signUpForm.controls['userPhone'].touched" class="cr-alert">
+            Некорректный телефон
+        </div>
+        <mat-form-field>
+            <mat-label>Пароль</mat-label>
+            <input matInput type="password" formControlName="password">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Пароль еще раз</mat-label>
+            <input matInput type="password" formControlName="passwordConfirm">
+        </mat-form-field>
+        <div *ngIf="signUpForm.errors?.notmatched && signUpForm.controls['passwordConfirm'].touched" class="cr-alert">
+            Пароль не совпадает с подтверждением
+        </div>
+        <div>
+            <button mat-flat-button color="primary" [disabled]="signUpForm.invalid" (click)="signUp()">Зарегистрироваться</button>
+        </div>
+    </form>
+</div>

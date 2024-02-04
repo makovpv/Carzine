@@ -31,10 +31,4 @@ export class LoginComponent implements OnInit {
         }
       });
   }
-
-  signUpClick() {
-    this.authService.signUp(this.login, this.password)
-    .then(() => alert('User created'))
-    .catch(err => alert(err.error));
-  }
 }

@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
@@ -24,6 +24,7 @@ import { AppFooterComponent } from './components/app-footer/app-footer.component
 import { LoginComponent } from './components/login/login.component';
 import { AuthInterceptor } from './auth.interceptor';
 import { AccountComponent } from './components/account/account.component';
+import { SignUpComponent } from './components/sign-up/sign-up.component';
 
 @NgModule({
   declarations: [
@@ -35,17 +36,20 @@ import { AccountComponent } from './components/account/account.component';
     IntCurrencyPipe,
     AppFooterComponent,
     LoginComponent,
-    AccountComponent
+    AccountComponent,
+    SignUpComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'pre-orders', component: PreOrderListComponent },
       { path: 'login', component: LoginComponent },
       { path: 'account', component: AccountComponent },
+      { path: 'signup', component: SignUpComponent },
     ]),
     BrowserAnimationsModule,
     MatDialogModule,

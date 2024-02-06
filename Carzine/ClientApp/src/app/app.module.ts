@@ -25,6 +25,7 @@ import { LoginComponent } from './components/login/login.component';
 import { AuthInterceptor } from './auth.interceptor';
 import { AccountComponent } from './components/account/account.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
+import { DeliveryPeriodPipe } from './pipes/delivery-period.pipe';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { SignUpComponent } from './components/sign-up/sign-up.component';
     AppFooterComponent,
     LoginComponent,
     AccountComponent,
-    SignUpComponent
+    SignUpComponent,
+    DeliveryPeriodPipe
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

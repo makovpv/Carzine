@@ -8,7 +8,7 @@ import { OrderService } from '../services/order.service';
 import { PreOrderModel } from '../models/PreOrderModel';
 import { CarModificationModel } from '../models/CarModificationModel';
 import { CarPartsGroupModel } from '../models/CarPartsGroupModel';
-import { MatSnackBar } from '@angular/material/snack-bar';
+//import { MatSnackBar } from '@angular/material/snack-bar';
 import { MarkModel, CarModel } from '../models/CarModel';
 import { GroupPartListModel } from '../models/PartNumberModel';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
@@ -18,6 +18,7 @@ import { CollectionViewer, DataSource, SelectionChange } from '@angular/cdk/coll
 import { merge } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { MessageService } from '../services/message.service';
 
 /** Flat node with expandable and level information */
 export class DynamicFlatNode {
@@ -204,9 +205,9 @@ export class HomeComponent {
   constructor(
     private searchService: SearchService,
     private orderService: OrderService,
+    private messageService: MessageService,
     private router: Router,
     public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
     private database: DynamicDatabase) { 
       this.treeControl = new FlatTreeControl<DynamicFlatNode>(this.getLevel, this.isExpandable);
     }
@@ -247,7 +248,7 @@ export class HomeComponent {
 
   search() {
     if (!this.searchCode) {
-      this.showSnack('Укажите код для поиска', 3000);
+      this.messageService.sendMessage('Укажите код для поиска', 3000); // showSnack('Укажите код для поиска', 3000);
       return;
     }
 
@@ -274,7 +275,7 @@ export class HomeComponent {
         this.searchResult = result;
         
         if (result.products.length === 0) {
-          this.showSnack("К сожалению сейчас нет той детали, которую вы ищете, проверьте правильность номера", 10000);
+          this.messageService.sendErrorMessage("К сожалению сейчас нет той детали, которую вы ищете, проверьте правильность номера");
         }
       })
       .catch((err) => {
@@ -289,7 +290,7 @@ export class HomeComponent {
         this.inProgress = false;
 
         if (!result.type || !result.model) {
-          this.showSnack("Ничего не найдено по данному VIN", 10000);
+          this.messageService.sendErrorMessage("Ничего не найдено по данному VIN");
           return;
         }
 
@@ -312,47 +313,41 @@ export class HomeComponent {
       });
   }
 
-  showSnack(message: string, duration: number) {
-    this._snackBar.open(message, "OK", {
-      duration: duration,
-      panelClass: ['cz-snack-panel'],
-    });
-  }
-
-  openDialog(product: ProductModel) {
-    this.dialog.open(PreOrderComponent)
-    .afterClosed()
-    .subscribe((res) => {
-      if (res && res.event === 'ok' && res.data) {
-        const preOrderData: PreOrderModel = {
-          phone: res.data,
-          product: product,
-          id: undefined,
-          date: undefined,
-          userEmail: undefined
-        }
-
-        this.orderService.preOrder(preOrderData).then(() => {
-          this.showSnack('Создан предзаказ', 10000);
-        })
-        .catch(err => {
-          if (err.status === 401) {
-            this.router.navigateByUrl('/login');
-          }
-          else {
-            alert(err.error);
-          }
-        })
+  addPreorder(product: ProductModel) {
+    if (!product.partNumber) {
+      this.messageService.sendErrorMessage('Не определен номер з/части');
+      return;
+    }
+    
+    this.orderService.preOrder(product).then(() => {
+      this.messageService.sendMessage('Создан предзаказ', 10000);
+    })
+    .catch(err => {
+      if (err.status === 401) {
+        this.router.navigateByUrl('/login');
+      }
+      else {
+        this.messageService.sendErrorMessage('Что то пошло не так');
       }
     })
   }
 
-  getDeliveryString(deliveryMin?: number, deliveryMax?: number): any {
-    if (deliveryMin === deliveryMax)
-      return deliveryMax;
+  // openDialog(product: ProductModel) {
+  //   this.dialog.open(PreOrderComponent)
+  //   .afterClosed()
+  //   .subscribe((res) => {
+  //     if (res && res.event === 'ok' && res.data) {
+        
+  //     }
+  //   })
+  // }
+
+  // getDeliveryString(deliveryMin?: number, deliveryMax?: number): any {
+  //   if (deliveryMin === deliveryMax)
+  //     return deliveryMax;
     
-    return `${deliveryMin} - ${deliveryMax}`;
-  }
+  //   return `${deliveryMin} - ${deliveryMax}`;
+  // }
 
   onSearchKeyDown(e: any) {
     if (e.code === 'Enter') {

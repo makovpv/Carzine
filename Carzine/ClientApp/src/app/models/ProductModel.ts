@@ -1,4 +1,9 @@
-export class ProductModel {
+export type DeliveryInfo = {
+	deliveryMin: number | undefined;
+	deliveryMax: number | undefined;
+}
+
+export class ProductModel implements DeliveryInfo {
 	name: string = "";
 	sourceId: number | undefined;
 	manufacturer: string | undefined;

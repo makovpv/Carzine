@@ -18,8 +18,11 @@ export class AuthService {
       });
   }
 
-  signUp(email: string, password: string): Promise<any> {
-    return this.http.post(this.baseUrl+'user/signup', { name: email, pwd: password })
+  signUp(email: string, password: string, phone: string): Promise<any> {
+    return this.http.post(this.baseUrl+'user/signup', { 
+      name: email,
+      phone: phone,
+      pwd: password })
       .toPromise();
   }
 

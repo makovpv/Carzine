@@ -24,9 +24,9 @@ namespace Carzine.Controllers
 
 		[Authorize]
 		[HttpPost("preorder")]
-		public async Task<IActionResult> AddPreOrderAsync([FromBody] PreOrderModel preorder)
+		public async Task<IActionResult> AddPreOrderAsync([FromBody] StandardProductModel product)
 		{
-			var result = await _dataService.AddPreOrderAsync(preorder, User.Identity.Name);
+			var result = await _dataService.AddPreOrderAsync(product, User.Identity.Name);
 			
 			return StatusCode(StatusCodes.Status201Created, result);
 		}

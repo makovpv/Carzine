@@ -12,9 +12,9 @@ namespace CarzineCore
 		private readonly string _connectionString;
 
 		const string _sqlInsertPreOrder =
-			"INSERT INTO pre_order(phone, date, pn, manufacturer, price_rub, delivery_min, source_id," +
+			"INSERT INTO pre_order(date, pn, manufacturer, price_rub, delivery_min, source_id," +
 				"weight, volume, supplyer_price, delivery_cost, extra_charge, supplyer_status, client_status, user_email) " +
-			"VALUES (@phone, now(), @pn, @manufacturer, @priceRub, @deliveryMin, @sourceId," +
+			"VALUES (now(), @pn, @manufacturer, @priceRub, @deliveryMin, @sourceId," +
 				"@weight, @volume, @supplyerPrice, @deliveryCost, @extraCharge, @supplyerStatus, @clientStatus, @userName)";
 
 		const string _sqlGetPreorders =
@@ -27,11 +27,15 @@ namespace CarzineCore
 			"SELECT * FROM pre_order WHERE user_email = @userEmail";
 
 		const string _sqlInsertUser =
-			"INSERT INTO user(login_name, pwd) " +
-			"VALUES (@loginName, @pwd)";
+			"INSERT INTO user(login_name, pwd, phone) " +
+			"VALUES (@loginName, @pwd, @phone)";
 
 		const string _sqlGetUserByName =
-			"SELECT * FROM user WHERE login_name = @name";
+			"SELECT u.*," +
+				"case isnull(ua.login) when 1 then 0 else 1 end as is_admin "+
+			"FROM user u " +
+				"LEFT JOIN user_admin ua ON u.login_name = ua.login " +
+			"WHERE login_name = @name";
 
 		public MySqlDataService(IConfiguration config)
 		{
@@ -48,7 +52,7 @@ namespace CarzineCore
 			return connection;
 		}
 
-		public async Task<int> AddPreOrderAsync(PreOrderModel preorder, string userName)
+		public async Task<int> AddPreOrderAsync(StandardProductModel product, string userName)
 		{
 			int preOrderId;
 
@@ -58,17 +62,17 @@ namespace CarzineCore
 
 				preOrderId = await connection.ExecuteAsync(_sqlInsertPreOrder, new
 				{
-					phone = preorder.Phone,
-					pn = preorder.Product.PartNumber,
-					manufacturer = preorder.Product.Manufacturer,
-					priceRub = preorder.Product.PriceRub,
-					deliveryMin = preorder.Product.DeliveryMin,
-					sourceId = (int)(preorder.Product.SourceId),
-					weight = preorder.Product.Weight,
-					volume = preorder.Product.Volume,
-					supplyerPrice = preorder.Product.Price,
-					deliveryCost = preorder.Product.DeliveryCost,
-					extraCharge = preorder.Product.ExtraCharge,
+					//phone = preorder.Phone,
+					pn = product.PartNumber,
+					manufacturer = product.Manufacturer,
+					priceRub = product.PriceRub,
+					deliveryMin = product.DeliveryMin,
+					sourceId = (int)(product.SourceId),
+					weight = product.Weight,
+					volume = product.Volume,
+					supplyerPrice = product.Price,
+					deliveryCost = product.DeliveryCost,
+					extraCharge = product.ExtraCharge,
 					supplyerStatus = SupplyerStatus.New,
 					clientStatus = ClientStatus.New,
 					userName = userName
@@ -118,7 +122,7 @@ namespace CarzineCore
 			}
 		}
 
-		public async Task AddUserAsync(string userName, string pwd)
+		public async Task AddUserAsync(string userName, string pwd, string phone)
 		{
 			try
 			{
@@ -127,14 +131,15 @@ namespace CarzineCore
 				await connection.ExecuteAsync(_sqlInsertUser, new
 				{
 					loginName = userName,
-					pwd = pwd
+					pwd = pwd,
+					phone
 				});
 			}
 			catch (Exception ex)
 			{
 				if (ex.Message.StartsWith("Duplicate entry"))
 				{
-					throw new Exception("User allready exists");
+					throw new CarzineException("User allready exists");
 				}
 				//LogException("Failed to ExecuteScalar for " + procedureName, ex, parameters);
 				throw;

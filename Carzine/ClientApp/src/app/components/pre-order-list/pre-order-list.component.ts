@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PreOrderModel } from '../../models/PreOrderModel';
 import { OrderService } from '../../services/order.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pre-order-list',
@@ -14,14 +15,23 @@ export class PreOrderListComponent implements OnInit {
   inProgress = false;
 
   constructor(
-    private orderService: OrderService) {
+    private orderService: OrderService, private router: Router) {
 
     this.inProgress = true;
 
     this.orderService.getPreOrders().then((data: any) => {
       this.preOrders = data;
       this.inProgress = false;
-	  });
+	  })
+    .catch(err => {
+      this.inProgress = false;
+      if (err.status === 401) {
+        this.router.navigateByUrl('/login');
+      }
+      if (err.status === 403) {
+        alert('Недостаточно прав доступа')
+      }
+    });
   }
 
   ngOnInit(): void {

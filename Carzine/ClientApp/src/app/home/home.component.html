@@ -77,18 +77,18 @@
 </div>
 
 <div>
-	Найдено {{searchResult.products.length}} вариантов от {{searchResult.bestPrice?.priceRub | number: '1.0-0'}} рублей
+	Найдено {{searchResult.products.length}} вариантов от {{searchResult.bestPrice?.priceRub | intCurrency}} рублей
 </div>
 
-<div style="display: flex;">
+<div *ngIf="searchResult.products.length > 0" style="display: flex;">
 	<div class="product-card">
 		<div class="product-card-title">
 			<strong>Лучшая цена</strong>
 		</div>
 		<div>Бренд: {{searchResult.bestPrice?.manufacturer}}</div>
 		<div>Цена: {{searchResult.bestPrice?.priceRub | intCurrency}} руб</div>
-		<div>Срок доставки: {{searchResult.bestPrice?.deliveryMin}} - {{searchResult.bestPrice?.deliveryMin}} дней</div>
-		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.bestPrice)">Заказать</button>
+		<div>Срок доставки: {{searchResult.bestPrice |deliveryPeriod}} дней</div>
+		<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.bestPrice)">Заказать</button>
 	</div>
 	<div class="product-card">
 		<div class="product-card-title">
@@ -96,8 +96,8 @@
 		</div>
 		<div>Бренд: {{searchResult.expressDelivery?.manufacturer}}</div>
 		<div>Цена: {{searchResult.expressDelivery?.priceRub | intCurrency}} руб</div>
-		<div>Срок доставки: {{searchResult.expressDelivery?.deliveryMin}} - {{searchResult.expressDelivery?.deliveryMin}} дней</div>
-		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.expressDelivery)">Заказать</button>
+		<div>Срок доставки: {{searchResult.expressDelivery |deliveryPeriod}} дней</div>
+		<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.expressDelivery)">Заказать</button>
 	</div>
 	<div class="product-card">
 		<div class="product-card-title">
@@ -105,8 +105,8 @@
 		</div>
 		<div>Бренд: {{searchResult.optimal?.manufacturer}}</div>
 		<div>Цена: {{searchResult.optimal?.priceRub | intCurrency}} руб</div>
-		<div>Срок доставки: {{searchResult.optimal?.deliveryMin}} - {{searchResult.optimal?.deliveryMin}} дней</div>
-		<button mat-stroked-button mat-button color="primary" (click)="openDialog(searchResult.optimal)">Заказать</button>
+		<div>Срок доставки: {{searchResult.optimal | deliveryPeriod}} дней</div>
+		<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.optimal)">Заказать</button>
 	</div>
 </div>
 
@@ -127,15 +127,18 @@
 			<td>{{x.manufacturer}}</td>
 			<td>{{x.partNumber}}</td>
 			<td>{{x.priceRub | intCurrency}}</td>
-			<td>{{getDeliveryString(x.deliveryMin, x.deliveryMax)}}</td>
+			<td>{{x | deliveryPeriod}}</td>
 			<td>{{x.isOriginal}}</td>
 			<td>
-				<button mat-stroked-button mat-button color="primary" (click)="openDialog(x)">Заказать</button>
+				<button mat-stroked-button mat-button color="primary" (click)="addPreorder(x)">Заказать</button>
 			</td>
 		</tr>
 	</table>
 
-	<button id="btn-show-all" *ngIf="!showAllProducts" mat-stroked-button mat-button (click)="showAllProducts = true;">Показать все</button>
+	<button id="btn-show-all" *ngIf="!showAllProducts && searchResult.products.length > 5" 
+		mat-stroked-button mat-button (click)="showAllProducts = true;">
+		Показать все
+	</button>
 
 	<mat-spinner *ngIf="inProgress"></mat-spinner>
 

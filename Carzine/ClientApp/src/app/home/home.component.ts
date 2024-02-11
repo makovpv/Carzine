@@ -2,13 +2,10 @@ import { Component, Inject, Injectable, TemplateRef, ViewChild } from '@angular/
 import { ProductModel } from '../models/ProductModel';
 import { ProductSearchResultModel } from '../models/ProductSearchResultModel';
 import { MatDialog } from '@angular/material/dialog';
-import { PreOrderComponent } from '../components/dialogs/pre-order/pre-order.component';
 import { SearchService } from '../services/search.service';
 import { OrderService } from '../services/order.service';
-import { PreOrderModel } from '../models/PreOrderModel';
 import { CarModificationModel } from '../models/CarModificationModel';
 import { CarPartsGroupModel } from '../models/CarPartsGroupModel';
-//import { MatSnackBar } from '@angular/material/snack-bar';
 import { MarkModel, CarModel } from '../models/CarModel';
 import { GroupPartListModel } from '../models/PartNumberModel';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';

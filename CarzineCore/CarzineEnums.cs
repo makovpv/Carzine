@@ -25,11 +25,23 @@ namespace CarzineCore
 
 	public enum ClientStatus
 	{
-		New = 1
+		InProgress = 1,
+		WaitForCall = 2,
+		WaitForPayment = 3,
+		InDelivery = 4,
+		ReadyForGet = 5,
+		Done = 6,
+		Canceled = 7
 	}
 
 	public enum SupplyerStatus
 	{
-		New = 1
+		New = 1,
+		zzz = 2,                // закуплено
+		nnn = 3,                // нет в наличии
+		transitEmirates = 4,    // транзит в Эмиратах (путь от поставщика до самолета)
+		transitMoscow = 5,      // транзит Москва (путь от терминалов до ТК, либо клиента)
+		Delivery = 6,           // передано в ТК
+		Finished = 7            // получено клиентом
 	}
 }

@@ -76,70 +76,70 @@
 	</div>
 </div>
 
-<div>
-	Найдено {{searchResult.products.length}} вариантов от {{searchResult.bestPrice?.priceRub | intCurrency}} рублей
-</div>
-
-<div *ngIf="searchResult.products.length > 0" style="display: flex;">
-	<div class="product-card">
-		<div class="product-card-title">
-			<strong>Лучшая цена</strong>
-		</div>
-		<div>Бренд: {{searchResult.bestPrice?.manufacturer}}</div>
-		<div>Цена: {{searchResult.bestPrice?.priceRub | intCurrency}} руб</div>
-		<div>Срок доставки: {{searchResult.bestPrice |deliveryPeriod}} дней</div>
-		<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.bestPrice)">Заказать</button>
+<div *ngIf="searchResult.products.length > 0">
+	<div>
+		Найдено {{searchResult.products.length}} вариантов от {{searchResult.bestPrice?.priceRub | intCurrency}} рублей
 	</div>
-	<div class="product-card">
-		<div class="product-card-title">
-			<strong>Экспресс доставка</strong>
+
+	<div style="display: flex;">
+		<div class="product-card">
+			<div class="product-card-title">
+				<strong>Лучшая цена</strong>
+			</div>
+			<div>Бренд: {{searchResult.bestPrice?.manufacturer}}</div>
+			<div>Цена: {{searchResult.bestPrice?.priceRub | intCurrency}} руб</div>
+			<div>Срок доставки: {{searchResult.bestPrice |deliveryPeriod}} дней</div>
+			<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.bestPrice)">Заказать</button>
 		</div>
-		<div>Бренд: {{searchResult.expressDelivery?.manufacturer}}</div>
-		<div>Цена: {{searchResult.expressDelivery?.priceRub | intCurrency}} руб</div>
-		<div>Срок доставки: {{searchResult.expressDelivery |deliveryPeriod}} дней</div>
-		<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.expressDelivery)">Заказать</button>
+		<div class="product-card">
+			<div class="product-card-title">
+				<strong>Экспресс доставка</strong>
+			</div>
+			<div>Бренд: {{searchResult.expressDelivery?.manufacturer}}</div>
+			<div>Цена: {{searchResult.expressDelivery?.priceRub | intCurrency}} руб</div>
+			<div>Срок доставки: {{searchResult.expressDelivery |deliveryPeriod}} дней</div>
+			<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.expressDelivery)">Заказать</button>
+		</div>
+		<div class="product-card">
+			<div class="product-card-title">
+				<strong>Оптимальный вариант</strong>
+			</div>
+			<div>Бренд: {{searchResult.optimal?.manufacturer}}</div>
+			<div>Цена: {{searchResult.optimal?.priceRub | intCurrency}} руб</div>
+			<div>Срок доставки: {{searchResult.optimal | deliveryPeriod}} дней</div>
+			<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.optimal)">Заказать</button>
+		</div>
 	</div>
-	<div class="product-card">
-		<div class="product-card-title">
-			<strong>Оптимальный вариант</strong>
-		</div>
-		<div>Бренд: {{searchResult.optimal?.manufacturer}}</div>
-		<div>Цена: {{searchResult.optimal?.priceRub | intCurrency}} руб</div>
-		<div>Срок доставки: {{searchResult.optimal | deliveryPeriod}} дней</div>
-		<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.optimal)">Заказать</button>
+	
+	<div>
+		<div>Другие предложения</div>
+		<table *ngIf="!inProgress">
+			<tr>
+				<th>Наименование детали</th>
+				<th>Бренд</th>
+				<th>Номер детали</th>
+				<th>Стоимость, руб</th>
+				<th>Срок доставки, дн</th>
+				<th>Оригинал</th>
+				<th></th>
+			</tr>
+			<tr *ngFor="let x of (showAllProducts ? searchResult.products : searchResult.products.slice(0,5))">
+				<td>{{x.name}}</td>
+				<td>{{x.manufacturer}}</td>
+				<td>{{x.partNumber}}</td>
+				<td>{{x.priceRub | intCurrency}}</td>
+				<td>{{x | deliveryPeriod}}</td>
+				<td>{{x.isOriginal}}</td>
+				<td>
+					<button mat-stroked-button mat-button color="primary" (click)="addPreorder(x)">Заказать</button>
+				</td>
+			</tr>
+		</table>
+	
+		<button id="btn-show-all" *ngIf="!showAllProducts && searchResult.products.length > 5" 
+			mat-stroked-button mat-button (click)="showAllProducts = true;">
+			Показать все
+		</button>
 	</div>
 </div>
-
-<div>
-	<div>Другие предложения</div>
-	<table *ngIf="!inProgress">
-		<tr>
-			<th>Наименование детали</th>
-			<th>Бренд</th>
-			<th>Номер детали</th>
-			<th>Стоимость, руб</th>
-			<th>Срок доставки, дн</th>
-			<th>Оригинал</th>
-			<th></th>
-		</tr>
-		<tr *ngFor="let x of (showAllProducts ? searchResult.products : searchResult.products.slice(0,5))">
-			<td>{{x.name}}</td>
-			<td>{{x.manufacturer}}</td>
-			<td>{{x.partNumber}}</td>
-			<td>{{x.priceRub | intCurrency}}</td>
-			<td>{{x | deliveryPeriod}}</td>
-			<td>{{x.isOriginal}}</td>
-			<td>
-				<button mat-stroked-button mat-button color="primary" (click)="addPreorder(x)">Заказать</button>
-			</td>
-		</tr>
-	</table>
-
-	<button id="btn-show-all" *ngIf="!showAllProducts && searchResult.products.length > 5" 
-		mat-stroked-button mat-button (click)="showAllProducts = true;">
-		Показать все
-	</button>
-
-	<mat-spinner *ngIf="inProgress"></mat-spinner>
-
-</div>
+<mat-spinner *ngIf="inProgress"></mat-spinner>

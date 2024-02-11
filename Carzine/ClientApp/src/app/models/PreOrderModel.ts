@@ -6,4 +6,6 @@ export class PreOrderModel {
     userEmail: string | undefined;
     date: Date | undefined;
     product: ProductModel = new ProductModel();
+    clientStatus: number | undefined;
+    clientStatusName: string = '';
 }

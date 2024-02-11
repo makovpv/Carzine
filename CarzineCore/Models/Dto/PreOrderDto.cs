@@ -30,7 +30,7 @@
 
 		public decimal Weight { get; set; }
 
-		public ClientStatus Client_status { get; set; }
+		public int Client_status { get; set; }
 
 		public SupplyerStatus Supplyer_status { get; set;}
 	}

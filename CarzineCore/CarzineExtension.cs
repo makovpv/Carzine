@@ -124,4 +124,21 @@ namespace CarzineCore
 			return products;
 		}
 	}
+
+	public class CarzineException : Exception
+	{
+		public CarzineException()
+		{
+		}
+
+		public CarzineException(string message)
+			: base(message)
+		{
+		}
+
+		public CarzineException(string message, Exception inner)
+			: base(message, inner)
+		{
+		}
+	}
 }

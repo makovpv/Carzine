@@ -32,6 +32,15 @@ namespace Carzine.Controllers
 		}
 
 		[Authorize(Roles = "Admin")]
+		[HttpPost("preorder/status/{preOrderId}")]
+		public async Task<IActionResult> SetOrderStatusAsync(int preOrderId, [FromBody] int statusId)
+		{
+			await _dataService.SetPreorderClientStatus(preOrderId, (ClientStatus)statusId);
+
+			return StatusCode(StatusCodes.Status200OK);
+		}
+
+		[Authorize(Roles = "Admin")]
 		[HttpPost("order/{preOrderId}")]
 		public async Task<IActionResult> CreateOrderAsync(int preOrderId)
 		{
@@ -86,5 +95,14 @@ namespace Carzine.Controllers
 
 			return StatusCode(StatusCodes.Status200OK, data);
 		}
+
+		[HttpGet("status")]
+		public async Task<IActionResult> GetAllOrderClientStatuses()
+		{
+			var statuses = await _dataService.GetClientStatusesAsync();
+
+			return StatusCode(StatusCodes.Status200OK, statuses);
+		}
+
 	}
 }

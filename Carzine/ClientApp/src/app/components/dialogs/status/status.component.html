@@ -1,0 +1,14 @@
+<h5>Статус заказа</h5>
+
+<mat-dialog-content>
+    <mat-form-field>
+        <mat-select [(value)]="status">
+            <mat-option *ngFor="let item of statusList" [value]="item.id">{{item.name}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="closeDialog('ok')">Ok</button>
+    <button mat-stroked-button (click)="closeDialog('cancel')">Отмена</button>
+</mat-dialog-actions>

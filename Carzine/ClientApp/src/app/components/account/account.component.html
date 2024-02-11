@@ -5,9 +5,7 @@
         <th>Объемный вес</th>
         <th>Физический вес</th>
         <th>Дата заказа</th>
-        
-        <th>Статус заказа для клиента</th>
-        
+        <th>Статус заказа</th>
         <th>Part Number</th>
         <th>Производитель</th>
         <th>Цена, руб</th>
@@ -18,9 +16,7 @@
         <td>{{x.product.volume}}</td>
         <td>{{x.product.weight}}</td>
         <td>{{x.date | date: 'dd.MM.yyyy HH:mm'}}</td>
-        
-        <td></td>
-        
+        <td>{{x.clientStatusName}}</td>
         <td>{{x.product.partNumber}}</td>
         <td>{{x.product.manufacturer}}</td>
         <td>{{x.product.priceRub | intCurrency}}</td>

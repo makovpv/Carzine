@@ -11,6 +11,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PreOrderComponent } from './components/dialogs/pre-order/pre-order.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -18,6 +19,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatTableModule } from '@angular/material/table';
 import { PreOrderListComponent } from './components/pre-order-list/pre-order-list.component';
 import { IntCurrencyPipe } from './pipes/int-currency.pipe';
 import { AppFooterComponent } from './components/app-footer/app-footer.component';
@@ -26,6 +28,8 @@ import { AuthInterceptor } from './auth.interceptor';
 import { AccountComponent } from './components/account/account.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { DeliveryPeriodPipe } from './pipes/delivery-period.pipe';
+import { StatusComponent } from './components/dialogs/status/status.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -39,7 +43,8 @@ import { DeliveryPeriodPipe } from './pipes/delivery-period.pipe';
     LoginComponent,
     AccountComponent,
     SignUpComponent,
-    DeliveryPeriodPipe
+    DeliveryPeriodPipe,
+    StatusComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -62,7 +67,10 @@ import { DeliveryPeriodPipe } from './pipes/delivery-period.pipe';
     MatInputModule,
     MatTreeModule,
     MatIconModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatSelectModule,
+    MatTableModule,
+    MatTooltipModule
   ],
   providers: [
     {

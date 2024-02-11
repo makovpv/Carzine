@@ -37,6 +37,14 @@ namespace CarzineCore
 				"LEFT JOIN user_admin ua ON u.login_name = ua.login " +
 			"WHERE login_name = @name";
 
+		const string _sqlSetPreOrderClientStatus =
+			"UPDATE pre_order " +
+			"SET client_status = @status " +
+			"WHERE id = @id";
+
+		const string _sqlGetClientStatuses =
+			"SELECT * FROM client_order_status";
+
 		public MySqlDataService(IConfiguration config)
 		{
 			_connectionString = config.GetConnectionString("carzineMySql");
@@ -62,7 +70,6 @@ namespace CarzineCore
 
 				preOrderId = await connection.ExecuteAsync(_sqlInsertPreOrder, new
 				{
-					//phone = preorder.Phone,
 					pn = product.PartNumber,
 					manufacturer = product.Manufacturer,
 					priceRub = product.PriceRub,
@@ -74,7 +81,7 @@ namespace CarzineCore
 					deliveryCost = product.DeliveryCost,
 					extraCharge = product.ExtraCharge,
 					supplyerStatus = SupplyerStatus.New,
-					clientStatus = ClientStatus.New,
+					clientStatus = ClientStatus.InProgress,
 					userName = userName
 				});
 			}
@@ -162,6 +169,20 @@ namespace CarzineCore
 				//"Sequence contains no elements"
 				throw;
 			}
+		}
+
+		public async Task SetPreorderClientStatus(int orderId, ClientStatus status)
+		{
+			using var connection = GetConnection();
+
+			await connection.ExecuteAsync(_sqlSetPreOrderClientStatus, new { id = orderId, status });
+		}
+
+		public async Task<IEnumerable<StatusDto>> GetClientStatusesAsync()
+		{
+			using var connection = GetConnection();
+
+			return await connection.QueryAsync<StatusDto>(_sqlGetClientStatuses);
 		}
 	}
 }

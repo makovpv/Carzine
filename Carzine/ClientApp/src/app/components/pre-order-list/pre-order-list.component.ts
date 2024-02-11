@@ -1,7 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { PreOrderModel } from '../../models/PreOrderModel';
 import { OrderService } from '../../services/order.service';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { StatusComponent } from '../dialogs/status/status.component';
+import { MessageService } from 'src/app/services/message.service';
+import { OrderStatusModel } from 'src/app/models/OrderStatusModel';
 
 @Component({
   selector: 'app-pre-order-list',
@@ -12,17 +16,35 @@ import { Router } from '@angular/router';
 export class PreOrderListComponent implements OnInit {
   preOrders: PreOrderModel[] = [];
   suppliers: any[] = [];
+  statuses: OrderStatusModel[] = [];
   inProgress = false;
+  displayCols: string[] = ['id', 'date', 'phone', 'userEmail', 'volume', 'weight', 'supplierName',
+    'price', 'deliveryCost', 'extraCharge', 'deliveryOrderStatus', 'partNumber',
+    'manufacturer', 'priceRub', 'deliveryMin','clientOrderStatus', 'cmd'];
+
+  @ViewChild('dialogRef')
+  dialogRef!: TemplateRef<any>;
 
   constructor(
-    private orderService: OrderService, private router: Router) {
+    private orderService: OrderService, 
+    private messageService: MessageService,
+    private router: Router,
+    public dialog: MatDialog) {
+  }
 
+  ngOnInit(): void {
     this.inProgress = true;
 
-    this.orderService.getPreOrders().then((data: any) => {
-      this.preOrders = data;
+    const f1 = this.orderService.getClientStatuses();
+    const f2 = this.orderService.getPreOrders();
+
+    Promise.all([f1, f2]).then(data => {
+      this.statuses = data[0];
+      this.preOrders = data[1];
+      this.preOrders.forEach(x => x.clientStatusName = this.statuses.find(s => s.id === x.clientStatus)?.name ?? '??');
+
       this.inProgress = false;
-	  })
+    })
     .catch(err => {
       this.inProgress = false;
       if (err.status === 401) {
@@ -34,14 +56,12 @@ export class PreOrderListComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-  }
-
   openDialog(preOrderId: number | undefined) {
     if (!preOrderId)
       return;
     
-    this.orderService.createOrder(preOrderId)
+    if (confirm("Создать реальный ордер?")) {
+      this.orderService.createOrder(preOrderId)
       .then((x: any) => {
         alert(x.res.info);
       }
@@ -49,6 +69,25 @@ export class PreOrderListComponent implements OnInit {
       .catch((err: any) => {
         alert(err.error.text ?? err.error)
       });
+    }
+  }
+
+  openStatusDialog(x: PreOrderModel) {
+    this.dialog.open(StatusComponent, {data: {
+      statusId: x.clientStatus,
+      statuses: this.statuses
+    }})
+    .afterClosed()
+    .subscribe((res) => {
+      if (res && res.event === 'ok' && res.data) {
+        this.orderService.setPreorderStatus(x.id!, res.data)
+        .then(() => {
+          this.messageService.sendMessage('Статус изменен', 5000);
+          x.clientStatus = res.data;
+          x.clientStatusName = this.statuses.find(s => s.id === res.data)?.name!
+        })
+      }
+    })
   }
 
   getSupplierName(id?: number): string | undefined {

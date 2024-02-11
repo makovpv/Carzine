@@ -14,7 +14,7 @@ namespace CarzineCore.Models
 
 		public DateTime Date { get; set; }
 
-		public ClientStatus ClientStatus { get; set; }
+		public int ClientStatus { get; set; }
 
 		public SupplyerStatus SupplyerStatus { get; set; }
 	}

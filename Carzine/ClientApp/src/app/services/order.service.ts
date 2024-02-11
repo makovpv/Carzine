@@ -34,4 +34,14 @@ export class OrderService {
   getSuppliers(): Promise<any> {
     return this.http.get(this.baseUrl+'order/suppliers').toPromise();
   }
+
+  getClientStatuses(): Promise<any> {
+    return this.http.get(this.baseUrl+'order/status').toPromise();
+  }
+
+  setPreorderStatus(orderId: number, statusId: number): Promise<any> {
+    return this.http.post(
+      `${this.baseUrl}order/preorder/status/${orderId}`, statusId)
+      .toPromise();
+  }
 }

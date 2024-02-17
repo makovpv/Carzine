@@ -28,36 +28,29 @@
             [routerLinkActive]="['link-active']"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
+            <a class="nav-link text-dark" [routerLink]="['/']">Поиск запчастей</a>
           </li>
-          <li 
+          <li *ngIf="isProfUser && userName"
             class="nav-item"
             [routerLinkActive]="['link-active']"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <a class="nav-link text-dark" [routerLink]="['/pre-orders']">Предзаказы</a>
+            <a class="nav-link text-dark" [routerLink]="['/pre-orders']">Панель управления</a>
           </li>
-          <li
+          <li *ngIf="userName"
             class="nav-item"
             [routerLinkActive]="['link-active']"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <a class="nav-link text-dark" [routerLink]="['/account']">Кабинет</a>
-          </li>
-          <li
-            class="nav-item"
-            [routerLinkActive]="['link-active']"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            <a *ngIf="!userName" class="nav-link text-dark" [routerLink]="['/login']">Login</a>
-            <span *ngIf="userName" style="cursor: pointer;" class="nav-link text-dark" (click)="logout()">Logout</span>
+            <a class="nav-link text-dark" [routerLink]="['/account']">Мои заказы</a>
           </li>
           <li
             class="nav-item"
             [routerLinkActive]="['link-active']"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <a style="cursor: pointer;" class="nav-link text-dark" [routerLink]="['/signup']">Регистрация</a>
+            <a *ngIf="!userName" class="nav-link text-dark" [routerLink]="['/login']">Войти</a>
+            <span *ngIf="userName" style="cursor: pointer;" class="nav-link text-dark" (click)="logout()">Выйти</span>
           </li>
         </ul>
       </div>

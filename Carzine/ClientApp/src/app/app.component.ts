@@ -19,6 +19,7 @@ export class AppComponent {
     this._snackBar.open(message, "OK", {
       duration: duration,
       panelClass: ['cz-snack-panel'],
+      verticalPosition: 'top'
     });
   }
 }

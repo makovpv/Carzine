@@ -8,13 +8,18 @@ import { AuthService } from '../services/auth.service';
 })
 export class NavMenuComponent implements OnInit {
   isExpanded = false;
-  userName = '';
+  userName: string | undefined | null;
+  isProfUser = false;
 
   constructor(private authService: AuthService) {}
 
   ngOnInit() {
+    this.userName = localStorage.getItem('userName');
+    this.isProfUser = localStorage.getItem('isProfUser') === 'true';
+
     this.authService.changeUserName.subscribe(data => {
-      this.userName = data;
+      this.userName = data.email;
+      this.isProfUser = data.isProfUser;
     });
   }
 

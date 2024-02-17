@@ -329,23 +329,6 @@ export class HomeComponent {
     })
   }
 
-  // openDialog(product: ProductModel) {
-  //   this.dialog.open(PreOrderComponent)
-  //   .afterClosed()
-  //   .subscribe((res) => {
-  //     if (res && res.event === 'ok' && res.data) {
-        
-  //     }
-  //   })
-  // }
-
-  // getDeliveryString(deliveryMin?: number, deliveryMax?: number): any {
-  //   if (deliveryMin === deliveryMax)
-  //     return deliveryMax;
-    
-  //   return `${deliveryMin} - ${deliveryMax}`;
-  // }
-
   onSearchKeyDown(e: any) {
     if (e.code === 'Enter') {
       this.search();

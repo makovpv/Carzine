@@ -43,10 +43,10 @@ namespace Carzine.Controllers
 			var products = CarzineCalculator.CalcPriceComponents(productData, usdRate);
 
 			products.Sort(delegate (StandardProductModel x, StandardProductModel y) {
-				if (x.Price == y.Price)
+				if (x.PriceRub == y.PriceRub)
 					return 0;
 				
-				return x.Price > y.Price ? 1 : -1;
+				return x.PriceRub > y.PriceRub ? 1 : -1;
 			});
 
 			return StatusCode(

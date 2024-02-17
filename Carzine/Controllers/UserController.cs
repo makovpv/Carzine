@@ -55,7 +55,8 @@ namespace Carzine.Controllers
 			{
 				access_token = encodedJwt,
 				userName = loginData.Email,
-				expires = expires
+				expires = expires,
+				isProfUser = userData.Is_Admin
 			};
 
 			return StatusCode(StatusCodes.Status200OK, Results.Json(response));

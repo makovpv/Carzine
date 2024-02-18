@@ -277,7 +277,7 @@ export class HomeComponent {
       })
       .catch((err) => {
         this.inProgress = false;
-        alert(err.error)
+        this.messageService.sendErrorMessage(err.error);
       });
   }
 
@@ -306,7 +306,7 @@ export class HomeComponent {
       })
       .catch((err) => {
         this.inProgress = false;
-        alert(err.error)
+        this.messageService.sendErrorMessage(err.error);
       });
   }
 

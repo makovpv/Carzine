@@ -9,3 +9,18 @@
 mat-form-field {
     display: block;
 }
+
+.mat-checkbox-container {
+    margin-bottom: 20px;
+}
+
+:host::ng-deep.mat-checkbox-layout{
+    white-space: normal !important;
+    text-align: left;
+    font-style: italic;
+    font-size: small;
+}
+    
+:host::ng-deep.mat-checkbox-inner-container{
+    margin-top: 4px;
+}

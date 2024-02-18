@@ -20,4 +20,9 @@ namespace CarzineCore.Interfaces
 
 		public Task<Stream> GetAcatImageSourceAsync(AcatGroupInfo groupInfo);
 	}
+
+	public interface IDataTranslatorService
+	{
+		public string Translate(string originalText);
+	}
 }

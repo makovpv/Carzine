@@ -23,4 +23,9 @@ namespace CarzineCore.Interfaces
 
 		public Task<UserDto?> GetUserByName(string userName);
 	}
+
+	public interface IDbTranslationService
+	{
+		public Dictionary<string, string> GetAllTranslations();
+	}
 }

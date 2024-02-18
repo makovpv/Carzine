@@ -17,7 +17,7 @@
 	<button mat-flat-button color="primary" (click)="search()" [disabled]="inProgress">Поиск</button>
 </div>
 
-<div style="border: solid 2px blue; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
+<div *ngIf="modification?.name" style="border: solid 2px blue; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
 	<div>{{modification?.brand}}</div>
 	<div>{{modification?.description}}</div>
 	<div>{{modification?.modelName}}</div>
@@ -25,7 +25,7 @@
 	<img [src]="model?.image">
 </div>
 
-<div id="group-parts">
+<div id="group-parts" *ngIf="dataSource">
 	<div class="group-parts-area">
 		<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
 			<!-- This is the tree node template for leaf nodes -->
@@ -137,7 +137,7 @@
 	
 		<button id="btn-show-all" *ngIf="!showAllProducts && searchResult.products.length > 5" 
 			mat-stroked-button mat-button (click)="showAllProducts = true;">
-			Показать все
+			Показать еще {{searchResult.products.length - 5}} вариантов
 		</button>
 	</div>
 </div>

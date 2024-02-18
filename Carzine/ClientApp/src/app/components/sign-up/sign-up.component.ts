@@ -17,6 +17,7 @@ const passwordMatchingValidatior: ValidatorFn = (control: AbstractControl): Vali
 })
 export class SignUpComponent implements OnInit {
   signUpForm: FormGroup = new FormGroup({});
+  personalAgreement = false;
 
   constructor(private authService: AuthService, private messageService: MessageService) { }
 
@@ -25,7 +26,8 @@ export class SignUpComponent implements OnInit {
       'userEmail': new FormControl('', [Validators.required, Validators.email]),
       'userPhone': new FormControl('', Validators.pattern('[0-9]{11}')),
       'password': new FormControl('', [Validators.required]),
-      'passwordConfirm': new FormControl('', [Validators.required])
+      'passwordConfirm': new FormControl('', [Validators.required]),
+      'personalAgreement': new FormControl('', [Validators.requiredTrue]),
     }, {validators: passwordMatchingValidatior});
   }
 

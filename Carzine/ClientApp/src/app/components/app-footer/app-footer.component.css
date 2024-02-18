@@ -1,11 +1,21 @@
 #footer {
     background: #f1f1f1;
     font-size: small;
-    text-align: center;
     padding: 8px;
     margin-top: 16px;
+    display: flex;
+    justify-content: center;
+}
+
+#footer div {
+    width: max(12%, 150px);
 }
 
 #footer div span {
     padding-right: 16px;
+    display: block;
+}
+
+#footer div span a {
+    text-decoration: none;
 }

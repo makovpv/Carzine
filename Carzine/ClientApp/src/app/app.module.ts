@@ -30,6 +30,12 @@ import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { DeliveryPeriodPipe } from './pipes/delivery-period.pipe';
 import { StatusComponent } from './components/dialogs/status/status.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AboutUsComponent } from './components/info/about-us/about-us.component';
+import { PublicOfferComponent } from './components/info/public-offer/public-offer.component';
+import { DetailsComponent } from './components/info/details/details.component';
+import { DeliveryComponent } from './components/customer/delivery/delivery.component';
+import { ReturnComponent } from './components/customer/return/return.component';
+import { PaymentMethodComponent } from './components/customer/payment-method/payment-method.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +50,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     AccountComponent,
     SignUpComponent,
     DeliveryPeriodPipe,
-    StatusComponent
+    StatusComponent,
+    AboutUsComponent,
+    PublicOfferComponent,
+    DetailsComponent,
+    DeliveryComponent,
+    ReturnComponent,
+    PaymentMethodComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -57,6 +69,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       { path: 'login', component: LoginComponent },
       { path: 'account', component: AccountComponent },
       { path: 'signup', component: SignUpComponent },
+      { path: 'about', component: AboutUsComponent },
+      { path: 'offer', component: PublicOfferComponent },
+      { path: 'details', component: DetailsComponent },
+      { path: 'return', component: ReturnComponent },
+      { path: 'delivery', component: DeliveryComponent },
+      { path: 'payment', component: PaymentMethodComponent },
     ]),
     BrowserAnimationsModule,
     MatDialogModule,

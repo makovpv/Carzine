@@ -27,6 +27,11 @@
         <div *ngIf="signUpForm.errors?.notmatched && signUpForm.controls['passwordConfirm'].touched" class="cr-alert">
             Пароль не совпадает с подтверждением
         </div>
+        <div class="mat-checkbox-container">
+            <mat-checkbox formControlName="personalAgreement">
+                <span>Я согласен с правилами сервиса, хранением и обработкой персональных данных</span>
+            </mat-checkbox>
+        </div>
         <div>
             <button mat-flat-button color="primary" [disabled]="signUpForm.invalid" (click)="signUp()">Зарегистрироваться</button>
         </div>

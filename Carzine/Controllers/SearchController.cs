@@ -54,7 +54,7 @@ namespace Carzine.Controllers
 				new SearchResultViewModel()
 				{
 					Products = products.FillEmptyNames(),
-					BestPrice = products.MinBy(x => x.PriceRub),
+					BestPrice = CarzineCalculator.GetBestPriceProduct(products),
 					ExpressDelivery = products.MinBy(x => x.DeliveryMin),
 					Optimal = CarzineCalculator.GetOptimalProduct(products),
 					UsdRate = usdRate
@@ -78,6 +78,11 @@ namespace Carzine.Controllers
 			{
 				var searchResult = await _apiDataService.SearchByVinAsync(vin);
 
+				if (searchResult.vins == null)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, "No vins in search result");
+				}
+				
 				var acatVin = searchResult.vins.FirstOrDefault();
 
 				groupInfo = new AcatGroupInfo

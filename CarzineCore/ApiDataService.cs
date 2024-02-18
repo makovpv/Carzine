@@ -6,10 +6,7 @@ using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarzineCore
 {
@@ -28,7 +25,9 @@ namespace CarzineCore
 		private ApecTokenResponse _apecApiToken;
 		private string _acatToken;
 
-		public ApiDataService(IConfiguration config, ILogger<ApiDataService> logger)
+		private readonly IDataTranslatorService _dataTranslationService;
+
+		public ApiDataService(IConfiguration config, ILogger<ApiDataService> logger, IDataTranslatorService dataTranslationService)
 		{
 			_logger = logger;
 			
@@ -38,6 +37,8 @@ namespace CarzineCore
 			_apiAcatCred = GetApiCredentials(config.GetSection("acatApi"));
 
 			_acatToken = config.GetSection("acatApi")["token"];
+
+			_dataTranslationService = dataTranslationService;
 		}
 
 		private static ApiCredentials GetApiCredentials(IConfigurationSection section)
@@ -110,6 +111,11 @@ namespace CarzineCore
 				result.AddRange(products[0]);
 				result.AddRange(products[1]);
 				result.AddRange(products[2]);
+
+				foreach (var resultProduct in result)
+				{
+					resultProduct.Name = _dataTranslationService.Translate(resultProduct.Name);
+				}
 			}
 			catch (Exception ex)
 			{
@@ -377,6 +383,11 @@ namespace CarzineCore
 			var response = await _restClient.ExecuteAsync(request);
 
 			var result = JsonConvert.DeserializeObject<AcatSearchResult>(response.Content);
+
+			if (!string.IsNullOrEmpty(result.message))
+			{
+				_logger.LogError($"SearchByVinAsync {result.message}");
+			}
 
 			return result;
 		}

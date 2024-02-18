@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CarzineCore.Models
+﻿namespace CarzineCore.Models
 {
 	public class AcatSearchResult
 	{
 		public AcatVinModel[] vins { get; set; }
 		public string[] marks { get; set; }
-		//public List<string> marks { get; set; }
+		public int code { get; set; }
+		public string message { get; set; }
 	}
 
 	public class AcatVinModel

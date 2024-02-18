@@ -46,6 +46,16 @@ namespace CarzineCore
 			return products.MinBy(x => (Array.IndexOf(prices, x.PriceRub) + Array.IndexOf(delivery, x.DeliveryMin)) / 2.0);
 		}
 
+		public static StandardProductModel? GetBestPriceProduct(List<StandardProductModel> products)
+		{
+			if (!products.Any())
+				return null;
+			
+			var minPrice = Math.Round(products.Min(x => x.PriceRub));
+
+			return products.Where(x => Math.Round(x.PriceRub) == minPrice).MinBy(x => x.DeliveryMin);
+		}
+
 		private static decimal GetExtraCharge(decimal price)
 		{
 			if (price <= 0)

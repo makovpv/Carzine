@@ -29,5 +29,48 @@ namespace CarzineTest
 
 			Assert.That(productsRub.Count, Is.EqualTo(1));
 		}
+
+		[Test]
+		public void Test2()
+		{
+			var emptyProducts = new List<StandardProductModel>();
+
+			Assert.DoesNotThrow(() => {
+				CarzineCalculator.GetBestPriceProduct(emptyProducts);
+			});
+		}
+
+		[Test]
+		public void Test3()
+		{
+			var products = new List<StandardProductModel>()
+			{
+				new StandardProductModel()
+				{
+					Price = (decimal)100.231234,
+					PriceRub = 9000,
+					DeliveryMin = 10,
+					Name = "variant 1"
+				},
+				new StandardProductModel()
+				{
+					Price = (decimal)100.231234,
+					PriceRub = 9000,
+					DeliveryMin = 5,
+					Name = "variant 2"
+				},
+				new StandardProductModel()
+				{
+					Price = (decimal)120,
+					PriceRub = 11000,
+					DeliveryMin = 3,
+					Name = "variant 3"
+				},
+			};
+
+			var res = CarzineCalculator.GetBestPriceProduct(products);
+
+			Assert.That(res.Name, Is.EqualTo("variant 2"));
+		}
 	}
 }

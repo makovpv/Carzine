@@ -7,7 +7,7 @@ using System.Data;
 
 namespace CarzineCore
 {
-	public class MySqlDataService : IDbDataService, IDbUserService
+	public class MySqlDataService : IDbDataService, IDbUserService, IDbTranslationService
 	{
 		private readonly string _connectionString;
 
@@ -44,6 +44,13 @@ namespace CarzineCore
 
 		const string _sqlGetClientStatuses =
 			"SELECT * FROM client_order_status";
+
+		const string _sqlGetAllTranslations =
+			"SELECT en_name AS enName, ru_name AS ruName FROM translation";
+		const string _sqlAddTranslations =
+			"INSERT INTO translation (en_name, ru_name) VALUES (@key, @translation)";
+		const string _sqlDeleteTranslations =
+			"DELETE FROM translation WHERE en_name = @key";
 
 		public MySqlDataService(IConfiguration config)
 		{
@@ -183,6 +190,28 @@ namespace CarzineCore
 			using var connection = GetConnection();
 
 			return await connection.QueryAsync<StatusDto>(_sqlGetClientStatuses);
+		}
+
+		public async Task<IEnumerable<TranslationDto>> GetAllTranslationsAsync()
+		{
+			using var connection = GetConnection();
+
+			return await connection.QueryAsync<TranslationDto>(_sqlGetAllTranslations);
+			
+		}
+
+		public async Task AddTranslationAsync(string key, string translation)
+		{
+			using var connection = GetConnection();
+
+			await connection.ExecuteAsync(_sqlAddTranslations, new { key, translation });
+		}
+
+		public async Task DeleteTranslationAsync(string key)
+		{
+			using var connection = GetConnection();
+
+			await connection.ExecuteAsync(_sqlDeleteTranslations, new { key });
 		}
 	}
 }

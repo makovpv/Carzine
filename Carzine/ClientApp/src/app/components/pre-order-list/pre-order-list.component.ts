@@ -86,6 +86,9 @@ export class PreOrderListComponent implements OnInit {
           x.clientStatus = res.data;
           x.clientStatusName = this.statuses.find(s => s.id === res.data)?.name!
         })
+        .catch(err => {
+          this.messageService.sendErrorMessage(err.message);
+        })
       }
     })
   }

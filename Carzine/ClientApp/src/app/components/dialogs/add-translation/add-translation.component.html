@@ -1,0 +1,21 @@
+<h5>Новый перевод</h5>
+
+<mat-dialog-content>
+    <mat-form-field>
+        <mat-label>Фраза (EN)</mat-label>
+        <input type="text" matInput [(ngModel)]="translation.enName" required>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Перевод</mat-label>
+        <input type="text" matInput [(ngModel)]="translation.ruName" required>
+    </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button
+        color="primary"
+        [disabled]="!translation.enName || !translation.ruName" 
+        (click)="closeDialog('ok')">Ok
+    </button>
+    <button mat-stroked-button (click)="closeDialog('cancel')">Отмена</button>
+</mat-dialog-actions>

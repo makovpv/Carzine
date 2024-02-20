@@ -26,6 +26,10 @@ namespace CarzineCore.Interfaces
 
 	public interface IDbTranslationService
 	{
-		public Dictionary<string, string> GetAllTranslations();
+		public Task<IEnumerable<TranslationDto>> GetAllTranslationsAsync();
+
+		public Task AddTranslationAsync(string key, string translation);
+
+		public Task DeleteTranslationAsync(string key);
 	}
 }

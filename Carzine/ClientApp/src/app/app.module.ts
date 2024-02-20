@@ -36,6 +36,8 @@ import { DetailsComponent } from './components/info/details/details.component';
 import { DeliveryComponent } from './components/customer/delivery/delivery.component';
 import { ReturnComponent } from './components/customer/return/return.component';
 import { PaymentMethodComponent } from './components/customer/payment-method/payment-method.component';
+import { TranslationComponent } from './components/translation/translation.component';
+import { AddTranslationComponent } from './components/dialogs/add-translation/add-translation.component';
 
 @NgModule({
   declarations: [
@@ -56,7 +58,9 @@ import { PaymentMethodComponent } from './components/customer/payment-method/pay
     DetailsComponent,
     DeliveryComponent,
     ReturnComponent,
-    PaymentMethodComponent
+    PaymentMethodComponent,
+    TranslationComponent,
+    AddTranslationComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -75,6 +79,7 @@ import { PaymentMethodComponent } from './components/customer/payment-method/pay
       { path: 'return', component: ReturnComponent },
       { path: 'delivery', component: DeliveryComponent },
       { path: 'payment', component: PaymentMethodComponent },
+      { path: 'translation', component: TranslationComponent },
     ]),
     BrowserAnimationsModule,
     MatDialogModule,

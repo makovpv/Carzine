@@ -1,0 +1,22 @@
+<div>
+    <table>
+      <tr>
+        <th>Фраза</th>
+        <th>Перевод</th>
+        <th></th>
+      </tr>
+      <tr *ngFor="let x of translations">
+        <td>{{x.enName}}</td>
+        <td>{{x.ruName}}</td>
+        <td>
+          <button mat-mini-fab color="warn" (click)="deleteTranslationClick(x.enName)" matTooltip="Удалить перевод">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </table>
+
+    <button mat-flat-button color="primary" (click)="addTranslationClick()">Добавить</button>
+
+    <mat-spinner *ngIf="inProgress"></mat-spinner>
+</div>

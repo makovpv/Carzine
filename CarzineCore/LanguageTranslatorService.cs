@@ -1,9 +1,5 @@
 ﻿using CarzineCore.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CarzineCore.Models;
 
 namespace CarzineCore
 {
@@ -18,7 +14,13 @@ namespace CarzineCore
 		{
 			_dbTranslationService = dbTranslationService;
 
-			Task.Run(() => StartPeriodicDictionaryRefreshAsync());
+			Task.Run(() => LoadTranslationsAsync()).Wait();
+		}
+
+		private async Task LoadTranslationsAsync()
+		{
+			_translations = (await _dbTranslationService.GetAllTranslationsAsync())
+					.ToDictionary(x => x.enName, x => x.ruName);
 		}
 
 		private async Task StartPeriodicDictionaryRefreshAsync()
@@ -26,17 +28,13 @@ namespace CarzineCore
 			using var pTimer = new PeriodicTimer(TimeSpan.FromMinutes(60));
 			while (await pTimer.WaitForNextTickAsync())
 			{
-				_translations = _dbTranslationService.GetAllTranslations();
+				_translations = (await _dbTranslationService.GetAllTranslationsAsync())
+					.ToDictionary(x => x.enName, x => x.ruName);
 			}
 		}
 
 		public string Translate(string originalText)
 		{
-			if (!_translations.Any())
-			{
-				_translations = _dbTranslationService.GetAllTranslations();
-			}
-
 			foreach (var key in _translations.Keys)
 			{
 				var idx = originalText.IndexOf(key, StringComparison.InvariantCultureIgnoreCase);
@@ -48,6 +46,25 @@ namespace CarzineCore
 			}
 
 			return originalText;
+		}
+
+		public async Task AddTranslationAsync(string key, string translation)
+		{
+			_translations.Add(key, translation);
+
+			await _dbTranslationService.AddTranslationAsync(key, translation);
+		}
+
+		public async Task DeleteTranslationAsync(string key)
+		{
+			_translations.Remove(key);
+
+			await _dbTranslationService.DeleteTranslationAsync(key);
+		}
+
+		public IEnumerable<TranslationDto> GetAllTranslations()
+		{
+			return _translations.Select(x => new TranslationDto(x.Key, x.Value));
 		}
 	}
 }

@@ -1,7 +1,9 @@
 ﻿using CarzineCore;
 using CarzineCore.Interfaces;
+using CarzineCore.Models;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CarzineTest
 {
@@ -25,12 +27,22 @@ namespace CarzineTest
 
 	class FakeDbTranslationService : IDbTranslationService
 	{
-		public Dictionary<string, string> GetAllTranslations()
+		public Task AddTranslationAsync(string key, string translation)
 		{
-			var result = new Dictionary<string, string>
+			throw new System.NotImplementedException();
+		}
+
+		public Task DeleteTranslationAsync(string key)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public async Task<IEnumerable<TranslationDto>> GetAllTranslationsAsync()
+		{
+			var result = new List<TranslationDto>
 			{
-				{ "en", "AAA" },
-				{ "RU", "RRR" }
+				new TranslationDto("en", "AAA"),
+				new TranslationDto("RU", "RRR")
 			};
 
 			return result;

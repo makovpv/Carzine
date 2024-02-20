@@ -24,5 +24,11 @@ namespace CarzineCore.Interfaces
 	public interface IDataTranslatorService
 	{
 		public string Translate(string originalText);
+
+		public Task AddTranslationAsync(string key, string translation);
+
+		public Task DeleteTranslationAsync(string key);
+
+		public IEnumerable<TranslationDto> GetAllTranslations();
 	}
 }

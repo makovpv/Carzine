@@ -43,9 +43,10 @@ try
 		});
 
 	builder.Services.AddSingleton<IApiDataService, ApiDataService>();
-	//builder.Services.AddSingleton<IDbDataService, DbDataService>();
 	builder.Services.AddSingleton<IDbDataService, MySqlDataService>();
 	builder.Services.AddSingleton<IDbUserService, MySqlDataService>();
+	builder.Services.AddSingleton<IDbTranslationService, MySqlDataService>();
+	builder.Services.AddSingleton<IDataTranslatorService, LanguageTranslatorService>();
 
 	builder.Services.AddCors(options =>
 	{

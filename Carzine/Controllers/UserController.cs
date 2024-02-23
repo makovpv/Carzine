@@ -14,10 +14,12 @@ namespace Carzine.Controllers
 	public class UserController : ControllerBase
 	{
 		private readonly IDbUserService _dataService;
+		private readonly IMailService _mailService;
 
-		public UserController(IDbUserService dbService)
+		public UserController(IDbUserService dbService, IMailService mailService)
 		{
 			_dataService = dbService;
+			_mailService = mailService;
 		}
 
 		[HttpPost("token")]
@@ -68,6 +70,8 @@ namespace Carzine.Controllers
 			try
 			{
 				await _dataService.AddUserAsync(user.Name, user.Pwd, user.Phone);
+
+				await _mailService.SendEmailAsync("makovpv@gmail.com", $"new user {user.Name} has been registered");
 			}
 			catch (CarzineException ex)
 			{

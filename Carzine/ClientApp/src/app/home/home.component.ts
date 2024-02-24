@@ -286,6 +286,9 @@ export class HomeComponent {
       .then((result: any) => {
         this.inProgress = false;
 
+	      this.schemeImage = null;
+	      this.groupParts.numbers = [];
+
         if (!result.type || !result.model) {
           this.messageService.sendErrorMessage("Ничего не найдено по данному VIN");
           return;

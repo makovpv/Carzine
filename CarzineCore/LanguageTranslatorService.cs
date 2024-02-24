@@ -35,17 +35,19 @@ namespace CarzineCore
 
 		public string Translate(string originalText)
 		{
+			var result = originalText;
+			
 			foreach (var key in _translations.Keys)
 			{
-				var idx = originalText.IndexOf(key, StringComparison.InvariantCultureIgnoreCase);
+				var idx = result.IndexOf(key, StringComparison.InvariantCultureIgnoreCase);
 
 				if (idx != -1)
 				{
-					return originalText.Replace(key, _translations[key], StringComparison.InvariantCultureIgnoreCase);
+					result = result.Replace(key, _translations[key], StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 
-			return originalText;
+			return result;
 		}
 
 		public async Task AddTranslationAsync(string key, string translation)

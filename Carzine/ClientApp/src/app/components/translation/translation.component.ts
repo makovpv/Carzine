@@ -20,9 +20,17 @@ export class TranslationComponent implements OnInit {
     this.inProgress = true;
 
     this.translationService.getAllTranslation()
-    .then(data => {
+    .then((data: TranslationModel[]) => {
       this.inProgress = false;
-      this.translations = data;
+      this.translations = data.sort((a, b) => {
+        if (a.enName < b.enName) {
+          return -1;
+        }
+        if (b.enName < a.enName) {
+          return 1;
+        }
+        return 0;
+      });
     })
     .catch(err => {
       this.inProgress = false;
@@ -31,7 +39,9 @@ export class TranslationComponent implements OnInit {
   }
 
   addTranslationClick() {
-    this.dialog.open(AddTranslationComponent)
+    this.dialog.open(AddTranslationComponent, {
+      width: '600px'
+    })
     .afterClosed()
     .subscribe((res) => {
       if (res && res.event === 'ok' && res.data) {

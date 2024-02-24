@@ -17,12 +17,9 @@
 	<button mat-flat-button color="primary" (click)="search()" [disabled]="inProgress">Поиск</button>
 </div>
 
-<div *ngIf="modification?.name" style="border: solid 2px blue; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;">
-	<div>{{modification?.brand}}</div>
-	<div>{{modification?.description}}</div>
-	<div>{{modification?.modelName}}</div>
-	<div>{{modification?.name}}</div>
-	<img [src]="model?.image">
+<div *ngIf="modification?.name" id="vin-info-block">
+	<div id="model-info">{{modification?.brand}}, {{modification?.modelName}}, {{modification?.name}}</div>
+	<div id="model-description">{{modification?.description}}</div>
 </div>
 
 <div id="group-parts" *ngIf="dataSource">

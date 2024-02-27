@@ -20,9 +20,10 @@ namespace CarzineTest
 		[Test]
 		[TestCase("expansion tank", "расширительный бачок")]
 		[TestCase("coolANt", "охлаждающая жидкость")]
-		[TestCase("coolANt - COOLant", "охлаждающая жидкость - охлаждающая жидкость")]
-		[TestCase("the best expansion tank of the world", "the best расширительный бачок of the world")]
+		[TestCase("coolANt - COOLant", "coolANt - COOLant")]
+		[TestCase("the best expansion tank of the world", "the best expansion tank of the world")]
 		[TestCase("expansion tank, coolant", "расширительный бачок, охлаждающая жидкость")]
+		[TestCase("expansion tank E327SR730I 94", "расширительный бачок E327SR730I 94")]
 		public void TranslateTest(string original, string translated)
 		{
 			Assert.That(_translatorService.Translate(original), Is.EqualTo(translated));
@@ -45,9 +46,11 @@ namespace CarzineTest
 		{
 			var result = new List<TranslationDto>
 			{
+				new TranslationDto("tank", "бак"),
 				new TranslationDto("anti roll bar bush", "втулка стабилизатора поперечной устойчивости"),
 				new TranslationDto("expansion tank", "расширительный бачок"),
-				new TranslationDto("Coolant", "охлаждающая жидкость")
+				new TranslationDto("Coolant", "охлаждающая жидкость"),
+				
 			};
 
 			return result;

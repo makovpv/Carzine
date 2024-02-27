@@ -20,7 +20,7 @@ namespace CarzineCore
 		private async Task LoadTranslationsAsync()
 		{
 			_translations = (await _dbTranslationService.GetAllTranslationsAsync())
-					.ToDictionary(x => x.enName, x => x.ruName);
+					.ToDictionary(x => x.enName.ToLower(), x => x.ruName);
 		}
 
 		private async Task StartPeriodicDictionaryRefreshAsync()
@@ -35,31 +35,32 @@ namespace CarzineCore
 
 		public string Translate(string originalText)
 		{
-			var result = originalText;
-			
-			foreach (var key in _translations.Keys)
-			{
-				var idx = result.IndexOf(key, StringComparison.InvariantCultureIgnoreCase);
+			var result = string.Empty;
 
-				if (idx != -1)
-				{
-					result = result.Replace(key, _translations[key], StringComparison.InvariantCultureIgnoreCase);
-				}
+			var tokens = originalText.Split(", ");
+
+			//StringBuilder
+
+			foreach (var token in tokens)
+			{
+				result += (_translations.GetValueOrDefault(token.ToLower()) ?? token) + ", ";
 			}
+
+			result = result.Remove(result.Length - 2);
 
 			return result;
 		}
 
 		public async Task AddTranslationAsync(string key, string translation)
 		{
-			_translations.Add(key, translation);
+			_translations.Add(key.ToLower(), translation);
 
 			await _dbTranslationService.AddTranslationAsync(key, translation);
 		}
 
 		public async Task DeleteTranslationAsync(string key)
 		{
-			_translations.Remove(key);
+			_translations.Remove(key.ToLower());
 
 			await _dbTranslationService.DeleteTranslationAsync(key);
 		}

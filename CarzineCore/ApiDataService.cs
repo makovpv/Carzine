@@ -112,6 +112,8 @@ namespace CarzineCore
 				result.AddRange(products[1]);
 				result.AddRange(products[2]);
 
+				result = result.Where(x => x.Price > 0).ToList();
+
 				foreach (var resultProduct in result)
 				{
 					resultProduct.Name = _dataTranslationService.Translate(resultProduct.Name);
@@ -388,6 +390,11 @@ namespace CarzineCore
 			{
 				_logger.LogError($"SearchByVinAsync {result.message}");
 			}
+
+			//if (result.vins != null)
+			//{
+
+			//}
 
 			return result;
 		}

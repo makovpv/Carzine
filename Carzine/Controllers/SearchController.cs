@@ -3,6 +3,7 @@ using CarzineCore;
 using CarzineCore.Interfaces;
 using CarzineCore.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Carzine.Controllers
 {
@@ -95,6 +96,11 @@ namespace Carzine.Controllers
 				};
 			}
 
+			if (User.Identity.IsAuthenticated)
+			{
+				//LogUserAuto(groupInfo, User.Identity.Name);
+			}
+
 			var acatGroups = await _apiDataService.GetAcatGroupsAsync(groupInfo);
 
 			//var result = new AcatPartsSearchResult();
@@ -158,7 +164,23 @@ namespace Carzine.Controllers
 
 			var result = await _apiDataService.GetAcatPartsAsync(groupInfo);
 
+			result.numbers = result.numbers.DistinctBy(x => x.Id + x.number + x.name).ToArray();
+
 			return StatusCode(StatusCodes.Status200OK, result);
+		}
+
+		[HttpGet("parts-by-name")]
+		public async Task<IActionResult> GetPartsByName(string name)
+		{
+			var rootGroups = new string[] { "MvCfmoAxMDE3NjgzM_CfmoEx", "MvCfmoAxMDE3NjgzNPCfmoEx", "MvCfmoAxMDE3Njg1MvCfmoEw",
+				"MvCfmoAxMDE3Njg1NPCfmoEw", "MvCfmoAxMDE3Njg1M_CfmoEw", "MvCfmoAxMDE3NjgzOPCfmoEx", "MvCfmoAxMDE3Njg0N_CfmoEx",
+				"MvCfmoAxMDE3Njg0NPCfmoEx", "MvCfmoAxMDE3Njg0OPCfmoEx", "MvCfmoAxMDE3NjgzOfCfmoEx", "MvCfmoAxMDE3Njg0MPCfmoEx",
+				"MvCfmoAxMDE3NjgzNfCfmoEx", "MvCfmoAxMDE3Njg0MvCfmoEx", "MvCfmoAxMDE3Njg0M_CfmoEx", "MvCfmoAxMDE3Njg0MfCfmoEx",
+				"MvCfmoAxMDE3NjgzN_CfmoEx", "MvCfmoAxMDE3Njg0OfCfmoEx", "MvCfmoAxMDE3Njg1MfCfmoEx", "MvCfmoAxMDE3Njg0NvCfmoEx",
+				"MvCfmoAxMDE3Njg1MPCfmoEx", "MvCfmoAxMDE3NjgzNvCfmoEx", "MvCfmoAxMDE3Njg0NfCfmoEx"
+			};
+
+			return StatusCode(StatusCodes.Status200OK, "not implemented yet");
 		}
 
 		[HttpGet("scheme")]

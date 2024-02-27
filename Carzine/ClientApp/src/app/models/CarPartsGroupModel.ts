@@ -7,6 +7,7 @@ export class CarPartsGroupModel {
 	name: string | undefined;
 	needLoadSubgroups: boolean | undefined;
 	parentId: string | undefined;
+	bcLevel: number = 0;
 }
 
 export class GroupInfoModel {

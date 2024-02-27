@@ -1,6 +1,7 @@
 using CarzineCore;
 using CarzineCore.Models;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace CarzineTest
@@ -28,6 +29,22 @@ namespace CarzineTest
 			var productsRub = CarzineCalculator.CalcPriceComponents(productsUsd, (decimal)12.34);
 
 			Assert.That(productsRub.Count, Is.EqualTo(1));
+		}
+
+		[Test]
+		public void ZeroPriceProductTest()
+		{
+			var productsUsd = new List<StandardProductModel>()
+			{
+				new StandardProductModel()
+				{
+					Price = 0,
+					Volume = (decimal)0.123,
+					Weight = (decimal)0.321
+				}
+			};
+
+			Assert.Throws<Exception>(() => CarzineCalculator.CalcPriceComponents(productsUsd, (decimal)12.34));
 		}
 
 		[Test]

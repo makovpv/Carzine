@@ -16,6 +16,7 @@ import { merge } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { MessageService } from '../services/message.service';
+import { ViewportScroller } from '@angular/common';
 
 /** Flat node with expandable and level information */
 export class DynamicFlatNode {
@@ -189,6 +190,11 @@ export class HomeComponent {
   dataSource: any;
   schemeImage: any;
   showAllProducts = false;
+  myRootPartGroups: CarPartsGroupModel[] = [];
+  myPartGroups1: CarPartsGroupModel[] = [];
+  myPartGroups2: any[] = [];
+  myPartGroups3: any[] = [];
+  breadCrumbGroups: any[] = [{name: '<-- Назад', bcLevel: 0}];
   
   getLevel = (node: DynamicFlatNode) => node.level;
   isExpandable = (node: DynamicFlatNode) => node.expandable;
@@ -204,6 +210,7 @@ export class HomeComponent {
     private orderService: OrderService,
     private messageService: MessageService,
     private router: Router,
+    private scroller: ViewportScroller,
     public dialog: MatDialog,
     private database: DynamicDatabase) { 
       this.treeControl = new FlatTreeControl<DynamicFlatNode>(this.getLevel, this.isExpandable);
@@ -245,7 +252,7 @@ export class HomeComponent {
 
   search() {
     if (!this.searchCode) {
-      this.messageService.sendMessage('Укажите код для поиска', 3000); // showSnack('Укажите код для поиска', 3000);
+      this.messageService.sendMessage('Укажите код для поиска', 3000);
       return;
     }
 
@@ -265,6 +272,8 @@ export class HomeComponent {
   }
 
   searchByPn(pn: string) {
+    this.scroller.scrollToAnchor("pn-search-result-anchor");
+    
     this.searchService.search(pn, this.includeAnalog)
       .then((result: ProductSearchResultModel) => {
         this.inProgress = false;
@@ -273,7 +282,10 @@ export class HomeComponent {
         
         if (result.products.length === 0) {
           this.messageService.sendErrorMessage("К сожалению сейчас нет той детали, которую вы ищете, проверьте правильность номера");
+          return;
         }
+
+        this.scroller.scrollToAnchor("pn-search-result");
       })
       .catch((err) => {
         this.inProgress = false;
@@ -286,26 +298,31 @@ export class HomeComponent {
       .then((result: any) => {
         this.inProgress = false;
 
-	      this.schemeImage = null;
-	      this.groupParts.numbers = [];
+        this.schemeImage = null;
+        this.groupParts.numbers = [];
 
         if (!result.type || !result.model) {
           this.messageService.sendErrorMessage("Ничего не найдено по данному VIN");
           return;
         }
 
-	      this.modification = result.modification;
+        this.modification = result.modification;
         this.model = result.model;
         this.mark = result.mark;
         this.carType = result.type.id;
 
-        this.dataSource = new DynamicDataSource(this.treeControl, this.database);
-        this.dataSource!.data = this.database.initialData(
-          result.type.id,
-          this.mark.id, 
-          this.modification.id,
-          this.model.id, 
-          result.groups);
+        // this.dataSource = new DynamicDataSource(this.treeControl, this.database);
+        // this.dataSource!.data = this.database.initialData(
+        //   result.type.id,
+        //   this.mark.id, 
+        //   this.modification.id,
+        //   this.model.id, 
+        //   result.groups);
+
+        //this.myPartGroups1 = result.groups.forEach((x: any) => x.bcLevel = 1);
+        this.myRootPartGroups = result.groups;
+        this.myPartGroups1 = result.groups.map((x: any) => ({...x, bcLevel: 1}));
+        this.breadCrumbGroups = [this.breadCrumbGroups.find(x => x.bcLevel === 0)];
       })
       .catch((err) => {
         this.inProgress = false;
@@ -335,6 +352,53 @@ export class HomeComponent {
   onSearchKeyDown(e: any) {
     if (e.code === 'Enter') {
       this.search();
+    }
+  }
+
+  foo(selectedGroup: CarPartsGroupModel, level: number) {
+    if (this.breadCrumbGroups.length === selectedGroup.bcLevel + 1)
+      return;
+
+    this.searchResult.products = [];
+
+    if (selectedGroup.bcLevel === 0) {
+      this.breadCrumbGroups = [selectedGroup];
+      this.myPartGroups1 = this.myRootPartGroups.map((x: any) => ({...x, bcLevel: 1}));
+      this.groupParts.labels = [];
+      return;
+    }
+    
+    this.breadCrumbGroups = this.breadCrumbGroups.filter(x => x.bcLevel <= selectedGroup.bcLevel);
+
+    this.breadCrumbGroups.push(selectedGroup);
+    
+    if (selectedGroup.hasSubgroups) {
+      this.searchService.getGroupItems(this.carType, selectedGroup.id, this.mark.id, this.modification.id, this.model.id, selectedGroup.parentId!) //ParentGroup
+      .then(data => {
+        
+        this.myPartGroups1 = data.groups.map((x: any) => ({...x, bcLevel: selectedGroup.bcLevel + 1}));
+
+        if (level === 0) {
+          while (this.breadCrumbGroups.length > (selectedGroup.bcLevel + 1)) {
+            this.breadCrumbGroups.pop();
+          }
+        }
+      });
+    }
+    else {
+      this.myPartGroups1 = [];
+    }
+
+    if (selectedGroup.hasParts) {
+      this.searchService.getGroupParts(this.carType, selectedGroup.id, this.mark.id, this.modification.id, this.model.id, selectedGroup.parentId!)
+        .then(data => {
+          this.groupParts = data;
+        })
+
+      this.schemeImage = this.searchService.getSchemeUrl(this.carType, selectedGroup.id, this.mark.id, this.modification.id, this.model.id, selectedGroup.parentId ?? '');
+    }
+    else {
+      this.groupParts.labels = [];
     }
   }
 }

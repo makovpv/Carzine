@@ -22,29 +22,21 @@
 	<div id="model-description">{{modification?.description}}</div>
 </div>
 
-<div id="group-parts" *ngIf="dataSource">
-	<div class="group-parts-area">
-		<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-			<!-- This is the tree node template for leaf nodes -->
-			<mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-			<!-- use a disabled button to provide padding for tree leaf -->
-			<button mat-icon-button disabled></button>
-			<span *ngIf="node.hasParts" (click)="getNodeParts(node)" style="cursor: pointer;"><strong>{{node.itemName}}</strong></span>
-			<span *ngIf="!node.hasParts">{{node.itemName}}</span>
-			</mat-tree-node>
-			<!-- This is the tree node template for expandable nodes -->
-			<mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
-			<button mat-icon-button matTreeNodeToggle
-					[attr.aria-label]="'Toggle ' + node.name">
-				<mat-icon class="mat-icon-rtl-mirror">
-				{{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-				</mat-icon>
-			</button>
-			{{node.itemName}}
-			</mat-tree-node>
-		</mat-tree>
+<div id="group-navigation">
+	<div id="bread-crumb-groups" *ngIf="breadCrumbGroups.length > 1">
+		<button mat-stroked-button class="crz-part-group" *ngFor="let x of breadCrumbGroups" (click)="foo(x, 0)">
+			<span *ngIf="x.hasSubgroups">{{x.name}}*</span>
+			<span *ngIf="!x.hasSubgroups">{{x.name}}</span>
+		</button>
 	</div>
+		
+	<button mat-stroked-button class="crz-part-group" *ngFor="let x of myPartGroups1" (click)="foo(x, 1)">
+		<span *ngIf="x.hasSubgroups">{{x.name}}*</span>
+		<span *ngIf="!x.hasSubgroups">{{x.name}}</span>
+	</button>
+</div>
 
+<div style="display: flex;" *ngIf="groupParts.labels.length > 0">
 	<div class="group-parts-area">
 		<div>
 			<!-- <svg *ngIf="mrk"  class="mark-img" width="600" height="800">
@@ -52,7 +44,7 @@
 				style="fill:rgba(0,0,0,0);stroke-width:1;stroke:red;" />
 			</svg> -->
 
-			 <img [src]="schemeImage" usemap="#workmap"> 
+			<img [src]="schemeImage" usemap="#workmap">
 			<map name="workmap">
 				<area *ngFor="let lbl of groupParts?.labels"
 					(click)="searchById(lbl.id)"
@@ -63,17 +55,42 @@
 					shape="rect">
 			</map>
 		</div>
-		<ul>
-			<li *ngFor="let x of groupParts.numbers">
-				{{x.id}} - {{ x.name }} (PN {{x.number}})
-				<button (click)="searchByPn(x.number)">Поиск по номеру</button>
-			</li>
-		</ul>
+	</div>
+
+	<div class="group-parts-area">
+		<button mat-flat-button *ngFor="let x of groupParts.numbers"
+			(click)="searchByPn(x.number)">{{x.id}} - {{ x.name }} (PN {{x.number}})
+		</button>
 	</div>
 </div>
 
+<div id="group-parts" *ngIf="dataSource">
+	<div class="group-parts-area">
+		<!-- <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+			
+			<mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+			
+			<button mat-icon-button disabled></button>
+			<span *ngIf="node.hasParts" (click)="getNodeParts(node)" style="cursor: pointer;"><strong>{{node.itemName}}</strong></span>
+			<span *ngIf="!node.hasParts">{{node.itemName}}</span>
+			</mat-tree-node>
+			
+			<mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+			<button mat-icon-button matTreeNodeToggle
+					[attr.aria-label]="'Toggle ' + node.name">
+				<mat-icon class="mat-icon-rtl-mirror">
+				{{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+				</mat-icon>
+			</button>
+			{{node.itemName}}
+			</mat-tree-node>
+		</mat-tree> -->
+	</div>
+</div>
+
+<div id="pn-search-result-anchor"></div>
 <div *ngIf="searchResult.products.length > 0">
-	<div>
+	<div id="pn-search-result">
 		Найдено {{searchResult.products.length}} вариантов от {{searchResult.bestPrice?.priceRub | intCurrency}} рублей
 	</div>
 
@@ -108,7 +125,7 @@
 	</div>
 	
 	<div>
-		<div>Другие предложения</div>
+		<div>Все предложения</div>
 		<table *ngIf="!inProgress">
 			<tr>
 				<th>Наименование детали</th>

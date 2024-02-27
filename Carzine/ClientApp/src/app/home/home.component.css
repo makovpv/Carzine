@@ -22,9 +22,18 @@
 	display: flex;
 }
 
-.group-parts-area {
-	width: 50%;
+/* .group-parts-area {
 	border: solid 2px orangered; border-radius: 8px; min-height: 24px;margin: 8px 0;padding: 8px;
+} */
+
+#group-navigation button {
+	font-weight: normal;
+}
+
+#bread-crumb-groups {
+	border-bottom: solid 1px gray;
+	margin-bottom: 8px;
+	padding-bottom: 8px;
 }
 
 area {
@@ -54,4 +63,8 @@ area {
 
 #model-info {
 	font-weight: bold;
+}
+
+.crz-part-group {
+	margin: 4px;
 }

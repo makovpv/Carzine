@@ -269,7 +269,7 @@ export class HomeComponent {
     if (selectedGroup.bcLevel === 0) {
       this.breadCrumbGroups = [selectedGroup];
       this.myPartGroups1 = this.myRootPartGroups.map((x: any) => ({...x, bcLevel: 1}));
-      this.groupParts.labels = [];
+      this.groupParts.numbers = [];
       return;
     }
     
@@ -303,7 +303,7 @@ export class HomeComponent {
       this.schemeImage = this.searchService.getSchemeUrl(this.carType, selectedGroup.id, this.mark.id, this.modification.id, this.model.id, selectedGroup.parentId ?? '');
     }
     else {
-      this.groupParts.labels = [];
+      this.groupParts.numbers = [];
     }
   }
 

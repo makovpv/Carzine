@@ -73,3 +73,17 @@ area {
 	padding-left: 0;
 	font-weight: unset;
 }
+
+.btn-detail-pn {
+	min-width: 50%;
+	text-align: left;
+	text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+@media screen and (max-width: 600px) {
+	.btn-detail-pn {
+		width: 375px;
+	}
+}

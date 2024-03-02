@@ -25,6 +25,9 @@ namespace CarzineCore
 		private ApecTokenResponse _apecApiToken;
 		private string _acatToken;
 
+		private readonly Dictionary<string, AcatSearchResult> _acatVinData = new();
+		private readonly Dictionary<string, AcatGroupResult> _acatGroups = new();
+
 		private readonly IDataTranslatorService _dataTranslationService;
 
 		public ApiDataService(IConfiguration config, ILogger<ApiDataService> logger, IDataTranslatorService dataTranslationService)
@@ -378,7 +381,7 @@ namespace CarzineCore
 			}
 		}
 
-		public async Task<AcatSearchResult> SearchByVinAsync(string vin)
+		protected virtual async Task<AcatSearchResult> SearchByVinInternalAsync(string vin)
 		{
 			var request = GetRestRequest($"{_apiAcatCred.url}catalogs/search?text={vin}&lang=ru", _acatToken, Method.Get);
 
@@ -391,15 +394,24 @@ namespace CarzineCore
 				_logger.LogError($"SearchByVinAsync {result.message}");
 			}
 
-			//if (result.vins != null)
-			//{
+			return result;
+		}
 
-			//}
+		public async Task<AcatSearchResult> SearchByVinAsync(string vin)
+		{
+			var key = vin.ToUpper();
+			
+			if (_acatVinData.ContainsKey(key))
+				return _acatVinData[key];
+
+			var result = await SearchByVinInternalAsync(vin);
+
+			_acatVinData[key] = result;
 
 			return result;
 		}
 
-		public async Task<AcatGroupResult?> GetAcatGroupsAsync(AcatGroupInfo groupInfo)
+		protected virtual async Task<AcatGroupResult?> GetAcatGroupsInternalAsync(AcatGroupInfo groupInfo)
 		{
 			var request = GetRestRequest(
 				$"{_apiAcatCred.url}catalogs/groups?type={groupInfo.GroupType}&mark={groupInfo.Mark}&modification={groupInfo.Modification}&model={groupInfo.Model}&group={groupInfo.Group}",
@@ -408,10 +420,21 @@ namespace CarzineCore
 
 			var response = await _restClient.ExecuteAsync(request);
 
-			var qqq = JsonConvert.DeserializeObject<AcatGroupResult>(response.Content);
+			return JsonConvert.DeserializeObject<AcatGroupResult>(response.Content);
+		}
 
+		public async Task<AcatGroupResult?> GetAcatGroupsAsync(AcatGroupInfo groupInfo)
+		{
+			var key = $"{groupInfo.Model}--{groupInfo.Modification}--{groupInfo.Group}";
+			
+			if (_acatGroups.ContainsKey(key))
+				return _acatGroups[key];
 
-			return qqq;
+			var result = await GetAcatGroupsInternalAsync(groupInfo);
+
+			_acatGroups[key] = result;
+
+			return result;
 		}
 
 		public async Task<AcatPartsSearchResult> GetAcatPartsAsync(AcatGroupInfo groupInfo)

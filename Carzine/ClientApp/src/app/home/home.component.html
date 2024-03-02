@@ -42,7 +42,7 @@
 	</button>
 </div>
 
-<div style="display: flex;" *ngIf="groupParts.numbers.length > 0">
+<div style="display: flex; flex-wrap: wrap;" *ngIf="groupParts.numbers.length > 0">
 	<div class="group-parts-area">
 		<div>
 			<!-- <svg *ngIf="mrk"  class="mark-img" width="600" height="800">
@@ -50,7 +50,7 @@
 				style="fill:rgba(0,0,0,0);stroke-width:1;stroke:red;" />
 			</svg> -->
 
-			<img [src]="schemeImage" usemap="#workmap">
+			<img [src]="schemeImage" width="100%" usemap="#workmap">
 			<map name="workmap">
 				<area *ngFor="let lbl of groupParts?.labels"
 					(click)="searchById(lbl.id)"
@@ -64,8 +64,8 @@
 	</div>
 
 	<div class="group-parts-area">
-		<button mat-flat-button *ngFor="let x of groupParts.numbers"
-			(click)="searchByPn(x.number)">{{x.id}} - {{ x.name }} (PN {{x.number}})
+		<button mat-flat-button *ngFor="let x of groupParts.numbers" class="btn-detail-pn"
+			(click)="searchByPn(x.number)">{{x.id}} - {{ x.name }}
 		</button>
 	</div>
 </div>

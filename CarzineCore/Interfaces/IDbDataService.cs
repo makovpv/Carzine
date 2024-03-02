@@ -32,4 +32,11 @@ namespace CarzineCore.Interfaces
 
 		public Task DeleteTranslationAsync(string key);
 	}
+
+	public interface IDbActionLogService
+	{
+		public Task LogUserAutoAsync(string vin, AcatVinModel acatVin, string userName);
+
+		public Task<IEnumerable<UserAutoDto>> GetUserAutoAsync(string userName, int limit);
+	}
 }

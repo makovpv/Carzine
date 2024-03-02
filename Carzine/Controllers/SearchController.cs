@@ -2,6 +2,7 @@
 using CarzineCore;
 using CarzineCore.Interfaces;
 using CarzineCore.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
@@ -15,11 +16,13 @@ namespace Carzine.Controllers
 
 		private readonly IApiDataService _apiDataService;
 
-		public SearchController(ILogger<SearchController> logger, IApiDataService apiDataService)
+		private readonly IDbActionLogService _dbActionLogService;
+
+		public SearchController(ILogger<SearchController> logger, IApiDataService apiDataService, IDbActionLogService dbActionLogService)
 		{
 			_logger = logger;
-
 			_apiDataService = apiDataService;
+			_dbActionLogService = dbActionLogService;
 		}
 
 		[HttpGet]
@@ -75,6 +78,8 @@ namespace Carzine.Controllers
 				Group = string.Empty
 			};
 
+			AcatVinModel? acatVin = new();
+
 			if (!requestEcoMode)
 			{
 				var searchResult = await _apiDataService.SearchByVinAsync(vin);
@@ -84,7 +89,7 @@ namespace Carzine.Controllers
 					return StatusCode(StatusCodes.Status500InternalServerError, "No vins in search result");
 				}
 				
-				var acatVin = searchResult.vins.FirstOrDefault();
+				acatVin = searchResult.vins.FirstOrDefault();
 
 				groupInfo = new AcatGroupInfo
 				{
@@ -96,31 +101,30 @@ namespace Carzine.Controllers
 				};
 			}
 
-			if (User.Identity.IsAuthenticated)
+			if (User.Identity.IsAuthenticated && acatVin?.model != null)
 			{
-				//LogUserAuto(groupInfo, User.Identity.Name);
+				try
+				{
+					_ = Task.Run(() => _dbActionLogService.LogUserAutoAsync(vin, acatVin, User.Identity.Name));
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError(ex.Message);
+				}
 			}
 
 			var acatGroups = await _apiDataService.GetAcatGroupsAsync(groupInfo);
 
-			//var result = new AcatPartsSearchResult();
-
-			//foreach (var group in acatGroups.Groups)
-			//{
-			//	groupInfo.ParentGroup = group.id;
-
-			//	if (group.hasSubgroups)
-			//	{
-			//		var qqq = await _apiDataService.GetAcatGroupsAsync(groupInfo);
-			//	}
-
-			//	if (group.hasParts)
-			//	{
-			//		result = await _apiDataService.GetAcatPartsAsync(groupInfo);
-			//	}
-			//}
-
 			return StatusCode(StatusCodes.Status200OK, acatGroups);
+		}
+
+		[Authorize]
+		[HttpGet("garage/{count}")]
+		public async Task<IActionResult> GetUserGarage(int count)
+		{
+			var cars = await _dbActionLogService.GetUserAutoAsync(User.Identity.Name, count);
+
+			return Ok(cars);
 		}
 
 		[HttpGet("groups")]

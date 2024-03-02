@@ -29,6 +29,7 @@ export class AuthService {
 
   private setSession(authResult: any) {
     localStorage.setItem('access_token', authResult.access_token);
+    localStorage.setItem('access_token_expires', authResult.expires);
     localStorage.setItem('userName', authResult.userName);
     localStorage.setItem('isProfUser', authResult.isProfUser);
   }
@@ -36,6 +37,7 @@ export class AuthService {
   logout() {
     this.changeUserName.emit({email: undefined, isProfUser: false});
     localStorage.removeItem("access_token");
+    localStorage.removeItem("access_token_expires");
     localStorage.removeItem("userName");
     localStorage.removeItem("isProfUser");
   }

@@ -1,0 +1,12 @@
+.auto-card {
+	border: solid 2px green;
+	margin: 16px 16px 16px 0;
+	padding: 8px;
+	border-radius: 8px;
+	width: 300px;
+}
+
+.auto-card-title {
+	border-bottom: solid 2px green;
+    text-transform: uppercase;
+}

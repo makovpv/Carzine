@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { OrderStatusModel } from 'src/app/models/OrderStatusModel';
 import { PreOrderModel } from 'src/app/models/PreOrderModel';
 import { OrderService } from 'src/app/services/order.service';
+import { SearchService } from 'src/app/services/search.service';
 
 @Component({
   selector: 'app-account',
@@ -10,10 +11,11 @@ import { OrderService } from 'src/app/services/order.service';
 })
 export class AccountComponent implements OnInit {
   userPreorders: PreOrderModel[] = [];
+  userCars: any[] = [];
   statuses: OrderStatusModel[] = [];
   inProgress = false;
 
-  constructor(private orderService: OrderService) { }
+  constructor(private orderService: OrderService, private searchService: SearchService) { }
 
   ngOnInit(): void {
     const f1 = this.orderService.getClientStatuses();
@@ -27,6 +29,8 @@ export class AccountComponent implements OnInit {
       this.inProgress = false;
     })
     .catch(err => alert(err.message));
+
+    this.searchService.getUserGarage(3).then(data => {this.userCars = data});
   }
 
 }

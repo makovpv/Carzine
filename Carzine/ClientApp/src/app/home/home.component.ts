@@ -8,12 +8,7 @@ import { CarModificationModel } from '../models/CarModificationModel';
 import { CarPartsGroupModel } from '../models/CarPartsGroupModel';
 import { MarkModel, CarModel } from '../models/CarModel';
 import { GroupPartListModel } from '../models/PartNumberModel';
-import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Observable } from 'rxjs/internal/Observable';
-import { CollectionViewer, DataSource, SelectionChange } from '@angular/cdk/collections';
-import { merge } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { MessageService } from '../services/message.service';
 import { ViewportScroller } from '@angular/common';
@@ -78,97 +73,6 @@ export class DynamicDatabase {
   }
 }
 
-export class DynamicDataSource implements DataSource<DynamicFlatNode> {
-  dataChange = new BehaviorSubject<DynamicFlatNode[]>([]);
-
-  get data(): DynamicFlatNode[] {
-    return this.dataChange.value;
-  }
-  set data(value: DynamicFlatNode[]) {
-    this._treeControl.dataNodes = value;
-    this.dataChange.next(value);
-  }
-
-  constructor(
-    private _treeControl: FlatTreeControl<DynamicFlatNode>,
-    private _database: DynamicDatabase,
-  ) {}
-
-  connect(collectionViewer: CollectionViewer): Observable<DynamicFlatNode[]> {
-    this._treeControl.expansionModel.changed.subscribe(change => {
-      if (
-        (change as SelectionChange<DynamicFlatNode>).added ||
-        (change as SelectionChange<DynamicFlatNode>).removed
-      ) {
-        this.handleTreeControl(change as SelectionChange<DynamicFlatNode>);
-      }
-    });
-
-    return merge(collectionViewer.viewChange, this.dataChange).pipe(map(() => this.data));
-  }
-
-  disconnect(collectionViewer: CollectionViewer): void {}
-
-   /** Handle expand/collapse behaviors */
-   handleTreeControl(change: SelectionChange<DynamicFlatNode>) {
-    if (change.added) {
-      change.added.forEach(node => this.toggleNode(node, true));
-    }
-    if (change.removed) {
-      change.removed
-        .slice()
-        .reverse()
-        .forEach(node => this.toggleNode(node, false));
-    }
-  }
-
-  /**
-   * Toggle the node, remove from display list
-   */
-  toggleNode(node: DynamicFlatNode, expand: boolean) {
-    //const children = this._database.getChildren(node.item);////////!!!!!!!
-    this._database.getChildren(node.id, node)?.then((data: any) => {
-      const children = data;
-
-      const index = this.data.indexOf(node);
-      if (!children || index < 0) {
-        // If no children, or cannot find the node, no op
-        return;
-      }
-
-      node.isLoading = true;
-
-      if (expand) {
-        const nodes = children.map(
-          (item: any) => new DynamicFlatNode(
-            item.name!, node.level + 1, 
-            this._database.isExpandable(item), 
-            false,
-            item.id, item.parentId,
-            node.groupTypeId,
-            node.mark,
-            node.modification,
-            node.model,
-            item.hasParts),
-        );
-        this.data.splice(index + 1, 0, ...nodes);
-      } else {
-        let count = 0;
-        for (
-          let i = index + 1;
-          i < this.data.length && this.data[i].level > node.level;
-          i++, count++
-        ) {}
-        this.data.splice(index + 1, count);
-      }
-
-        // notify the change
-        this.dataChange.next(this.data);
-        node.isLoading = false;
-    }) ;
-  }
-}
-
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -183,6 +87,7 @@ export class HomeComponent {
   modification = new CarModificationModel();
   model = new CarModel();
   mark = new MarkModel();
+  fastSearch: any;
   carType = "";
   currentGroup = new CarPartsGroupModel();
   groupParts = new GroupPartListModel();
@@ -219,6 +124,15 @@ export class HomeComponent {
   ngOnInit() {
     const searchHistory = localStorage.getItem('searchHistory');
     this.options = searchHistory?.split(';') ?? [];
+
+    //if auth
+    this.searchService.getUserGarage(1).then((data: any[]) => {
+      if (!!data && data.length === 1) {
+        this.fastSearch = data[0];
+      }
+    }).catch(err => {
+      this.fastSearch = null;
+    });
   }
 
   onAreaMouseOver(lbl: any) {}
@@ -311,15 +225,6 @@ export class HomeComponent {
         this.mark = result.mark;
         this.carType = result.type.id;
 
-        // this.dataSource = new DynamicDataSource(this.treeControl, this.database);
-        // this.dataSource!.data = this.database.initialData(
-        //   result.type.id,
-        //   this.mark.id, 
-        //   this.modification.id,
-        //   this.model.id, 
-        //   result.groups);
-
-        //this.myPartGroups1 = result.groups.forEach((x: any) => x.bcLevel = 1);
         this.myRootPartGroups = result.groups;
         this.myPartGroups1 = result.groups.map((x: any) => ({...x, bcLevel: 1}));
         this.breadCrumbGroups = [this.breadCrumbGroups.find(x => x.bcLevel === 0)];
@@ -400,5 +305,10 @@ export class HomeComponent {
     else {
       this.groupParts.labels = [];
     }
+  }
+
+  fastSearchOnClick() {
+    this.searchCode = this.fastSearch.vin; 
+    this.searchByVin(this.fastSearch.vin);
   }
 }

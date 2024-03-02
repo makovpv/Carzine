@@ -7,7 +7,7 @@ using System.Data;
 
 namespace CarzineCore
 {
-	public class MySqlDataService : IDbDataService, IDbUserService, IDbTranslationService
+	public class MySqlDataService : IDbDataService, IDbUserService, IDbTranslationService, IDbActionLogService
 	{
 		private readonly string _connectionString;
 
@@ -48,9 +48,24 @@ namespace CarzineCore
 		const string _sqlGetAllTranslations =
 			"SELECT en_name AS enName, ru_name AS ruName FROM translation";
 		const string _sqlAddTranslations =
-			"INSERT INTO translation (en_name, ru_name) VALUES (@key, @translation)";
+			"INSERT INTO translation(en_name, ru_name) VALUES (@key, @translation)";
 		const string _sqlDeleteTranslations =
 			"DELETE FROM translation WHERE en_name = @key";
+
+		const string _sqlInsertVinSearchHistory =
+			"INSERT INTO vin_search_history(vin, user_name, search_date, " +
+				"mark_name, model_name, modification_name, year, " +
+				"mark, model_code, modification_code) " +
+			"VALUES (@vin, @userName, now(), @markName, @modelName, @modificationName, @year, " +
+				"@mark, @modelCode, @modificationCode) " +
+			"ON DUPLICATE KEY UPDATE search_date = now();";
+		const string _sqlGetUserAuto =
+			"SELECT vin, mark_name AS markName, model_name AS modelName, year, " +
+				"mark, model_code AS modelCode, modification_code AS modificationCode " +
+			"FROM vin_search_history " +
+			"WHERE user_name = @userName " +
+			"ORDER BY search_date DESC " +
+			"LIMIT @limit";
 
 		public MySqlDataService(IConfiguration config)
 		{
@@ -212,6 +227,49 @@ namespace CarzineCore
 			using var connection = GetConnection();
 
 			await connection.ExecuteAsync(_sqlDeleteTranslations, new { key });
+		}
+
+		private static int? GetProductionYear(AcatVinParameterModel[] parameters)
+		{
+			var productionYear = parameters.FirstOrDefault(x => x.key.ToLower() == "year")?.value;
+
+			if (!string.IsNullOrEmpty(productionYear)) {
+				return Convert.ToInt16(productionYear);
+			}
+
+			var productionDate = parameters.FirstOrDefault(x => x.key.ToLower() == "production date")?.value;
+
+			if (DateOnly.TryParse(productionDate, out DateOnly prdDate))
+			{
+				return prdDate.Year;
+			}
+
+			return null;
+		}
+
+		public async Task LogUserAutoAsync (string vin, AcatVinModel acatVin, string userName)
+		{
+			using var connection = GetConnection();
+
+			await connection.ExecuteAsync(_sqlInsertVinSearchHistory, new
+				{
+					userName,
+					vin,
+					acatVin.markName,
+					acatVin.modelName,
+					modificationName = acatVin.modification,
+					acatVin.mark,
+					modelCode = acatVin.model,
+					modificationCode = acatVin.modification,
+					year = GetProductionYear(acatVin.parameters)
+			});
+		}
+
+		public async Task<IEnumerable<UserAutoDto>> GetUserAutoAsync(string userName, int limit)
+		{
+			using var connection = GetConnection();
+
+			return await connection.QueryAsync<UserAutoDto>(_sqlGetUserAuto, new { userName, limit });
 		}
 	}
 }

@@ -46,6 +46,7 @@ try
 	builder.Services.AddSingleton<IDbDataService, MySqlDataService>();
 	builder.Services.AddSingleton<IDbUserService, MySqlDataService>();
 	builder.Services.AddSingleton<IDbTranslationService, MySqlDataService>();
+	builder.Services.AddSingleton<IDbActionLogService, MySqlDataService>();
 	builder.Services.AddSingleton<IDataTranslatorService, LanguageTranslatorService>();
 	builder.Services.AddSingleton<IMailService, MailService>();
 

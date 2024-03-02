@@ -53,4 +53,13 @@ export class SearchService {
     parentGroup: string): string {
     return `${this.baseUrl}search/scheme?groupType=${groupType}&group=${groupId}&Mark=${mark}&Modification=${modification}&Model=${model}&ParentGroup=${parentGroup}`;
   }
+
+  getUserGarage(count: number): Promise<any> {
+    const tokenExpires = localStorage.getItem("access_token_expires");
+
+    if (!tokenExpires || (new Date(tokenExpires) < new Date()))
+      return new Promise((resolve, reject) => { reject() });
+
+    return this.http.get<any>(`${this.baseUrl}search/garage/${count}`).toPromise();
+  }
 }

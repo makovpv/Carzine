@@ -1,5 +1,7 @@
-<div>
-    <table>
+<div style="margin-bottom: 36px;">
+  <h3>Мои заказы</h3>
+    
+  <table>
       <tr>
         <th>№ заказа</th>
         <th>Объемный вес</th>
@@ -24,5 +26,19 @@
       </tr>
     </table>
   
-      <mat-spinner *ngIf="inProgress"></mat-spinner>
+    <mat-spinner *ngIf="inProgress"></mat-spinner>
+</div>
+
+<div *ngIf="userCars.length > 0">
+  <h3>Мои авто</h3>
+  <div style="display: flex;">
+    <div *ngFor="let x of userCars" class="auto-card">
+      <div class="auto-card-title">
+        <strong>{{x.vin}}</strong>
+      </div>
+      <div>Марка: {{x.markName}}</div>
+      <div>Модель: {{x.modelName}}</div>
+      <div>Год выпуска: {{x.year}}</div>
+    </div>
   </div>
+</div>

@@ -29,7 +29,6 @@
 		public string criteriaURI { get; set; }
 
 		public string image { get; set; }
-
 	}
 
 	public class AcatVinParameterModel

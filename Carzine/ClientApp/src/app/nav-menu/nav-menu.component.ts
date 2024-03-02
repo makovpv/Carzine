@@ -12,7 +12,13 @@ export class NavMenuComponent implements OnInit {
   userName: string | undefined | null;
   isProfUser = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {
+    this.router.routeReuseStrategy.shouldReuseRoute = function () {
+      return false;
+    }
+
+    this.router.onSameUrlNavigation = 'reload';
+  }
 
   ngOnInit() {
     this.userName = localStorage.getItem('userName');

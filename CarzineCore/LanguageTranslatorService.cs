@@ -1,5 +1,6 @@
 ﻿using CarzineCore.Interfaces;
 using CarzineCore.Models;
+using System.Text.RegularExpressions;
 
 namespace CarzineCore
 {
@@ -43,7 +44,22 @@ namespace CarzineCore
 
 			foreach (var token in tokens)
 			{
-				result += (_translations.GetValueOrDefault(token.ToLower()) ?? token) + ", ";
+				if (!Regex.Match(token, "[0-9]").Success)
+				{
+					result += (_translations.GetValueOrDefault(token.ToLower()) ?? token) + ", ";
+
+					continue;
+				}
+
+				var digitWordIdx = Regex.Match(token, "[0-9]").Index;
+
+				var tokenWithoutDigits = token[..(digitWordIdx - 2)];
+
+				var translation = string.Concat(
+					_translations.GetValueOrDefault(tokenWithoutDigits.ToLower()) ?? tokenWithoutDigits,
+					token.AsSpan(digitWordIdx - 2));
+
+				result += translation + ", ";
 			}
 
 			result = result.Remove(result.Length - 2);

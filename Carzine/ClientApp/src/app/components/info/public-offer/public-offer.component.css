@@ -1,0 +1,22 @@
+ol {
+    counter-reset: my-item;
+    list-style-type: none;
+}
+
+ol li::before {
+    counter-increment: my-item;
+    content: counters(my-item, ".") " ";
+    margin-right: 12px;
+}
+
+li.level-1 {
+    margin-top: 16px;
+}
+
+ul li::before {
+    content: none;
+}
+
+h4 {
+    text-align: center;
+}

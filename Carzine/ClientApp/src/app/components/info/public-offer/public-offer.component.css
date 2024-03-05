@@ -1,6 +1,7 @@
 ol {
     counter-reset: my-item;
     list-style-type: none;
+    padding-left: 0;
 }
 
 ol li::before {
@@ -10,7 +11,7 @@ ol li::before {
 }
 
 li.level-1 {
-    margin-top: 16px;
+    margin-bottom: 2rem;
 }
 
 ul li::before {
@@ -19,4 +20,13 @@ ul li::before {
 
 h4 {
     text-align: center;
+    margin-bottom: 4rem;
+}
+
+.last-container {
+    margin-bottom: 6rem;
+}
+
+p {
+    margin-bottom: 2rem;
 }

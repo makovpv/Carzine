@@ -13,11 +13,11 @@ export class NavMenuComponent implements OnInit {
   isProfUser = false;
 
   constructor(private authService: AuthService, private router: Router) {
-    this.router.routeReuseStrategy.shouldReuseRoute = function () {
-      return false;
-    }
+    // this.router.routeReuseStrategy.shouldReuseRoute = function () {
+    //   return false;
+    // }
 
-    this.router.onSameUrlNavigation = 'reload';
+    // this.router.onSameUrlNavigation = 'reload';
   }
 
   ngOnInit() {
@@ -40,6 +40,14 @@ export class NavMenuComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+    this.router.navigateByUrl('/');
+  }
+
+  logoClick() {
+    if (window.location.pathname === '/') {
+      window.location.reload();
+    }
+    
     this.router.navigateByUrl('/');
   }
 }

@@ -34,11 +34,13 @@
   <div style="display: flex;">
     <div *ngFor="let x of userCars" class="auto-card">
       <div class="auto-card-title">
-        <strong>{{x.vin}}</strong>
+        <strong>{{x.markName}}, {{x.modelName}}</strong>
       </div>
       <div>Марка: {{x.markName}}</div>
       <div>Модель: {{x.modelName}}</div>
       <div>Год выпуска: {{x.year}}</div>
+      <div>VIN: {{x.vin}}</div>
+      <a [routerLink]="['/search/', x.vin]">найти запчасти</a>
     </div>
   </div>
 </div>

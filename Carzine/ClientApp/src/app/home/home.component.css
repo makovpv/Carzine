@@ -82,6 +82,12 @@ area {
     white-space: nowrap;
 }
 
+.span-link {
+	text-decoration: underline;
+	cursor: pointer;
+	color: #0366d6;
+}
+
 @media screen and (max-width: 600px) {
 	.btn-detail-pn {
 		width: 375px;

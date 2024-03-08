@@ -11,13 +11,13 @@ export class SearchService {
 
   search(searchCode: string, analog: boolean): Promise<any> {
       return this.http.get<ProductSearchResultModel>(
-        `${this.baseUrl}search?code=${searchCode}&analog=${analog}`)
+        `${this.baseUrl}api/search?code=${searchCode}&analog=${analog}`)
         .toPromise();
   }
 
   searchVIN(searchVIN: string): Promise<any> {
       return this.http.get<any>(
-        `${this.baseUrl}search/searchVIN?vin=${searchVIN}&requestEcoMode=${searchVIN === '123'}`)
+        `${this.baseUrl}api/search/searchVIN?vin=${searchVIN}&requestEcoMode=${searchVIN === '123'}`)
         .toPromise();
   }
 
@@ -29,7 +29,7 @@ export class SearchService {
     model: string, 
     parentGroup: string ): Promise<any> {
       return this.http.get<any>(
-        `${this.baseUrl}search/groups?groupType=${groupType}&group=${groupId}&Mark=${mark}&Modification=${modification}&Model=${model}&ParentGroup=${parentGroup}`)
+        `${this.baseUrl}api/search/groups?groupType=${groupType}&group=${groupId}&Mark=${mark}&Modification=${modification}&Model=${model}&ParentGroup=${parentGroup}`)
         .toPromise();
   }
 
@@ -41,7 +41,7 @@ export class SearchService {
     model: string, 
     parentGroup: string ): Promise<any> {
       return this.http.get<any>(
-        `${this.baseUrl}search/parts?groupType=${groupType}&group=${groupId}&Mark=${mark}&Modification=${modification}&Model=${model}&ParentGroup=${parentGroup}`)
+        `${this.baseUrl}api/search/parts?groupType=${groupType}&group=${groupId}&Mark=${mark}&Modification=${modification}&Model=${model}&ParentGroup=${parentGroup}`)
         .toPromise();
   }
 
@@ -51,7 +51,7 @@ export class SearchService {
     modification: string,
     model: string,
     parentGroup: string): string {
-    return `${this.baseUrl}search/scheme?groupType=${groupType}&group=${groupId}&Mark=${mark}&Modification=${modification}&Model=${model}&ParentGroup=${parentGroup}`;
+    return `${this.baseUrl}api/search/scheme?groupType=${groupType}&group=${groupId}&Mark=${mark}&Modification=${modification}&Model=${model}&ParentGroup=${parentGroup}`;
   }
 
   getUserGarage(count: number): Promise<any> {
@@ -60,6 +60,6 @@ export class SearchService {
     if (!tokenExpires || (new Date(tokenExpires) < new Date()))
       return new Promise((resolve, reject) => { reject() });
 
-    return this.http.get<any>(`${this.baseUrl}search/garage/${count}`).toPromise();
+    return this.http.get<any>(`${this.baseUrl}api/search/garage/${count}`).toPromise();
   }
 }

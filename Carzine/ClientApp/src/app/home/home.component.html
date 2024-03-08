@@ -1,7 +1,9 @@
-<div *ngIf="!!fastSearch">
-	<button id="fast-search-btn" mat-flat-button (click)="fastSearchOnClick()">
-		Искать запчасти на {{fastSearch.markName}}, {{fastSearch.modelName}}, {{fastSearch.year}} г
-	</button>
+<div *ngIf="!!garage">
+	<span>Искать запчасти на</span>
+	<span *ngFor="let x of garage; let i = index">
+		<span class="span-link" (click)="fastSearchOnClick(x)">{{x.markName}} {{x.modelName}}</span>
+		<span *ngIf="i < garage.length-1">,</span>
+	</span>
 </div>
 
 <div id="search">
@@ -31,14 +33,12 @@
 <div id="group-navigation">
 	<div id="bread-crumb-groups" *ngIf="breadCrumbGroups.length > 1">
 		<button mat-stroked-button class="crz-part-group" *ngFor="let x of breadCrumbGroups" (click)="foo(x, 0)">
-			<span *ngIf="x.hasSubgroups">{{x.name}}*</span>
-			<span *ngIf="!x.hasSubgroups">{{x.name}}</span>
+			<span>{{x.name}}</span>
 		</button>
 	</div>
 		
 	<button mat-stroked-button class="crz-part-group" *ngFor="let x of myPartGroups1" (click)="foo(x, 1)">
-		<span *ngIf="x.hasSubgroups">{{x.name}}*</span>
-		<span *ngIf="!x.hasSubgroups">{{x.name}}</span>
+		<span>{{x.name}}</span>
 	</button>
 </div>
 

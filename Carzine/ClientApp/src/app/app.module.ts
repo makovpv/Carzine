@@ -15,7 +15,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
-import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTableModule } from '@angular/material/table';
@@ -68,6 +67,7 @@ import { AddTranslationComponent } from './components/dialogs/add-translation/ad
     ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
+      { path: 'search/:code', component: HomeComponent },
       { path: 'pre-orders', component: PreOrderListComponent },
       { path: 'login', component: LoginComponent },
       { path: 'account', component: AccountComponent },
@@ -87,7 +87,6 @@ import { AddTranslationComponent } from './components/dialogs/add-translation/ad
     MatCheckboxModule,
     MatSnackBarModule,
     MatInputModule,
-    MatTreeModule,
     MatIconModule,
     MatAutocompleteModule,
     MatSelectModule,

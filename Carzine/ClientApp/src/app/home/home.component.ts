@@ -8,70 +8,9 @@ import { CarModificationModel } from '../models/CarModificationModel';
 import { CarPartsGroupModel } from '../models/CarPartsGroupModel';
 import { MarkModel, CarModel } from '../models/CarModel';
 import { GroupPartListModel } from '../models/PartNumberModel';
-import { FlatTreeControl } from '@angular/cdk/tree';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from '../services/message.service';
 import { ViewportScroller } from '@angular/common';
-
-/** Flat node with expandable and level information */
-export class DynamicFlatNode {
-  constructor(
-    public itemName: string,
-    public level = 1,
-    public expandable = false,
-    public isLoading = false,
-    public id: string,
-    public parentId: string | undefined,
-    public groupTypeId = '',
-    public mark = '',
-    public modification = '',
-    public model = '',
-    public hasParts = false
-  ) {}
-}
-
-@Injectable({providedIn: 'root'})
-export class DynamicDatabase {
-  partGroups: CarPartsGroupModel[] = [];
-  groupTypeId = '';
-  mark = '';
-  modification = '';
-  model = '';
-
-  constructor(private searchService: SearchService) { }
-
-  initialData(typeId: string, mark: string, modification: string,
-    model: string, groups: CarPartsGroupModel[]): DynamicFlatNode[] {
-    this.groupTypeId = typeId;
-    this.mark = mark;
-    this.modification = modification;
-    this.model = model;
-    this.partGroups = groups;
-
-    return this.partGroups.map(x =>
-      new DynamicFlatNode(x.name!, 0, x.hasSubgroups, true, x.id, x.parentId, typeId, mark, modification, model)
-    );
-  }
-
-  getChildren(nodeKey: string, groupInfo: any): Promise<CarPartsGroupModel[]> | undefined {
-    let ww = this.partGroups.filter(x => x.parentId === nodeKey);
-    if (ww.length === 0) {
-      return this.searchService.getGroupItems(this.groupTypeId, groupInfo.id, 
-        groupInfo.mark, groupInfo.modification, groupInfo.model, groupInfo.parentId ?? '').then((data: any) => {
-          this.partGroups.push(...data.groups);
-          return data.groups;
-        });
-    }
-
-    return new Promise<CarPartsGroupModel[]>((resolve, reject) => {
-      resolve(ww);
-    });
-  }
-
-  isExpandable(item: CarPartsGroupModel): boolean {
-    return item.hasSubgroups!;
-  }
-}
 
 @Component({
   selector: 'app-home',
@@ -87,11 +26,10 @@ export class HomeComponent {
   modification = new CarModificationModel();
   model = new CarModel();
   mark = new MarkModel();
-  fastSearch: any;
+  garage: any;
   carType = "";
   currentGroup = new CarPartsGroupModel();
   groupParts = new GroupPartListModel();
-  treeControl: FlatTreeControl<DynamicFlatNode>;
   dataSource: any;
   schemeImage: any;
   showAllProducts = false;
@@ -101,10 +39,6 @@ export class HomeComponent {
   myPartGroups3: any[] = [];
   breadCrumbGroups: any[] = [{name: '<-- Назад', bcLevel: 0}];
   
-  getLevel = (node: DynamicFlatNode) => node.level;
-  isExpandable = (node: DynamicFlatNode) => node.expandable;
-  hasChild = (_: number, node: any) => node.expandable;
-
   options: string[] | undefined = [];
 
   @ViewChild('dialogRef')
@@ -115,10 +49,9 @@ export class HomeComponent {
     private orderService: OrderService,
     private messageService: MessageService,
     private router: Router,
+    private activateRoter: ActivatedRoute,
     private scroller: ViewportScroller,
-    public dialog: MatDialog,
-    private database: DynamicDatabase) { 
-      this.treeControl = new FlatTreeControl<DynamicFlatNode>(this.getLevel, this.isExpandable);
+    public dialog: MatDialog) {
     }
 
   ngOnInit() {
@@ -126,13 +59,16 @@ export class HomeComponent {
     this.options = searchHistory?.split(';') ?? [];
 
     //if auth
-    this.searchService.getUserGarage(1).then((data: any[]) => {
-      if (!!data && data.length === 1) {
-        this.fastSearch = data[0];
-      }
+    this.searchService.getUserGarage(3).then((data: any[]) => {
+        this.garage = data;
     }).catch(err => {
-      this.fastSearch = null;
+      this.garage = null;
     });
+
+    this.searchCode = this.activateRoter.snapshot.params["code"];
+    if (!!this.searchCode) {
+      this.search();
+    }
   }
 
   onAreaMouseOver(lbl: any) {}
@@ -307,8 +243,8 @@ export class HomeComponent {
     }
   }
 
-  fastSearchOnClick() {
-    this.searchCode = this.fastSearch.vin; 
-    this.searchByVin(this.fastSearch.vin);
+  fastSearchOnClick(x: any) {
+    this.searchCode = x.vin; 
+    this.searchByVin(x.vin);
   }
 }

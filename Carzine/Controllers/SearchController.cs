@@ -4,12 +4,11 @@ using CarzineCore.Interfaces;
 using CarzineCore.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 
 namespace Carzine.Controllers
 {
 	[ApiController]
-	[Route("[controller]")]
+	[Route("api/[controller]")]
 	public class SearchController : ControllerBase
 	{
 		private readonly ILogger<SearchController> _logger;

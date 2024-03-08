@@ -51,11 +51,12 @@ namespace CarzineCore
 				url = section["url"],
 				username = section["username"],
 				password = section["password"],
-				contractNumber = section["contractNumber"]
+				contractNumber = section["contractNumber"],
+				token = section["token"]
 			};
 		}
 
-		private async Task<ApmTokenResponse> GetApmApiTokenAsync()
+		private ApmTokenResponse GetApmApiToken()
 		{
 			if (_apmApiToken != null)
 				return _apmApiToken;
@@ -65,15 +66,11 @@ namespace CarzineCore
 				throw new Exception("Apm credentials is empty");
 			}
 
-			var data = new
+			_apmApiToken = new ApmTokenResponse
 			{
-				username = _apiApmCred.username,
-				password = _apiApmCred.password
+				name = _apiApmCred.username,
+				token = _apiApmCred.token
 			};
-
-			var response = await new HttpClient().PostAsJsonAsync($"{_apiApmCred.url}token", data);
-
-			_apmApiToken = await response.Content.ReadFromJsonAsync<ApmTokenResponse>();
 
 			return _apmApiToken;
 		}
@@ -165,7 +162,7 @@ namespace CarzineCore
 		{
 			try
 			{
-				var token = await GetApmApiTokenAsync();
+				var token = GetApmApiToken();
 
 				var dataSearch = new
 				{
@@ -274,7 +271,7 @@ namespace CarzineCore
 		{
 			try
 			{
-				var token = await GetApmApiTokenAsync();
+				var token = GetApmApiToken();
 
 				var orderPosition = new
 				{

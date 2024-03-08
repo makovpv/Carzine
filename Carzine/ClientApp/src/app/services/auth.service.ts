@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Inject, Injectable, Output } from '@angular/core';
-import { UserModel } from '../models/UserModel';
+import { UserModel, UserSessionModel } from '../models/UserModel';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +8,11 @@ import { UserModel } from '../models/UserModel';
 export class AuthService {
   @Output() changeUserName: EventEmitter<UserModel> = new EventEmitter();
 
-  constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
+  sessionData: UserSessionModel;
+
+  constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) {
+    this.sessionData = this.getSessionData();
+  }
 
   getAuthToken(email: string, password: string): Promise<any> {
     return this.http.post(this.baseUrl+'user/token', { email, password })
@@ -27,7 +31,19 @@ export class AuthService {
       .toPromise();
   }
 
+  private getSessionData(): UserSessionModel {
+    return {
+      access_token: localStorage.getItem('access_token'),
+      access_token_expires: new Date(localStorage.getItem('access_token_expires') ?? 0),
+      userName: localStorage.getItem('userName'),
+      isProfUser: localStorage.getItem('isProfUser') == 'true'
+    };
+  }
+
   private setSession(authResult: any) {
+    this.sessionData.access_token = authResult.access_token
+    this.sessionData.access_token_expires = new Date(authResult.expires);
+    
     localStorage.setItem('access_token', authResult.access_token);
     localStorage.setItem('access_token_expires', authResult.expires);
     localStorage.setItem('userName', authResult.userName);
@@ -35,6 +51,8 @@ export class AuthService {
   }
 
   logout() {
+    this.sessionData.access_token = null;
+
     this.changeUserName.emit({email: undefined, isProfUser: false});
     localStorage.removeItem("access_token");
     localStorage.removeItem("access_token_expires");
@@ -42,9 +60,9 @@ export class AuthService {
     localStorage.removeItem("isProfUser");
   }
 
-// public isLoggedIn() {
-//     return moment().isBefore(this.getExpiration());
-// }
+  public isLoggedIn() {
+    return !!this.sessionData.access_token && (this.sessionData.access_token_expires?.getTime()! > Date.now());
+  }
 
 // isLoggedOut() {
 //     return !this.isLoggedIn();

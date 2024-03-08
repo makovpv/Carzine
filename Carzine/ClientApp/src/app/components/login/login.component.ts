@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -12,7 +12,7 @@ export class LoginComponent implements OnInit {
   login: string = '';
   password: string = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
   }
@@ -20,7 +20,8 @@ export class LoginComponent implements OnInit {
   loginClick(): void {
     this.authService.getAuthToken(this.login, this.password)
       .then((data) => {
-        this.router.navigateByUrl('/');
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+        this.router.navigateByUrl(returnUrl);
       })
       .catch(err => {
         if (err.status === 401) {

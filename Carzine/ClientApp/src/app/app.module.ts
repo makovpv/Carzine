@@ -29,13 +29,13 @@ import { DeliveryPeriodPipe } from './pipes/delivery-period.pipe';
 import { StatusComponent } from './components/dialogs/status/status.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AboutUsComponent } from './components/info/about-us/about-us.component';
-import { PublicOfferComponent } from './components/info/public-offer/public-offer.component';
 import { DetailsComponent } from './components/info/details/details.component';
 import { DeliveryComponent } from './components/customer/delivery/delivery.component';
 import { ReturnComponent } from './components/customer/return/return.component';
 import { PaymentMethodComponent } from './components/customer/payment-method/payment-method.component';
 import { TranslationComponent } from './components/translation/translation.component';
 import { AddTranslationComponent } from './components/dialogs/add-translation/add-translation.component';
+import { AuthGuard } from './auth.guard';
 
 @NgModule({
   declarations: [
@@ -52,7 +52,6 @@ import { AddTranslationComponent } from './components/dialogs/add-translation/ad
     DeliveryPeriodPipe,
     StatusComponent,
     AboutUsComponent,
-    PublicOfferComponent,
     DetailsComponent,
     DeliveryComponent,
     ReturnComponent,
@@ -68,17 +67,18 @@ import { AddTranslationComponent } from './components/dialogs/add-translation/ad
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'search/:code', component: HomeComponent },
-      { path: 'pre-orders', component: PreOrderListComponent },
+      { path: 'pre-orders', component: PreOrderListComponent, canActivate: [AuthGuard] },
       { path: 'login', component: LoginComponent },
-      { path: 'account', component: AccountComponent },
+      { path: 'account', component: AccountComponent, canActivate: [AuthGuard] },
       { path: 'signup', component: SignUpComponent },
       { path: 'about', component: AboutUsComponent },
-      { path: 'offer', component: PublicOfferComponent },
+      { path: 'offer', loadChildren: () => import('./misc.module').then(m => m.MiscModule) },
       { path: 'details', component: DetailsComponent },
       { path: 'return', component: ReturnComponent },
       { path: 'delivery', component: DeliveryComponent },
       { path: 'payment', component: PaymentMethodComponent },
-      { path: 'translation', component: TranslationComponent },
+      { path: 'translation', component: TranslationComponent, canActivate: [AuthGuard] },
+      { path: '**', redirectTo: ''}
     ]),
     BrowserAnimationsModule,
     MatDialogModule,
@@ -96,7 +96,8 @@ import { AddTranslationComponent } from './components/dialogs/add-translation/ad
   providers: [
     {
       provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true
-    }
+    },
+    AuthGuard
   ],
   bootstrap: [AppComponent]
 })

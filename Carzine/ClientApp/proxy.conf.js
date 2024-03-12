@@ -7,7 +7,7 @@ const PROXY_CONFIG = [
   {
     context: [
       "/api/search",
-      "/order",
+      "/api/order",
       "/token",
       "/user",
       "/api/translation"

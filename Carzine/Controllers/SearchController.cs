@@ -14,14 +14,16 @@ namespace Carzine.Controllers
 		private readonly ILogger<SearchController> _logger;
 
 		private readonly IApiDataService _apiDataService;
-
 		private readonly IDbActionLogService _dbActionLogService;
+		private readonly IDbDataRepository _dbDataRepository;
 
-		public SearchController(ILogger<SearchController> logger, IApiDataService apiDataService, IDbActionLogService dbActionLogService)
+		public SearchController(ILogger<SearchController> logger, IApiDataService apiDataService, 
+			IDbActionLogService dbActionLogService, IDbDataRepository dataRepository)
 		{
 			_logger = logger;
 			_apiDataService = apiDataService;
 			_dbActionLogService = dbActionLogService;
+			_dbDataRepository = dataRepository;
 		}
 
 		[HttpGet]
@@ -43,7 +45,7 @@ namespace Carzine.Controllers
 
 			var usdRate = await DataCollector.GetCbrCursAsync("USD");
 
-			var products = CarzineCalculator.CalcPriceComponents(productData, usdRate);
+			var products = await new CarzineCalculator(_dbDataRepository).CalcProductComponentsAsync(productData, usdRate);
 
 			products.Sort(delegate (StandardProductModel x, StandardProductModel y) {
 				if (x.PriceRub == y.PriceRub)

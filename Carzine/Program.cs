@@ -43,10 +43,10 @@ try
 		});
 
 	builder.Services.AddSingleton<IApiDataService, ApiDataService>();
-	builder.Services.AddSingleton<IDbDataService, MySqlDataService>();
-	builder.Services.AddSingleton<IDbUserService, MySqlDataService>();
-	builder.Services.AddSingleton<IDbTranslationService, MySqlDataService>();
-	builder.Services.AddSingleton<IDbActionLogService, MySqlDataService>();
+	builder.Services.AddSingleton<IDbDataRepository, MySqlDataRepository>();
+	builder.Services.AddSingleton<IDbUserService, MySqlDataRepository>();
+	builder.Services.AddSingleton<IDbTranslationService, MySqlDataRepository>();
+	builder.Services.AddSingleton<IDbActionLogService, MySqlDataRepository>();
 	builder.Services.AddSingleton<IDataTranslatorService, LanguageTranslatorService>();
 	builder.Services.AddSingleton<IMailService, MailService>();
 

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { PreOrderModel } from '../models/PreOrderModel';
 import { ProductModel } from '../models/ProductModel';
+import { RuleRangeModel } from '../models/RuleRangeModel';
 
 @Injectable({
   providedIn: 'root'
@@ -16,32 +16,44 @@ export class OrderService {
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
 
   preOrder(data: ProductModel): Promise<any> {
-    return this.http.post(this.baseUrl+'order/preorder', data).toPromise();
+    return this.http.post(this.baseUrl+'api/order/preorder', data).toPromise();
   }
 
   getPreOrders(): Promise<any> {
-    return this.http.get(this.baseUrl+'order/preorder').toPromise();
+    return this.http.get(this.baseUrl+'api/order/preorder').toPromise();
   }
 
   getUserPreOrders(): Promise<any> {
-    return this.http.get(this.baseUrl+'order/user-preorders').toPromise();
+    return this.http.get(this.baseUrl+'api/order/user-preorders').toPromise();
   }
 
   createOrder(preorderId: number): Promise<any> {
-    return this.http.post(`${this.baseUrl}order/order/${preorderId}`, {}).toPromise();
+    return this.http.post(`${this.baseUrl}api/order/order/${preorderId}`, {}).toPromise();
   }
 
   getSuppliers(): Promise<any> {
-    return this.http.get(this.baseUrl+'order/suppliers').toPromise();
+    return this.http.get(this.baseUrl+'api/order/suppliers').toPromise();
   }
 
   getClientStatuses(): Promise<any> {
-    return this.http.get(this.baseUrl+'order/status').toPromise();
+    return this.http.get(this.baseUrl+'api/order/status').toPromise();
   }
 
   setPreorderStatus(orderId: number, statusId: number): Promise<any> {
     return this.http.post(
-      `${this.baseUrl}order/preorder/status/${orderId}`, statusId)
+      `${this.baseUrl}api/order/preorder/status/${orderId}`, statusId)
       .toPromise();
+  }
+
+  getRules(): Promise<any> {
+    return this.http.get(this.baseUrl+'api/order/rules').toPromise();
+  }
+
+  addRule(data: RuleRangeModel): Promise<any> {
+    return this.http.post(this.baseUrl+'api/order/rule', data).toPromise();
+  }
+
+  deleteRule(id: number): Promise<any> {
+    return this.http.delete(`${this.baseUrl}api/order/rule/${id}`).toPromise();
   }
 }

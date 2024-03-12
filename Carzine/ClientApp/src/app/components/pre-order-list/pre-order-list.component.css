@@ -41,3 +41,10 @@ table {
 .mat-column-cmd {
     padding-left: 24px;
 }
+
+#admin-menu {
+    margin-bottom: 16px;
+    a {
+        margin-right: 16px;
+    }
+}

@@ -25,6 +25,9 @@
 		public int DeliveryMin { get; set; }
 
 		public int DeliveryMax { get; set; }
+		public int DeliveryMinOriginal { get; set; }
+
+		public int DeliveryMaxOriginal { get; set; }
 
 		public ApiSource SourceId { get; set; }
 

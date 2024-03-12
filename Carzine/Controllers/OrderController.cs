@@ -7,18 +7,18 @@ using Microsoft.AspNetCore.Mvc;
 namespace Carzine.Controllers
 {
 	[ApiController]
-	[Route("[controller]")]
+	[Route("api/[controller]")]
 	public class OrderController : ControllerBase
 	{
-		private readonly IDbDataService _dataService;
+		private readonly IDbDataRepository _dataRepository;
 		private readonly IApiDataService _apiService;
 		private readonly ILogger<OrderController> _logger;
 
-		public OrderController(IDbDataService dbService, IApiDataService apiService, ILogger<OrderController> logger)
+		public OrderController(IDbDataRepository dbService, IApiDataService apiService, ILogger<OrderController> logger)
 		{
 			_logger = logger;
 
-			_dataService = dbService;
+			_dataRepository = dbService;
 			_apiService = apiService;
 		}
 
@@ -26,7 +26,7 @@ namespace Carzine.Controllers
 		[HttpPost("preorder")]
 		public async Task<IActionResult> AddPreOrderAsync([FromBody] StandardProductModel product)
 		{
-			var result = await _dataService.AddPreOrderAsync(product, User.Identity.Name);
+			var result = await _dataRepository.AddPreOrderAsync(product, User.Identity.Name);
 			
 			return StatusCode(StatusCodes.Status201Created, result);
 		}
@@ -35,7 +35,7 @@ namespace Carzine.Controllers
 		[HttpPost("preorder/status/{preOrderId}")]
 		public async Task<IActionResult> SetOrderStatusAsync(int preOrderId, [FromBody] int statusId)
 		{
-			await _dataService.SetPreorderClientStatus(preOrderId, (ClientStatus)statusId);
+			await _dataRepository.SetPreorderClientStatus(preOrderId, (ClientStatus)statusId);
 
 			return StatusCode(StatusCodes.Status200OK);
 		}
@@ -44,7 +44,7 @@ namespace Carzine.Controllers
 		[HttpPost("order/{preOrderId}")]
 		public async Task<IActionResult> CreateOrderAsync(int preOrderId)
 		{
-			var preOrder = (await _dataService.GetPreOrderAsync(preOrderId)).ToPreOrderModel();
+			var preOrder = (await _dataRepository.GetPreOrderAsync(preOrderId)).ToPreOrderModel();
 			
 			switch (preOrder.Product.SourceId)
 			{
@@ -65,7 +65,7 @@ namespace Carzine.Controllers
 		[HttpGet("preorder")]
 		public async Task<IActionResult> GetPreOrdersAsync()
 		{
-			var preOrders = await _dataService.GetPreOrdersAsync();
+			var preOrders = await _dataRepository.GetPreOrdersAsync();
 
 			var result = preOrders.Select(x => x.ToPreOrderModel());
 
@@ -76,7 +76,7 @@ namespace Carzine.Controllers
 		[HttpGet("user-preorders")]
 		public async Task<IActionResult> GetUserPreOrdersAsync()
 		{
-			var preOrders = await _dataService.GetPreOrdersByUserAsync(User.Identity.Name);
+			var preOrders = await _dataRepository.GetPreOrdersByUserAsync(User.Identity.Name);
 
 			var result = preOrders.Select(x => x.ToUserPreOrderModel());
 
@@ -99,9 +99,44 @@ namespace Carzine.Controllers
 		[HttpGet("status")]
 		public async Task<IActionResult> GetAllOrderClientStatuses()
 		{
-			var statuses = await _dataService.GetClientStatusesAsync();
+			var statuses = await _dataRepository.GetClientStatusesAsync();
 
 			return StatusCode(StatusCodes.Status200OK, statuses);
+		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpGet("rules")]
+		public async Task<IActionResult> GetAllRuleRangesAsync()
+		{
+			var rules = await _dataRepository.GetRuleRangesAsync();
+
+			return Ok(rules);
+		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpPost("rule")]
+		public async Task<IActionResult> AddRuleRangeAsync([FromBody] RuleRangeDto rule)
+		{
+			await _dataRepository.AddRuleRangeAsync(rule);
+
+			return Ok();
+		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpDelete("rule/{id}")]
+		public async Task<IActionResult> DeleteRuleRangeAsync(int id)
+		{
+			try
+			{
+				await _dataRepository.DeleteRuleRangeAsync(id);
+
+				return Ok();
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "Что-то пошло не так");
+			}
+			
 		}
 
 	}

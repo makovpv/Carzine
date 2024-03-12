@@ -25,8 +25,8 @@ namespace CarzineCore
 				MaxOrderAmount = product.available,
 				MinOrderAmount = product.minLot,
 				Weight = product.weight,
-				DeliveryMin = product.delivery.FirstInt(),
-				DeliveryMax = product.delivery.SecondInt(),
+				DeliveryMinOriginal = product.delivery.FirstInt(),
+				DeliveryMaxOriginal = product.delivery.SecondInt(),
 				SourceId = ApiSource.Apm
 			});
 		}
@@ -35,8 +35,8 @@ namespace CarzineCore
 		{
 			return products.Select(product => new StandardProductModel()
 			{
-				DeliveryMax = Convert.ToInt32(product.GuaranteedDay),
-				DeliveryMin = Convert.ToInt32(product.Delivery),
+				DeliveryMaxOriginal = Convert.ToInt32(product.GuaranteedDay),
+				DeliveryMinOriginal = Convert.ToInt32(product.Delivery),
 				Volume = Convert.ToDecimal(product.VolumeAdd),
 				Weight = Convert.ToDecimal(product.WeightGr / 1000.0),
 				Price = Math.Round(Convert.ToDecimal(product.Price)),
@@ -52,8 +52,8 @@ namespace CarzineCore
 		{
 			return products.Select(product => new StandardProductModel()
 			{
-				DeliveryMax = product.DeliveryDays,
-				DeliveryMin = product.DeliveryDays,
+				DeliveryMaxOriginal = product.DeliveryDays,
+				DeliveryMinOriginal = product.DeliveryDays,
 				Volume = product.WeightVolume,
 				Weight = product.WeightPhysical,
 				Price = Math.Round(product.Price),

@@ -36,6 +36,8 @@ import { PaymentMethodComponent } from './components/customer/payment-method/pay
 import { TranslationComponent } from './components/translation/translation.component';
 import { AddTranslationComponent } from './components/dialogs/add-translation/add-translation.component';
 import { AuthGuard } from './auth.guard';
+import { RulesComponent } from './components/rules/rules.component';
+import { RuleDataComponent } from './components/dialogs/rule-data/rule-data.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,9 @@ import { AuthGuard } from './auth.guard';
     ReturnComponent,
     PaymentMethodComponent,
     TranslationComponent,
-    AddTranslationComponent
+    AddTranslationComponent,
+    RulesComponent,
+    RuleDataComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -78,6 +82,7 @@ import { AuthGuard } from './auth.guard';
       { path: 'delivery', component: DeliveryComponent },
       { path: 'payment', component: PaymentMethodComponent },
       { path: 'translation', component: TranslationComponent, canActivate: [AuthGuard] },
+      { path: 'rules', component: RulesComponent, canActivate: [AuthGuard] },
       { path: '**', redirectTo: ''}
     ]),
     BrowserAnimationsModule,

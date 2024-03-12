@@ -1,0 +1,49 @@
+<h3>Наценка</h3>
+<div>
+    <table>
+      <tr>
+        <th>Нижняя граница</th>
+        <th>Верхняя граница</th>
+        <th>Значение</th>
+        <th></th>
+      </tr>
+      <tr *ngFor="let x of priceRules">
+        <td>{{x.min}}</td>
+        <td>{{x.max}}</td>
+        <td>{{x.value}}</td>
+        <td>
+          <button mat-mini-fab color="warn" (click)="deleteClick(x.id)" matTooltip="Удалить интервал">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </table>
+    <button mat-flat-button color="primary" (click)="addClick(1)">Добавить</button>
+</div>
+
+<hr/>
+
+<h3>Сроки доставки</h3>
+<div>
+    <table>
+      <tr>
+        <th>Нижняя граница</th>
+        <th>Верхняя граница</th>
+        <th>Значение</th>
+        <th></th>
+      </tr>
+      <tr *ngFor="let x of deliveryRules">
+        <td>{{x.min}}</td>
+        <td>{{x.max}}</td>
+        <td>{{x.value}}</td>
+        <td>
+          <button mat-mini-fab color="warn" (click)="deleteClick(x.id)" matTooltip="Удалить интервал">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </table>
+    <button mat-flat-button color="primary" (click)="addClick(2)">Добавить</button>
+</div>
+
+<mat-spinner *ngIf="inProgress"></mat-spinner>

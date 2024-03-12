@@ -7,14 +7,18 @@ using System.Data;
 
 namespace CarzineCore
 {
-	public class MySqlDataService : IDbDataService, IDbUserService, IDbTranslationService, IDbActionLogService
+	public class MySqlDataRepository : IDbDataRepository, IDbUserService, IDbTranslationService, IDbActionLogService
 	{
 		private readonly string _connectionString;
 
+		private IEnumerable<RuleRangeDto> _rules;
+
+		#region SQL
+
 		const string _sqlInsertPreOrder =
-			"INSERT INTO pre_order(date, pn, manufacturer, price_rub, delivery_min, source_id," +
-				"weight, volume, supplyer_price, delivery_cost, extra_charge, supplyer_status, client_status, user_email) " +
-			"VALUES (now(), @pn, @manufacturer, @priceRub, @deliveryMin, @sourceId," +
+			"INSERT INTO pre_order(date, pn, manufacturer, price_rub, delivery_min, delivery_min_original, delivery_max_original, " +
+				"source_id, weight, volume, supplyer_price, delivery_cost, extra_charge, supplyer_status, client_status, user_email) " +
+			"VALUES (now(), @pn, @manufacturer, @priceRub, @deliveryMin, @deliveryMinOriginal, @deliveryMaxOriginal, @sourceId," +
 				"@weight, @volume, @supplyerPrice, @deliveryCost, @extraCharge, @supplyerStatus, @clientStatus, @userName)";
 
 		const string _sqlGetPreorders =
@@ -45,6 +49,15 @@ namespace CarzineCore
 		const string _sqlGetClientStatuses =
 			"SELECT * FROM client_order_status";
 
+		const string _sqlGetRuleRanges =
+			"SELECT * FROM rule_range";
+		const string _sqlDeleteRuleRange =
+			"DELETE FROM rule_range WHERE id = @id";
+		const string _sqlAddRuleRange =
+			"INSERT INTO rule_range(min, max, value, type) " +
+			"VALUES(@min, @max, @value, @type); " +
+			"SELECT LAST_INSERT_ID();";
+
 		const string _sqlGetAllTranslations =
 			"SELECT en_name AS enName, ru_name AS ruName FROM translation";
 		const string _sqlAddTranslations =
@@ -66,8 +79,9 @@ namespace CarzineCore
 			"WHERE user_name = @userName " +
 			"ORDER BY search_date DESC " +
 			"LIMIT @limit";
+		#endregion SQL
 
-		public MySqlDataService(IConfiguration config)
+		public MySqlDataRepository(IConfiguration config)
 		{
 			_connectionString = config.GetConnectionString("carzineMySql");
 		}
@@ -95,8 +109,12 @@ namespace CarzineCore
 					pn = product.PartNumber,
 					manufacturer = product.Manufacturer,
 					priceRub = product.PriceRub,
+
 					deliveryMin = product.DeliveryMin,
-					sourceId = (int)(product.SourceId),
+					deliveryMinOriginal = product.DeliveryMinOriginal,
+					deliveryMaxOriginal = product.DeliveryMaxOriginal,
+
+					sourceId = (int)product.SourceId,
 					weight = product.Weight,
 					volume = product.Volume,
 					supplyerPrice = product.Price,
@@ -207,12 +225,58 @@ namespace CarzineCore
 			return await connection.QueryAsync<StatusDto>(_sqlGetClientStatuses);
 		}
 
+		public async Task<IEnumerable<RuleRangeDto>> GetRuleRangesAsync()
+		{
+			if (_rules != null)
+			{
+				return _rules;
+			}
+			
+			using var connection = GetConnection();
+
+			_rules = await connection.QueryAsync<RuleRangeDto>(_sqlGetRuleRanges);
+
+			return _rules;
+		}
+
+		public async Task<IEnumerable<RuleRangeDto>> GetRuleRangesAsync(RuleRangeType rangeType)
+		{
+			var ranges = await GetRuleRangesAsync();
+
+			return ranges.Where(x => x.Type == rangeType);
+		}
+
+		public async Task AddRuleRangeAsync(RuleRangeDto ruleRange)
+		{
+			using var connection = GetConnection();
+
+			var id = await connection.ExecuteScalarAsync<int>(_sqlAddRuleRange, new
+			{
+				min = ruleRange.Min,
+				max = ruleRange.Max,
+				value = ruleRange.Value,
+				type = (int)ruleRange.Type
+			});
+
+			var newRuleRange = new RuleRangeDto(Id: id, ruleRange.Min, ruleRange.Max, ruleRange.Value, ruleRange.Type);
+				
+			_rules = _rules.Append(newRuleRange);
+		}
+
+		public async Task DeleteRuleRangeAsync(int id)
+		{
+			using var connection = GetConnection();
+
+			await connection.ExecuteAsync(_sqlDeleteRuleRange, new { id });
+
+			_rules = _rules.Where(x => x.Id != id);
+		}
+
 		public async Task<IEnumerable<TranslationDto>> GetAllTranslationsAsync()
 		{
 			using var connection = GetConnection();
 
 			return await connection.QueryAsync<TranslationDto>(_sqlGetAllTranslations);
-			
 		}
 
 		public async Task AddTranslationAsync(string key, string translation)
@@ -271,5 +335,7 @@ namespace CarzineCore
 
 			return await connection.QueryAsync<UserAutoDto>(_sqlGetUserAuto, new { userName, limit });
 		}
+
+
 	}
 }

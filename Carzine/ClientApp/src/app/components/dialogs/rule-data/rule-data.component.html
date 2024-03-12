@@ -1,0 +1,25 @@
+<h5>Правило перевода диапазона</h5>
+
+<mat-dialog-content>
+    <mat-form-field>
+        <mat-label>Нижняя граница</mat-label>
+        <input type="number" matInput [(ngModel)]="ruleRange!.min">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Верхняя граница (включительно)</mat-label>
+        <input type="number" matInput [(ngModel)]="ruleRange!.max">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Значение</mat-label>
+        <input type="number" matInput [(ngModel)]="ruleRange!.value">
+    </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button
+        color="primary"
+        [disabled]="!ruleRange?.value" 
+        (click)="closeDialog('ok')">Ok
+    </button>
+    <button mat-stroked-button (click)="closeDialog('cancel')">Отмена</button>
+</mat-dialog-actions>

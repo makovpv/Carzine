@@ -2,7 +2,7 @@
 
 namespace CarzineCore.Interfaces
 {
-	public interface IDbDataService
+	public interface IDbDataRepository
 	{
 		public Task<int> AddPreOrderAsync(StandardProductModel product, string userName);
 
@@ -15,6 +15,13 @@ namespace CarzineCore.Interfaces
 		public Task SetPreorderClientStatus(int orderId, ClientStatus status);
 
 		public Task<IEnumerable<StatusDto>> GetClientStatusesAsync();
+
+		public Task<IEnumerable<RuleRangeDto>> GetRuleRangesAsync();
+		public Task<IEnumerable<RuleRangeDto>> GetRuleRangesAsync(RuleRangeType rangeType);
+
+		public Task AddRuleRangeAsync(RuleRangeDto ruleRange);
+
+		public Task DeleteRuleRangeAsync(int id);
 	}
 
 	public interface IDbUserService

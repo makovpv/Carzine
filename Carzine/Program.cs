@@ -43,12 +43,14 @@ try
 		});
 
 	builder.Services.AddSingleton<IApiDataService, ApiDataService>();
+	builder.Services.AddSingleton<IDataTranslatorService, LanguageTranslatorService>();
+	builder.Services.AddScoped<IPaymentService, PaymentService>();
+	builder.Services.AddTransient<IMailService, MailService>();
+
 	builder.Services.AddSingleton<IDbDataRepository, MySqlDataRepository>();
 	builder.Services.AddSingleton<IDbUserService, MySqlDataRepository>();
 	builder.Services.AddSingleton<IDbTranslationService, MySqlDataRepository>();
 	builder.Services.AddSingleton<IDbActionLogService, MySqlDataRepository>();
-	builder.Services.AddSingleton<IDataTranslatorService, LanguageTranslatorService>();
-	builder.Services.AddSingleton<IMailService, MailService>();
 
 	builder.Services.AddCors(options =>
 	{

@@ -12,6 +12,7 @@
         <th>Производитель</th>
         <th>Цена, руб</th>
         <th>Срок поставки</th>
+        <th></th>
       </tr>
       <tr *ngFor="let x of userPreorders">
         <td>{{x.id | number: '3.0-0'}}</td>
@@ -23,6 +24,9 @@
         <td>{{x.product.manufacturer}}</td>
         <td>{{x.product.priceRub | intCurrency}}</td>
         <td>{{x.product.deliveryMin}}</td>
+        <td>
+          <button (click)="payClick(x.id)">Оплатить</button>
+        </td>
       </tr>
     </table>
   

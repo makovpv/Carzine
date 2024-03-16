@@ -10,7 +10,8 @@ const PROXY_CONFIG = [
       "/api/order",
       "/token",
       "/user",
-      "/api/translation"
+      "/api/translation",
+      "/api/payment"
    ],
     target: target,
     secure: false,

@@ -3,9 +3,9 @@
     class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
   >
     <div class="container">
-      <span id="app-logo" (click)="logoClick()">Zild</span>
+      <span id="app-logo" (click)="logoClick()">ЗИЛД</span>
 
-      <span style="color: darkblue;">{{userName}}</span>
+      <span style="color: darkblue; margin: 0 16px;">{{userName}}</span>
 
       <button
         class="navbar-toggler"
@@ -42,7 +42,7 @@
             [routerLinkActive]="['link-active']"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <a class="nav-link text-dark" [routerLink]="['/account']">Мои заказы</a>
+            <a class="nav-link text-dark" [routerLink]="['/account']">Заказы</a>
           </li>
           <li
             class="nav-item"

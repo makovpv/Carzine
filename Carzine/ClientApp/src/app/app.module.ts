@@ -28,11 +28,6 @@ import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { DeliveryPeriodPipe } from './pipes/delivery-period.pipe';
 import { StatusComponent } from './components/dialogs/status/status.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { AboutUsComponent } from './components/info/about-us/about-us.component';
-import { DetailsComponent } from './components/info/details/details.component';
-import { DeliveryComponent } from './components/customer/delivery/delivery.component';
-import { ReturnComponent } from './components/customer/return/return.component';
-import { PaymentMethodComponent } from './components/customer/payment-method/payment-method.component';
 import { TranslationComponent } from './components/translation/translation.component';
 import { AddTranslationComponent } from './components/dialogs/add-translation/add-translation.component';
 import { AuthGuard } from './auth.guard';
@@ -53,11 +48,6 @@ import { RuleDataComponent } from './components/dialogs/rule-data/rule-data.comp
     SignUpComponent,
     DeliveryPeriodPipe,
     StatusComponent,
-    AboutUsComponent,
-    DetailsComponent,
-    DeliveryComponent,
-    ReturnComponent,
-    PaymentMethodComponent,
     TranslationComponent,
     AddTranslationComponent,
     RulesComponent,
@@ -75,12 +65,7 @@ import { RuleDataComponent } from './components/dialogs/rule-data/rule-data.comp
       { path: 'login', component: LoginComponent },
       { path: 'account', component: AccountComponent, canActivate: [AuthGuard] },
       { path: 'signup', component: SignUpComponent },
-      { path: 'about', component: AboutUsComponent },
-      { path: 'offer', loadChildren: () => import('./misc.module').then(m => m.MiscModule) },
-      { path: 'details', component: DetailsComponent },
-      { path: 'return', component: ReturnComponent },
-      { path: 'delivery', component: DeliveryComponent },
-      { path: 'payment', component: PaymentMethodComponent },
+      { path: 'info', loadChildren: () => import('./info.module').then(m => m.InfoModule) },
       { path: 'translation', component: TranslationComponent, canActivate: [AuthGuard] },
       { path: 'rules', component: RulesComponent, canActivate: [AuthGuard] },
       { path: '**', redirectTo: ''}

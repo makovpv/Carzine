@@ -7,7 +7,7 @@ import { MessageService } from './services/message.service';
   templateUrl: './app.component.html'
 })
 export class AppComponent {
-  title = 'Zild';
+  title = 'ЗИЛД';
 
   constructor(private messageService: MessageService, private _snackBar: MatSnackBar) {
     this.messageService.carzineMessage.subscribe(data => {

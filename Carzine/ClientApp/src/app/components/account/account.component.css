@@ -10,3 +10,7 @@
 	border-bottom: solid 2px green;
     text-transform: uppercase;
 }
+
+table {
+	margin-top: 16px;
+}

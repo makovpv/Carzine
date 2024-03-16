@@ -60,3 +60,7 @@ form {
 .cr-form-container {
   text-align: center;
 }
+
+h5.info {
+  margin-bottom: 2rem;
+}

@@ -51,7 +51,7 @@ export class PreOrderListComponent implements OnInit {
         this.router.navigateByUrl('/login');
       }
       if (err.status === 403) {
-        alert('Недостаточно прав доступа')
+        this.messageService.sendErrorMessage('Недостаточно прав доступа')
       }
     });
   }

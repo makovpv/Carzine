@@ -51,6 +51,9 @@ try
 	builder.Services.AddSingleton<IDbUserService, MySqlDataRepository>();
 	builder.Services.AddSingleton<IDbTranslationService, MySqlDataRepository>();
 	builder.Services.AddSingleton<IDbActionLogService, MySqlDataRepository>();
+	builder.Services.AddSingleton<IOrderRepository, MySqlDataRepository>();
+
+	builder.Services.AddSingleton<IDataCollector, DataCollector>();
 
 	builder.Services.AddCors(options =>
 	{

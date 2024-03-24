@@ -4,13 +4,13 @@ namespace Carzine.Models
 {
     public class SearchResultViewModel
     {
-        public StandardProductModel? BestPrice { get; set; }
+        public CartItemViewModel? BestPrice { get; set; }
 
-        public StandardProductModel? ExpressDelivery { get; set; }
+        public CartItemViewModel? ExpressDelivery { get; set; }
 
-        public StandardProductModel? Optimal { get; set; }
+        public CartItemViewModel? Optimal { get; set; }
 
-        public IEnumerable<StandardProductModel>? Products { get; set; }
+        public IEnumerable<CartItemViewModel>? Products { get; set; }
 
         public decimal UsdRate { get; set; }
     }

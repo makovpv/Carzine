@@ -1,11 +1,10 @@
-import {ProductModel} from './ProductModel'
-
-export class PreOrderModel {
+export class OrderModel {
     id: number | undefined;
     phone: string | undefined;
-    userEmail: string | undefined;
+    user_email: string | undefined;
     date: Date | undefined;
-    product: ProductModel = new ProductModel();
-    clientStatus: number | undefined;
+    client_status_id: number | undefined;
     clientStatusName: string = '';
+    payment_Order_State: string = '';
+    total_Sum: number = 0;
 }

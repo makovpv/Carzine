@@ -15,25 +15,44 @@ namespace Carzine.Controllers
 
 		private readonly IApiDataService _apiDataService;
 		private readonly IDbActionLogService _dbActionLogService;
-		private readonly IDbDataRepository _dbDataRepository;
 
-		public SearchController(ILogger<SearchController> logger, IApiDataService apiDataService, 
-			IDbActionLogService dbActionLogService, IDbDataRepository dataRepository)
+		private readonly IDataCollector _dataCollector;
+
+		public SearchController(ILogger<SearchController> logger, IApiDataService apiDataService, IDataCollector dataCollector,
+			IDbActionLogService dbActionLogService)
 		{
 			_logger = logger;
 			_apiDataService = apiDataService;
 			_dbActionLogService = dbActionLogService;
-			_dbDataRepository = dataRepository;
+			_dataCollector = dataCollector;
 		}
 
 		[HttpGet]
 		public async Task<IActionResult> Get(string code, bool analog)
 		{
-			IEnumerable<StandardProductModel> productData;
+			//IEnumerable<StandardProductModel> products;
 			
 			try
 			{
-				productData = await _apiDataService.GetDataMultipleSourceAsync(code, analog);
+				var products = await _dataCollector.GetCalculatedDataAsync(code, analog);
+
+				products.Sort(delegate (StandardProductModel x, StandardProductModel y) {
+					if (x.PriceRub == y.PriceRub)
+						return 0;
+
+					return x.PriceRub > y.PriceRub ? 1 : -1;
+				});
+
+				return StatusCode(
+					StatusCodes.Status200OK,
+					new SearchResultViewModel()
+					{
+						Products = products.FillEmptyNames().ToViewModel(),
+						BestPrice = CarzineCalculator.GetBestPriceProduct(products).ToViewModel(),
+						ExpressDelivery = products.MinBy(x => x.DeliveryMin).ToViewModel(),
+						Optimal = CarzineCalculator.GetOptimalProduct(products).ToViewModel(),
+						//UsdRate = usdRate ??
+					});
 			}
 			catch (Exception ex)
 			{
@@ -42,46 +61,17 @@ namespace Carzine.Controllers
 				
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
-
-			var usdRate = await DataCollector.GetCbrCursAsync("USD");
-
-			var products = await new CarzineCalculator(_dbDataRepository).CalcProductComponentsAsync(productData, usdRate);
-
-			products.Sort(delegate (StandardProductModel x, StandardProductModel y) {
-				if (x.PriceRub == y.PriceRub)
-					return 0;
-				
-				return x.PriceRub > y.PriceRub ? 1 : -1;
-			});
-
-			return StatusCode(
-				StatusCodes.Status200OK,
-				new SearchResultViewModel()
-				{
-					Products = products.FillEmptyNames(),
-					BestPrice = CarzineCalculator.GetBestPriceProduct(products),
-					ExpressDelivery = products.MinBy(x => x.DeliveryMin),
-					Optimal = CarzineCalculator.GetOptimalProduct(products),
-					UsdRate = usdRate
-				});
-
 		}
 
 		[HttpGet("searchVin")]
 		public async Task<IActionResult> SearchByVIN(string vin, bool requestEcoMode = false)
 		{
-			var groupInfo = new AcatGroupInfo
-			{
-				GroupType = "CARS_FOREIGN",
-				Mark = "ford",
-				Modification = "0417effa2c41f9665976e0ad9467387e",
-				Model = "5c2447bd0d8d57b0bcbf7d8cc8407f3f",
-				Group = string.Empty
-			};
+			AcatGroupInfo groupInfo;
+
 
 			AcatVinModel? acatVin = new();
 
-			if (!requestEcoMode)
+			if (true)
 			{
 				var searchResult = await _apiDataService.SearchByVinAsync(vin);
 

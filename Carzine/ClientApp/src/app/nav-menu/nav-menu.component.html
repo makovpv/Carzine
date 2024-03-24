@@ -52,6 +52,13 @@
             <a *ngIf="!userName" class="nav-link text-dark" [routerLink]="['/login']">Войти</a>
             <span *ngIf="userName" style="cursor: pointer;" class="nav-link text-dark" (click)="logout()">Выйти</span>
           </li>
+
+          <li class="nav-item" [routerLinkActive]="['link-active']" [routerLinkActiveOptions]="{ exact: true }">
+            <a class="nav-link text-dark" [routerLink]="['/cart']">
+              <mat-icon>shopping_cart</mat-icon>
+            </a>
+          </li>
+
         </ul>
       </div>
     </div>

@@ -8,7 +8,7 @@ namespace CarzineCore.Interfaces
 {
 	public interface IPaymentService
 	{
-		public Task<RegisterOrderResponse> PayAsync(PaymentData data);
+		public Task<RegisterOrderResponse> PayAsync(PaymentData data, bool isTestMode);
 
 		public Task<OrderPaymentStatusModel> GetOrderStatusAsync(string orderId);
 

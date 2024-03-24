@@ -1,0 +1,17 @@
+<h3>Корзина</h3>
+
+<div>
+    <button mat-stroked-button color="primary" (click)="makeOrder()"
+        [disabled]="!isUserLogged || items.length === 0">
+        Перейти к оформлению
+    </button>
+    <span>{{items.length}} позиций на сумму {{totalSum() | intCurrency}} руб</span>
+</div>
+
+<div *ngFor="let x of items">
+    <hr>
+    {{x.item_code}} --- {{x.name}} --- {{x.amount}} шт --- {{x.price_rub | intCurrency}} руб --- {{x.delivery_min}} дней
+    <button mat-icon-button color="warn" (click)="removeFromCart(x.id)">
+        <mat-icon>remove_shopping_cart</mat-icon>
+    </button>
+</div>

@@ -26,11 +26,13 @@ namespace CarzineCore
 			_paymentUri = config.GetSection("PaymentApi")["url"];
 		}
 
-		public async Task<RegisterOrderResponse> PayAsync(PaymentData data)
+		public async Task<RegisterOrderResponse> PayAsync(PaymentData data, bool isTestMode)
 		{
 			using var httpClient = new HttpClient();
 
-			var requestUri = $"{_paymentUri}register.do?token={_token}&orderNumber={data.orderId}&amount={data.amount}&returnUrl={data.additionalProps.returnUrl}";
+			var orderNumber = isTestMode ? $"T{data.orderId}" : data.orderId;
+
+			var requestUri = $"{_paymentUri}register.do?token={_token}&orderNumber={orderNumber}&amount={data.amount}&returnUrl={data.additionalProps.returnUrl}";
 
 			var response = await httpClient.PostAsync(requestUri, null);
 

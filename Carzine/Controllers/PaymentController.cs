@@ -35,22 +35,26 @@ namespace Carzine.Controllers
 		{
 			try
 			{
-				var order = await _orderRepostory.GetPreOrderAsync(orderId);
+				var order = await _orderRepostory.GetOrderAsync(orderId);
 
-				//var uName = User.Identity.Name;
-				//var ff = order.User_email;
-
-				var res = await _paymentService.PayAsync(new PaymentData
+				if (order.User_email != User.Identity.Name)
 				{
-					amount = Convert.ToInt32(order.Price_Rub * 100),
-					orderId = orderId.ToString(), //Guid.NewGuid().ToString(),
-					bankId = BankId.Alfa,
-					sessionType = "oneStep",
-					additionalProps = new AdditionalPaymentData
-					{
-						returnUrl = $"{Request.Scheme}://{Request.Host}/account"
-					}
-				});
+					throw new Exception($"User {User.Identity.Name} doesn't have order with id = {orderId}");
+				}
+
+				var res = await _paymentService.PayAsync(
+					new PaymentData {
+						amount = Convert.ToInt32(order.Total_Sum * 100),
+						orderId = orderId.ToString(), //Guid.NewGuid().ToString(),
+						bankId = BankId.Alfa,
+						sessionType = "oneStep",
+						additionalProps = new AdditionalPaymentData
+						{
+							returnUrl = $"{Request.Scheme}://{Request.Host}/account"
+						}
+					},
+					isTestMode: IsTestMode()
+				);
 
 				return Ok(res);
 			}
@@ -60,14 +64,25 @@ namespace Carzine.Controllers
 			}
 			
 		}
+
+		private bool IsTestMode()
+		{
+			return Request.Host.Host == "localhost";
+		}
 		
-		[HttpPost("check/{orderId}")]
+		[HttpPost("check/{paymentOrderId}")]
 		[Authorize]
-		public async Task<IActionResult> CheckAsync(string orderId)
+		public async Task<IActionResult> CheckAndSetPaymerOrderIdAsync(string paymentOrderId)
 		{
 			try
 			{
-				var res = await _paymentService.GetOrderStatusAsync(orderId);
+				var res = await _paymentService.GetOrderStatusAsync(paymentOrderId);
+
+				await _orderRepostory.SetPaymentOrderIdAsync(
+					orderId: Convert.ToInt32(IsTestMode() ? res.orderNumber.Replace("T", "") : res.orderNumber),
+					paymentOrderId: paymentOrderId,
+					paymentStatus: res.paymentAmountInfo.paymentState
+				);
 
 				return Ok(res);
 			}

@@ -19,4 +19,5 @@ export class ProductModel implements DeliveryInfo {
 	isOriginal: boolean | undefined;
     extraCharge: number | undefined;
 	deliveryCost: number | undefined;
+	code: number = 0;
 }

@@ -7,7 +7,7 @@ using System.Data;
 
 namespace CarzineCore
 {
-	public class MySqlDataRepository : IDbDataRepository, IDbUserService, IDbTranslationService, IDbActionLogService
+	public class MySqlDataRepository : IDbDataRepository, IDbUserService, IDbTranslationService, IDbActionLogService, IOrderRepository
 	{
 		private readonly string _connectionString;
 
@@ -21,14 +21,24 @@ namespace CarzineCore
 			"VALUES (now(), @pn, @manufacturer, @priceRub, @deliveryMin, @deliveryMinOriginal, @deliveryMaxOriginal, @sourceId," +
 				"@weight, @volume, @supplyerPrice, @deliveryCost, @extraCharge, @supplyerStatus, @clientStatus, @userName)";
 
-		const string _sqlGetPreorders =
-			"SELECT * FROM pre_order";
+		const string _sqlGetOrders =
+			"SELECT o.*, u.phone " +
+			"FROM `order` o " +
+			"LEFT JOIN `user` u ON u.login_name = o.user_email";
 
-		const string _sqlGetPreorderById =
-			"SELECT * FROM pre_order WHERE id = @id";
+		const string _sqlGetOrderById =
+			"SELECT o.id, o.user_email, sum(oi.price_rub) AS total_sum " +
+			"FROM `order` o " +
+			"LEFT JOIN `order_item` oi ON o.id = oi.order_id " +
+			"WHERE o.id = @id " +
+			"GROUP BY o.id, o.user_email";
 
-		const string _sqlGetPreordersByUser =
-			"SELECT * FROM pre_order WHERE user_email = @userEmail";
+		const string _sqlGetOrdersByUser =
+			"SELECT o.id, o.date, o.payment_order_state, o.client_status_id, sum(oi.price_rub) as total_sum " +
+			"from `order` o " +
+			"left join order_item oi on o.id = oi.order_id " +
+			"where user_email = @userEmail " +
+			"group by o.id, o.date, o.user_email, o.payment_order_state, o.client_status_id;";
 
 		const string _sqlInsertUser =
 			"INSERT INTO user(login_name, pwd, phone) " +
@@ -41,10 +51,15 @@ namespace CarzineCore
 				"LEFT JOIN user_admin ua ON u.login_name = ua.login " +
 			"WHERE login_name = @name";
 
-		const string _sqlSetPreOrderClientStatus =
-			"UPDATE pre_order " +
-			"SET client_status = @status " +
+		const string _sqlSetOrderClientStatus =
+			"UPDATE `order` " +
+			"SET client_status_id = @status " +
 			"WHERE id = @id";
+		const string _sqlSetOrderPaymentOrderId =
+			"UPDATE `order` " +
+			"SET payment_order_id = @paymentOrderId, " +
+				"payment_order_state = @paymentStatus " +
+			"WHERE id = @orderId";
 
 		const string _sqlGetClientStatuses =
 			"SELECT * FROM client_order_status";
@@ -79,6 +94,27 @@ namespace CarzineCore
 			"WHERE user_name = @userName " +
 			"ORDER BY search_date DESC " +
 			"LIMIT @limit";
+
+		const string _sqlGetUserCart =
+			"SELECT * FROM cart WHERE login = @login";
+		const string _sqlGetUserCartItemByHash =
+			"SELECT id FROM cart " +
+			"WHERE item_hash = @hash AND login = @login";
+		const string _sqlAddItemToCart =
+			"INSERT INTO cart (item_code, code_type, login, name, amount, price_rub, item_hash," +
+				"manufacturer, delivery_min, weight, volume, supplyer_price, delivery_cost, extra_charge," +
+				"delivery_min_original, delivery_max_original, source_id) " +
+			"VALUES(@itemCode, @codeType, @login, @name, @amount, @priceRub, @hash," +
+				"@manufacturer, @deliveryMin, @weight, @volume, @supplyerPrice, @deliveryCost, @extraCharge," +
+				"@deliveryMinOriginal, @deliveryMaxOriginal, @sourceId); " +
+			"SELECT LAST_INSERT_ID();";
+		const string _sqlRemoveUserCartItem =
+			"DELETE FROM cart " +
+			"WHERE id = @id AND login = @login";
+		const string _sqlMakeOrderFromCart =
+			"CALL make_order_from_cart(@login)";
+		const string _sqlMergeUserCart =
+			"CALL merge_user_cart(@uid, @login)";
 		#endregion SQL
 
 		public MySqlDataRepository(IConfiguration config)
@@ -134,20 +170,20 @@ namespace CarzineCore
 			return preOrderId;
 		}
 
-		public async Task<PreOrderDto> GetPreOrderAsync(int preOrderId)
+		public async Task<OrderDto> GetOrderAsync(int orderId)
 		{
 			using var connection = GetConnection();
 
-			return await connection.QuerySingleAsync<PreOrderDto>(_sqlGetPreorderById, new { id = preOrderId });
+			return await connection.QuerySingleAsync<OrderDto>(_sqlGetOrderById, new { id = orderId });
 		}
 
-		public async Task<IEnumerable<PreOrderDto>> GetPreOrdersAsync()
+		public async Task<IEnumerable<OrderDto>> GetOrdersAsync()
 		{
 			try
 			{
 				using var connection = GetConnection();
 
-				return await connection.QueryAsync<PreOrderDto>(_sqlGetPreorders);
+				return await connection.QueryAsync<OrderDto>(_sqlGetOrders);
 			}
 			catch (Exception ex)
 			{
@@ -155,19 +191,33 @@ namespace CarzineCore
 			}
 		}
 
-		public async Task<IEnumerable<PreOrderDto>> GetPreOrdersByUserAsync(string userEmail)
+		public async Task<IEnumerable<OrderDto>> GetOrdersByUserAsync(string userEmail)
 		{
 			try
 			{
 				using var connection = GetConnection();
 
-				return await connection.QueryAsync<PreOrderDto>(_sqlGetPreordersByUser, new { userEmail });
+				return await connection.QueryAsync<OrderDto>(_sqlGetOrdersByUser, new { userEmail });
 			}
 			catch (Exception ex)
 			{
 				throw;
 			}
 		}
+
+		//public async Task<decimal> GetOrderTotalSumAsync(int orderId)
+		//{
+		//	try
+		//	{
+		//		using var connection = GetConnection();
+
+		//		return await connection.QueryAsync<OrderDto>(_sqlGetOrdersByUser, new { userEmail });
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		throw;
+		//	}
+		//}
 
 		public async Task AddUserAsync(string userName, string pwd, string phone)
 		{
@@ -211,11 +261,18 @@ namespace CarzineCore
 			}
 		}
 
-		public async Task SetPreorderClientStatus(int orderId, ClientStatus status)
+		public async Task SetOrderClientStatus(int orderId, ClientStatus status)
 		{
 			using var connection = GetConnection();
 
-			await connection.ExecuteAsync(_sqlSetPreOrderClientStatus, new { id = orderId, status });
+			await connection.ExecuteAsync(_sqlSetOrderClientStatus, new { id = orderId, status });
+		}
+
+		public async Task SetPaymentOrderIdAsync(int orderId, string paymentOrderId, string paymentStatus)
+		{
+			using var connection = GetConnection();
+
+			await connection.ExecuteAsync(_sqlSetOrderPaymentOrderId, new { orderId, paymentOrderId, paymentStatus });
 		}
 
 		public async Task<IEnumerable<StatusDto>> GetClientStatusesAsync()
@@ -336,6 +393,68 @@ namespace CarzineCore
 			return await connection.QueryAsync<UserAutoDto>(_sqlGetUserAuto, new { userName, limit });
 		}
 
+		public async Task<int> AddToCartAsync(string userName, int hash, StandardProductModel product)
+		{
+			using var connection = GetConnection();
 
+			var id = await connection.QueryFirstOrDefaultAsync<int?>(_sqlGetUserCartItemByHash, new { 
+				hash, 
+				login = userName
+			});
+
+			if (id.HasValue)
+				return id.Value;
+
+			var newId = await connection.ExecuteScalarAsync<int>(_sqlAddItemToCart, new
+			{
+				hash = hash,
+				itemCode = product.PartNumber,
+				codeType = product.PartNumberType,
+				login = userName,
+				name = product.Name,
+				amount = 1,
+				priceRub = product.PriceRub,
+				@manufacturer = product.Manufacturer,
+				deliveryMin = product.DeliveryMin,
+				weight = product.Weight,
+				volume = product.Volume,
+				supplyerPrice = product.Price,
+				deliveryCost = product.DeliveryCost,
+				extraCharge = product.ExtraCharge,
+				deliveryMinOriginal = product.DeliveryMinOriginal,
+				deliveryMaxOriginal = product.DeliveryMaxOriginal,
+				sourceId = product.SourceId
+			});
+
+			return newId;
+		}
+
+		public async Task<int> MakeOrderFromCartAsync(string userName)
+		{
+			using var connection = GetConnection();
+
+			return await connection.ExecuteScalarAsync<int>(_sqlMakeOrderFromCart, new { login = userName });
+		}
+
+		public async Task<int> MergeUserCartAsync(string uid, string userName)
+		{
+			using var connection = GetConnection();
+
+			return await connection.ExecuteScalarAsync<int>(_sqlMergeUserCart, new { uid, login = userName });
+		}
+
+		public async Task RemoveFromCartAsync(int id, string login)
+		{
+			using var connection = GetConnection();
+
+			await connection.ExecuteAsync(_sqlRemoveUserCartItem, new { id, login });
+		}
+
+		public async Task<IEnumerable<CartItemDto>> GetCartAsync(string userName)
+		{
+			using var connection = GetConnection();
+
+			return await connection.QueryAsync<CartItemDto>(_sqlGetUserCart, new { login = userName });
+		}
 	}
 }

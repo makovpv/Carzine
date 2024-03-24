@@ -15,11 +15,13 @@ namespace Carzine.Controllers
 	{
 		private readonly IDbUserService _dataService;
 		private readonly IMailService _mailService;
+		private readonly ILogger<UserController> _logger;
 
-		public UserController(IDbUserService dbService, IMailService mailService)
+		public UserController(IDbUserService dbService, IMailService mailService, ILogger<UserController> logger)
 		{
 			_dataService = dbService;
 			_mailService = mailService;
+			_logger = logger;
 		}
 
 		[HttpPost("token")]
@@ -70,8 +72,6 @@ namespace Carzine.Controllers
 			try
 			{
 				await _dataService.AddUserAsync(user.Name, user.Pwd, user.Phone);
-
-				await _mailService.SendEmailAsync("makovpv@gmail.com", $"new user {user.Name} has been registered");
 			}
 			catch (CarzineException ex)
 			{
@@ -80,6 +80,17 @@ namespace Carzine.Controllers
 			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+
+			try
+			{
+				_logger.LogInformation($"new user {user.Name} has been registered");
+
+				await _mailService.SendEmailAsync("makovpv@gmail.com", $"new user {user.Name} has been registered");
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex.Message);
 			}
 
 			return StatusCode(StatusCodes.Status200OK);

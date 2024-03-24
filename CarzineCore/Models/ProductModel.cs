@@ -6,6 +6,8 @@
 
 		public string PartNumber { get; set; }
 
+		public ItemCodeType PartNumberType { get; set; }
+
 		public string Manufacturer { get; set; }
 
 		/// <summary>

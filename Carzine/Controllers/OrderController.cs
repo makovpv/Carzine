@@ -22,65 +22,53 @@ namespace Carzine.Controllers
 			_apiService = apiService;
 		}
 
-		[Authorize]
-		[HttpPost("preorder")]
-		public async Task<IActionResult> AddPreOrderAsync([FromBody] StandardProductModel product)
+
+		[Authorize(Roles = "Admin")]
+		[HttpPost("status/{orderId}")]
+		public async Task<IActionResult> SetOrderStatusAsync(int orderId, [FromBody] int statusId)
 		{
-			var result = await _dataRepository.AddPreOrderAsync(product, User.Identity.Name);
+			await _dataRepository.SetOrderClientStatus(orderId, (ClientStatus)statusId);
+
+			return Ok();
+		}
+
+		//[Authorize(Roles = "Admin")]
+		//[HttpPost("order/{preOrderId}")]
+		//public async Task<IActionResult> CreateOrderAsync(int preOrderId)
+		//{
+		//	var preOrder = (await _dataRepository.GetOrderAsync(preOrderId)).ToPreOrderModel();
 			
-			return StatusCode(StatusCodes.Status201Created, result);
-		}
+		//	switch (preOrder.Product.SourceId)
+		//	{
+		//		case ApiSource.Apec:
+		//			var result1 = await _apiService.CreateApecOrderAsync();
+		//			return StatusCode(StatusCodes.Status201Created, result1);
+		//		case ApiSource.Apm:
+		//			var result2 = await _apiService.CreateApmOrderAsync(preOrder);
+		//			return StatusCode(StatusCodes.Status200OK, result2);
+		//		case ApiSource.Emex:
+		//			return StatusCode(StatusCodes.Status501NotImplemented, "Emex");
+		//		default:
+		//			return StatusCode(StatusCodes.Status400BadRequest, "Api doesn't support order creating");
+		//	}
+		//}
 
 		[Authorize(Roles = "Admin")]
-		[HttpPost("preorder/status/{preOrderId}")]
-		public async Task<IActionResult> SetOrderStatusAsync(int preOrderId, [FromBody] int statusId)
+		[HttpGet]
+		public async Task<IActionResult> GetOrdersAsync()
 		{
-			await _dataRepository.SetPreorderClientStatus(preOrderId, (ClientStatus)statusId);
+			var orders = await _dataRepository.GetOrdersAsync();
 
-			return StatusCode(StatusCodes.Status200OK);
-		}
-
-		[Authorize(Roles = "Admin")]
-		[HttpPost("order/{preOrderId}")]
-		public async Task<IActionResult> CreateOrderAsync(int preOrderId)
-		{
-			var preOrder = (await _dataRepository.GetPreOrderAsync(preOrderId)).ToPreOrderModel();
-			
-			switch (preOrder.Product.SourceId)
-			{
-				case ApiSource.Apec:
-					var result1 = await _apiService.CreateApecOrderAsync();
-					return StatusCode(StatusCodes.Status201Created, result1);
-				case ApiSource.Apm:
-					var result2 = await _apiService.CreateApmOrderAsync(preOrder);
-					return StatusCode(StatusCodes.Status200OK, result2);
-				case ApiSource.Emex:
-					return StatusCode(StatusCodes.Status501NotImplemented, "Emex");
-				default:
-					return StatusCode(StatusCodes.Status400BadRequest, "Api doesn't support order creating");
-			}
-		}
-
-		[Authorize(Roles = "Admin")]
-		[HttpGet("preorder")]
-		public async Task<IActionResult> GetPreOrdersAsync()
-		{
-			var preOrders = await _dataRepository.GetPreOrdersAsync();
-
-			var result = preOrders.Select(x => x.ToPreOrderModel());
-
-			return StatusCode(StatusCodes.Status200OK, result);
+			return StatusCode(StatusCodes.Status200OK, orders);
 		}
 
 		[Authorize]
-		[HttpGet("user-preorders")]
-		public async Task<IActionResult> GetUserPreOrdersAsync()
+		[HttpGet("own")]
+		public async Task<IEnumerable<OrderDto>> GetUserOrdersAsync()
 		{
-			var preOrders = await _dataRepository.GetPreOrdersByUserAsync(User.Identity.Name);
+			var orders = await _dataRepository.GetOrdersByUserAsync(User.Identity.Name);
 
-			var result = preOrders.Select(x => x.ToUserPreOrderModel());
-
-			return StatusCode(StatusCodes.Status200OK, result);
+			return orders;
 		}
 
 		[HttpGet("suppliers")]

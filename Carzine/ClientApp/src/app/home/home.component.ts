@@ -171,23 +171,31 @@ export class HomeComponent {
       });
   }
 
-  addPreorder(product: ProductModel) {
-    if (!product.partNumber) {
-      this.messageService.sendErrorMessage('Не определен номер з/части');
-      return;
-    }
+  // addPreorder(product: ProductModel) {
+  //   if (!product.partNumber) {
+  //     this.messageService.sendErrorMessage('Не определен номер з/части');
+  //     return;
+  //   }
     
-    this.orderService.preOrder(product).then(() => {
-      this.messageService.sendMessage('Создан предзаказ', 10000);
-    })
+  //   this.orderService.preOrder(product).then(() => {
+  //     this.messageService.sendMessage('Создан предзаказ', 10000);
+  //   })
+  //   .catch(err => {
+  //     if (err.status === 401) {
+  //       this.router.navigateByUrl('/login');
+  //     }
+  //     else {
+  //       this.messageService.sendErrorMessage('Что то пошло не так');
+  //     }
+  //   })
+  // }
+
+  addToCart(code: number) {
+    this.orderService.addPnToCart(code)
+    .then(() => this.messageService.sendMessage('Добавлено в корзину', 3000))
     .catch(err => {
-      if (err.status === 401) {
-        this.router.navigateByUrl('/login');
-      }
-      else {
-        this.messageService.sendErrorMessage('Что то пошло не так');
-      }
-    })
+      this.messageService.sendErrorMessage(err.error.title ?? err.error)
+    });
   }
 
   onSearchKeyDown(e: any) {

@@ -17,5 +17,7 @@ namespace CarzineCore.Models
 		public int ClientStatus { get; set; }
 
 		public SupplyerStatus SupplyerStatus { get; set; }
+
+		public string PaymentOrderState { get; set; }
 	}
 }

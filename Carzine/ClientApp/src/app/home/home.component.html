@@ -108,7 +108,10 @@
 			<div>Бренд: {{searchResult.bestPrice?.manufacturer}}</div>
 			<div>Цена: {{searchResult.bestPrice?.priceRub | intCurrency}} руб</div>
 			<div>Срок доставки: {{searchResult.bestPrice |deliveryPeriod}} дней</div>
-			<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.bestPrice)">Заказать</button>
+			<!-- <button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.bestPrice)">Заказать</button> -->
+			<button mat-icon-button color="primary" (click)="addToCart(searchResult.bestPrice.code)">
+				<mat-icon>add_shopping_cart</mat-icon>
+			</button>
 		</div>
 		<div class="product-card">
 			<div class="product-card-title">
@@ -117,7 +120,10 @@
 			<div>Бренд: {{searchResult.expressDelivery?.manufacturer}}</div>
 			<div>Цена: {{searchResult.expressDelivery?.priceRub | intCurrency}} руб</div>
 			<div>Срок доставки: {{searchResult.expressDelivery |deliveryPeriod}} дней</div>
-			<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.expressDelivery)">Заказать</button>
+			<!-- <button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.expressDelivery)">Заказать</button> -->
+			<button mat-icon-button color="primary" (click)="addToCart(searchResult.expressDelivery.code)">
+				<mat-icon>add_shopping_cart</mat-icon>
+			</button>
 		</div>
 		<div class="product-card">
 			<div class="product-card-title">
@@ -126,7 +132,10 @@
 			<div>Бренд: {{searchResult.optimal?.manufacturer}}</div>
 			<div>Цена: {{searchResult.optimal?.priceRub | intCurrency}} руб</div>
 			<div>Срок доставки: {{searchResult.optimal | deliveryPeriod}} дней</div>
-			<button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.optimal)">Заказать</button>
+			<!-- <button mat-stroked-button mat-button color="primary" (click)="addPreorder(searchResult.optimal)">Заказать</button> -->
+			<button mat-icon-button color="primary" (click)="addToCart(searchResult.optimal.code)">
+				<mat-icon>add_shopping_cart</mat-icon>
+			</button>
 		</div>
 	</div>
 	
@@ -150,7 +159,10 @@
 				<td>{{x | deliveryPeriod}}</td>
 				<td>{{x.isOriginal}}</td>
 				<td>
-					<button mat-stroked-button mat-button color="primary" (click)="addPreorder(x)">Заказать</button>
+					<!-- <button mat-stroked-button mat-button color="primary" (click)="addPreorder(x)">Заказать</button> -->
+					<button mat-icon-button color="primary" (click)="addToCart(x.code)">
+						<mat-icon>add_shopping_cart</mat-icon>
+					</button>
 				</td>
 			</tr>
 		</table>

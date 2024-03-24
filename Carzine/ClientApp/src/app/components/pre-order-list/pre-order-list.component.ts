@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { PreOrderModel } from '../../models/PreOrderModel';
+import { OrderModel } from '../../models/PreOrderModel';
 import { OrderService } from '../../services/order.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,13 +14,12 @@ import { OrderStatusModel } from 'src/app/models/OrderStatusModel';
   preserveWhitespaces: true
 })
 export class PreOrderListComponent implements OnInit {
-  preOrders: PreOrderModel[] = [];
+  preOrders: OrderModel[] = [];
   suppliers: any[] = [];
   statuses: OrderStatusModel[] = [];
   inProgress = false;
-  displayCols: string[] = ['id', 'date', 'phone', 'userEmail', 'volume', 'weight', 'supplierName',
-    'price', 'deliveryCost', 'extraCharge', 'deliveryOrderStatus', 'partNumber',
-    'manufacturer', 'priceRub', 'deliveryMin','clientOrderStatus', 'cmd'];
+  displayCols: string[] = ['id', 'date', 'phone', 'userEmail',
+    'deliveryOrderStatus', 'clientOrderStatus', 'paymentState', 'cmd'];
 
   @ViewChild('dialogRef')
   dialogRef!: TemplateRef<any>;
@@ -36,12 +35,12 @@ export class PreOrderListComponent implements OnInit {
     this.inProgress = true;
 
     const f1 = this.orderService.getClientStatuses();
-    const f2 = this.orderService.getPreOrders();
+    const f2 = this.orderService.getOrders();
 
     Promise.all([f1, f2]).then(data => {
       this.statuses = data[0];
       this.preOrders = data[1];
-      this.preOrders.forEach(x => x.clientStatusName = this.statuses.find(s => s.id === x.clientStatus)?.name ?? '??');
+      this.preOrders.forEach(x => x.clientStatusName = this.statuses.find(s => s.id === x.client_status_id)?.name ?? '??');
 
       this.inProgress = false;
     })
@@ -72,18 +71,18 @@ export class PreOrderListComponent implements OnInit {
     }
   }
 
-  openStatusDialog(x: PreOrderModel) {
+  openStatusDialog(x: OrderModel) {
     this.dialog.open(StatusComponent, {data: {
-      statusId: x.clientStatus,
+      statusId: x.client_status_id,
       statuses: this.statuses
     }})
     .afterClosed()
     .subscribe((res) => {
       if (res && res.event === 'ok' && res.data) {
-        this.orderService.setPreorderStatus(x.id!, res.data)
+        this.orderService.setOrderStatus(x.id!, res.data)
         .then(() => {
           this.messageService.sendMessage('Статус изменен', 5000);
-          x.clientStatus = res.data;
+          x.client_status_id = res.data;
           x.clientStatusName = this.statuses.find(s => s.id === res.data)?.name!
         })
         .catch(err => {

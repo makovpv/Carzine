@@ -1,4 +1,5 @@
 ﻿using CarzineCore.Models;
+using Newtonsoft.Json;
 
 namespace CarzineCore
 {
@@ -20,6 +21,7 @@ namespace CarzineCore
 			{
 				Name = product.name,
 				PartNumber = product.code,
+				PartNumberType = ItemCodeType.PN,
 				Manufacturer = product.make,
 				Price = Math.Round(product.price),
 				MaxOrderAmount = product.available,
@@ -44,6 +46,7 @@ namespace CarzineCore
 				Manufacturer = product.MakeName,
 				Name = product.PartNameRus,
 				PartNumber = product.DetailNum,
+				PartNumberType = ItemCodeType.PN,
 				SourceId = ApiSource.Emex
 			});
 		}
@@ -61,53 +64,58 @@ namespace CarzineCore
 				Manufacturer = product.Brand,
 				Name = product.PartDescription,
 				PartNumber = product.PartNumber,
+				PartNumberType = ItemCodeType.PN,
 				SourceId = ApiSource.Apec,
 				IsOriginal = originalBrandName == product.Brand
 			});
 		}
 
-		public static PreOrderModel ToPreOrderModel(this PreOrderDto preOrder)
-		{
-			return new PreOrderModel
-			{
-				Id = preOrder.Id,
-				Date = preOrder.Date,
-				Phone = preOrder.Phone,
-				UserEmail = preOrder.User_email,
-				ClientStatus = preOrder.Client_status,
-				SupplyerStatus = preOrder.Supplyer_status,
-				Product = new StandardProductModel
-				{
-					SourceId = (ApiSource)preOrder.Source_Id,
-					PartNumber = preOrder.PN,
-					DeliveryCost = preOrder.Delivery_cost,
-					ExtraCharge = preOrder.Extra_charge,
-					Manufacturer = preOrder.Manufacturer,
-					PriceRub = preOrder.Price_Rub,
-					Price = preOrder.Supplyer_price,
-					Volume = preOrder.Volume,
-					Weight = preOrder.Weight,
-				}
-			};
-		}
+		//public static PreOrderModel ToPreOrderModel(this PreOrderDto preOrder)
+		//{
+		//	return new PreOrderModel
+		//	{
+		//		Id = preOrder.Id,
+		//		Date = preOrder.Date,
+		//		Phone = preOrder.Phone,
+		//		UserEmail = preOrder.User_email,
+		//		ClientStatus = preOrder.Client_status,
+		//		SupplyerStatus = preOrder.Supplyer_status,
+		//		Product = new StandardProductModel
+		//		{
+		//			SourceId = (ApiSource)preOrder.Source_Id,
+		//			PartNumber = preOrder.PN,
+		//			DeliveryCost = preOrder.Delivery_cost,
+		//			ExtraCharge = preOrder.Extra_charge,
+		//			Manufacturer = preOrder.Manufacturer,
+		//			PriceRub = preOrder.Price_Rub,
+		//			Price = preOrder.Supplyer_price,
+		//			Volume = preOrder.Volume,
+		//			Weight = preOrder.Weight,
+		//			DeliveryMin = preOrder.Delivery_Min ?? 0
+		//		},
+		//		PaymentOrderState = preOrder.Payment_Order_State
+		//	};
+		//}
 
-		public static PreOrderModel ToUserPreOrderModel(this PreOrderDto preOrder)
-		{
-			return new PreOrderModel
-			{
-				Id = preOrder.Id,
-				Date = preOrder.Date,
-				ClientStatus = preOrder.Client_status,
-				Product = new StandardProductModel
-				{
-					PartNumber = preOrder.PN,
-					Manufacturer = preOrder.Manufacturer,
-					PriceRub = preOrder.Price_Rub,
-					Volume = preOrder.Volume,
-					Weight = preOrder.Weight,
-				}
-			};
-		}
+		//public static PreOrderModel ToUserPreOrderModel(this PreOrderDto preOrder)
+		//{
+		//	return new PreOrderModel
+		//	{
+		//		Id = preOrder.Id,
+		//		Date = preOrder.Date,
+		//		ClientStatus = preOrder.Client_status,
+		//		Product = new StandardProductModel
+		//		{
+		//			PartNumber = preOrder.PN,
+		//			Manufacturer = preOrder.Manufacturer,
+		//			PriceRub = preOrder.Price_Rub,
+		//			Volume = preOrder.Volume,
+		//			Weight = preOrder.Weight,
+		//			DeliveryMin = preOrder.Delivery_Min ?? 0
+		//		},
+		//		PaymentOrderState = preOrder.Payment_Order_State
+		//	};
+		//}
 
 		public static IEnumerable<StandardProductModel> FillEmptyNames(this List<StandardProductModel> products)
 		{
@@ -122,6 +130,30 @@ namespace CarzineCore
 			}
 
 			return products;
+		}
+
+		public static int GetDeterministicHashCode(this StandardProductModel product)
+		{
+			return JsonConvert.SerializeObject(product).GetDeterministicHashCode();
+		}
+
+		public static int GetDeterministicHashCode(this string str)
+		{
+			unchecked
+			{
+				int hash1 = (5381 << 16) + 5381;
+				int hash2 = hash1;
+
+				for (int i = 0; i < str.Length; i += 2)
+				{
+					hash1 = ((hash1 << 5) + hash1) ^ str[i];
+					if (i == str.Length - 1)
+						break;
+					hash2 = ((hash2 << 5) + hash2) ^ str[i + 1];
+				}
+
+				return hash1 + (hash2 * 1566083941);
+			}
 		}
 	}
 

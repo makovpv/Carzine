@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { ProductModel } from '../models/ProductModel';
 import { RuleRangeModel } from '../models/RuleRangeModel';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,18 +14,23 @@ export class OrderService {
     { id: 3, name: 'Apec' }
   ];
 
-  constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
+  userTempUid = this.authService.getUserTempUid();
+
+  constructor(
+    private http: HttpClient,
+    @Inject('BASE_URL') private baseUrl: string,
+    private authService: AuthService) { }
 
   preOrder(data: ProductModel): Promise<any> {
     return this.http.post(this.baseUrl+'api/order/preorder', data).toPromise();
   }
 
-  getPreOrders(): Promise<any> {
-    return this.http.get(this.baseUrl+'api/order/preorder').toPromise();
+  getOrders(): Promise<any> {
+    return this.http.get(this.baseUrl+'api/order').toPromise();
   }
 
-  getUserPreOrders(): Promise<any> {
-    return this.http.get(this.baseUrl+'api/order/user-preorders').toPromise();
+  getUserOrders(): Promise<any> {
+    return this.http.get(this.baseUrl+'api/order/own').toPromise();
   }
 
   createOrder(preorderId: number): Promise<any> {
@@ -39,9 +45,9 @@ export class OrderService {
     return this.http.get(this.baseUrl+'api/order/status').toPromise();
   }
 
-  setPreorderStatus(orderId: number, statusId: number): Promise<any> {
+  setOrderStatus(orderId: number, statusId: number): Promise<any> {
     return this.http.post(
-      `${this.baseUrl}api/order/preorder/status/${orderId}`, statusId)
+      `${this.baseUrl}api/order/status/${orderId}`, statusId)
       .toPromise();
   }
 
@@ -55,5 +61,37 @@ export class OrderService {
 
   deleteRule(id: number): Promise<any> {
     return this.http.delete(`${this.baseUrl}api/order/rule/${id}`).toPromise();
+  }
+
+  addPnToCart(code: number): Promise<any> {
+    return this.http.post(
+      `${this.baseUrl}api/cart/add`,
+      {
+        uid: this.userTempUid,
+        code
+      }
+    ).toPromise();
+  }
+
+  removeFromCart(id: number): Promise<any> {
+    return this.http.post(
+      `${this.baseUrl}api/cart/remove`,
+      {
+        code: id,
+        uid: this.userTempUid
+      }
+    ).toPromise();
+  }
+
+  getUserCart(): Promise<any> {
+    return this.http.get(`${this.baseUrl}api/cart/${this.userTempUid}`).toPromise();
+  }
+
+  makeOrder(): Promise<any> {
+    return this.http.post(`${this.baseUrl}api/cart/order`, {}).toPromise();
+  }
+
+  mergeCart(): Promise<any> {
+    return this.http.post(`${this.baseUrl}api/cart/merge/${this.userTempUid}`, {}).toPromise();
   }
 }

@@ -6,13 +6,15 @@ namespace CarzineCore.Interfaces
 	{
 		public Task<int> AddPreOrderAsync(StandardProductModel product, string userName);
 
-		public Task<IEnumerable<PreOrderDto>> GetPreOrdersAsync();
+		public Task<IEnumerable<OrderDto>> GetOrdersAsync();
 
-		public Task<PreOrderDto> GetPreOrderAsync(int preOrderId);
+		public Task<OrderDto> GetOrderAsync(int preOrderId);
 
-		public Task<IEnumerable<PreOrderDto>> GetPreOrdersByUserAsync(string userEmail);
+		public Task<IEnumerable<OrderDto>> GetOrdersByUserAsync(string userEmail);
 
-		public Task SetPreorderClientStatus(int orderId, ClientStatus status);
+		public Task SetOrderClientStatus(int orderId, ClientStatus status);
+
+		public Task SetPaymentOrderIdAsync(int orderId, string paymentOrderId, string paymentStatus);
 
 		public Task<IEnumerable<StatusDto>> GetClientStatusesAsync();
 
@@ -22,6 +24,15 @@ namespace CarzineCore.Interfaces
 		public Task AddRuleRangeAsync(RuleRangeDto ruleRange);
 
 		public Task DeleteRuleRangeAsync(int id);
+	}
+
+	public interface IOrderRepository
+	{
+		public Task<IEnumerable<CartItemDto>> GetCartAsync(string userName);
+		public Task<int> AddToCartAsync(string userName, int hash, StandardProductModel product);
+		public Task RemoveFromCartAsync(int id, string userName);
+		public Task<int> MakeOrderFromCartAsync(string userName);
+		public Task<int> MergeUserCartAsync(string uid, string userName);
 	}
 
 	public interface IDbUserService

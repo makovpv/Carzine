@@ -163,21 +163,6 @@ namespace CarzineTest
 			throw new NotImplementedException();
 		}
 
-		public Task<PreOrderDto> GetPreOrderAsync(int preOrderId)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<IEnumerable<PreOrderDto>> GetPreOrdersAsync()
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<IEnumerable<PreOrderDto>> GetPreOrdersByUserAsync(string userEmail)
-		{
-			throw new NotImplementedException();
-		}
-
 		public Task<IEnumerable<RuleRangeDto>> GetRuleRangesAsync()
 		{
 			throw new NotImplementedException();
@@ -200,7 +185,27 @@ namespace CarzineTest
 			return await Task.FromResult(res.Where(x => x.Type == rangeType));
 		}
 
-		public Task SetPreorderClientStatus(int orderId, ClientStatus status)
+		public Task SetPaymentOrderIdAsync(int orderId, string paymentOrderId, string paymentStatus)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task SetOrderClientStatus(int orderId, ClientStatus status)
+		{
+			throw new NotImplementedException();
+		}
+
+		Task<IEnumerable<OrderDto>> IDbDataRepository.GetOrdersAsync()
+		{
+			throw new NotImplementedException();
+		}
+
+		Task<OrderDto> IDbDataRepository.GetOrderAsync(int preOrderId)
+		{
+			throw new NotImplementedException();
+		}
+
+		Task<IEnumerable<OrderDto>> IDbDataRepository.GetOrdersByUserAsync(string userEmail)
 		{
 			throw new NotImplementedException();
 		}

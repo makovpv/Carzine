@@ -33,6 +33,7 @@ import { AddTranslationComponent } from './components/dialogs/add-translation/ad
 import { AuthGuard } from './auth.guard';
 import { RulesComponent } from './components/rules/rules.component';
 import { RuleDataComponent } from './components/dialogs/rule-data/rule-data.component';
+import { CartComponent } from './components/cart/cart.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { RuleDataComponent } from './components/dialogs/rule-data/rule-data.comp
     TranslationComponent,
     AddTranslationComponent,
     RulesComponent,
-    RuleDataComponent
+    RuleDataComponent,
+    CartComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -68,6 +70,7 @@ import { RuleDataComponent } from './components/dialogs/rule-data/rule-data.comp
       { path: 'info', loadChildren: () => import('./info.module').then(m => m.InfoModule) },
       { path: 'translation', component: TranslationComponent, canActivate: [AuthGuard] },
       { path: 'rules', component: RulesComponent, canActivate: [AuthGuard] },
+      { path: 'cart', component: CartComponent },
       { path: '**', redirectTo: ''}
     ]),
     BrowserAnimationsModule,
